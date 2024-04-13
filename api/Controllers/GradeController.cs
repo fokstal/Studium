@@ -121,7 +121,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateAsync([FromBody] GradeDTO gradeDTO, [FromBody] GradeDTO gradeDTONew)
+        public async Task<IActionResult> UpdateAsync([FromBody] GradeDTO gradeDTO)
         {
             using (AppDbContext db = new())
             {
@@ -134,20 +134,16 @@ namespace api.Controllers
 
                 if (gradeToUpdate is null) return NotFound("Grade is null");
 
-                Student? student = await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == gradeDTONew.StudentId);
+                Student? student = await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == gradeDTO.StudentId);
 
                 if (student is null) return NotFound("Student is null!");
 
-                Subject? subject = await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == gradeDTONew.SubjectId);
+                Subject? subject = await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == gradeDTO.SubjectId);
 
                 if (subject is null) return NotFound("Subject is null!");
 
-                gradeToUpdate.Value = gradeDTONew.Value;
+                gradeToUpdate.Value = gradeDTO.Value;
                 gradeToUpdate.SetDate = DateTime.Now;
-                gradeToUpdate.StudentId = student.Id;
-                gradeToUpdate.Student = student;
-                gradeToUpdate.SubjectId = subject.Id;
-                gradeToUpdate.Subject = subject;
 
                 await db.SaveChangesAsync();
 
