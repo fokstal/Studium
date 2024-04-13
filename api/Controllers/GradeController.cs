@@ -47,7 +47,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpGet("by-student/{id:int}")]
+        [HttpGet("list-by-student/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -66,7 +66,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpGet("by-subject/{id:int}")]
+        [HttpGet("list-by-subject/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
