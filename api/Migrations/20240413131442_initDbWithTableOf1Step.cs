@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace api.Migrations
 {
     /// <inheritdoc />
-    public partial class initCreateDbWithTableOn1Step : Migration
+    public partial class initDbWithTableOf1Step : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,10 +17,10 @@ namespace api.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
-                    Description = table.Column<string>(type: "TEXT", maxLength: 70, nullable: false),
-                    Curator = table.Column<string>(type: "TEXT", maxLength: 80, nullable: false),
-                    AuditoryName = table.Column<string>(type: "TEXT", maxLength: 5, nullable: false)
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Curator = table.Column<string>(type: "TEXT", nullable: false),
+                    AuditoryName = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -45,9 +45,9 @@ namespace api.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 65, nullable: false),
-                    Descripton = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
-                    TeacherName = table.Column<string>(type: "TEXT", maxLength: 60, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Descripton = table.Column<string>(type: "TEXT", nullable: false),
+                    TeacherName = table.Column<string>(type: "TEXT", nullable: false),
                     GroupId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
@@ -66,9 +66,9 @@ namespace api.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    FirstName = table.Column<string>(type: "TEXT", maxLength: 15, nullable: false),
-                    MiddleName = table.Column<string>(type: "TEXT", maxLength: 25, nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
+                    MiddleName = table.Column<string>(type: "TEXT", nullable: false),
+                    LastName = table.Column<string>(type: "TEXT", nullable: false),
                     BirthDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     PassportId = table.Column<int>(type: "INTEGER", nullable: false)
                 },

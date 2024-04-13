@@ -11,8 +11,8 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240412123623_initCreateDbWithTableOn1Step")]
-    partial class initCreateDbWithTableOn1Step
+    [Migration("20240413131442_initDbWithTableOf1Step")]
+    partial class initDbWithTableOf1Step
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,22 +52,18 @@ namespace api.Migrations
 
                     b.Property<string>("AuditoryName")
                         .IsRequired()
-                        .HasMaxLength(5)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Curator")
                         .IsRequired()
-                        .HasMaxLength(80)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(70)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -97,17 +93,14 @@ namespace api.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(15)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("MiddleName")
                         .IsRequired()
-                        .HasMaxLength(25)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("PassportId")
@@ -149,7 +142,6 @@ namespace api.Migrations
 
                     b.Property<string>("Descripton")
                         .IsRequired()
-                        .HasMaxLength(150)
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("GroupId")
@@ -157,12 +149,10 @@ namespace api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(65)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TeacherName")
                         .IsRequired()
-                        .HasMaxLength(60)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
