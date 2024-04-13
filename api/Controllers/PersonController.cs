@@ -13,7 +13,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetPersonListAsync()
+        public async Task<ActionResult> GetListAsync()
         {
             using (AppDbContext db = new())
             {
@@ -28,7 +28,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetPersonAsync(int id)
+        public async Task<ActionResult> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -47,7 +47,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> CreatePersonAsync([FromBody] PersonDTO personDTO)
+        public async Task<ActionResult> CreateAsync([FromBody] PersonDTO personDTO)
         {
             using (AppDbContext db = new())
             {
@@ -80,7 +80,7 @@ namespace api.Controllers
 
                 await db.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetPersonAsync), new { id = personDTO.Id }, personDTO);
+                return CreatedAtAction(nameof(GetAsync), new { id = personDTO.Id }, personDTO);
             }
         }
 
@@ -89,7 +89,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdatePersonAsync(int id, [FromBody] PersonDTO personDTO)
+        public async Task<ActionResult> UpdateAsync(int id, [FromBody] PersonDTO personDTO)
         {
             if (id < 1) return BadRequest();
 
@@ -134,7 +134,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeletePersonAsync(int id)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 

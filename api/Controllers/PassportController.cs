@@ -13,7 +13,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetPassportListAsync()
+        public async Task<ActionResult> GetListAsync()
         {
             using (AppDbContext db = new())
             {
@@ -28,7 +28,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetPassportAsync(int id)
+        public async Task<ActionResult> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -45,7 +45,7 @@ namespace api.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> CreatePassportAsync([FromBody] PassportDTO passportDTO)
+        public async Task<ActionResult> CreateAsync([FromBody] PassportDTO passportDTO)
         {
             using (AppDbContext db = new())
             {
@@ -56,7 +56,7 @@ namespace api.Controllers
 
                 await db.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetPassportAsync), new { id = passportDTO.Id }, passportDTO);
+                return CreatedAtAction(nameof(GetAsync), new { id = passportDTO.Id }, passportDTO);
             }
         }
 
@@ -65,7 +65,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdatePassportAsync(int id, [FromBody] PassportDTO passportDTO)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] PassportDTO passportDTO)
         {
             if (id < 1) return BadRequest();
 
@@ -88,7 +88,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeletePassportAsync(int id)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 

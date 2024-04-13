@@ -13,7 +13,7 @@ namespace api.Controllers
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetGradeListAsync()
+        public async Task<ActionResult> GetListAsync()
         {
             using (AppDbContext db = new())
             {
@@ -29,7 +29,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetGradeAsync([FromBody] GradeDTO gradeDTO)
+        public async Task<ActionResult> GetAsync([FromBody] GradeDTO gradeDTO)
         {
             if (gradeDTO.StudentId < 1 || gradeDTO.SubjectId < 1) return BadRequest();
 
@@ -52,7 +52,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetGradeListByStudentIdAsync(int id)
+        public async Task<ActionResult> GetByStudentIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -71,7 +71,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetGradeListBySubjectIdAsync(int id)
+        public async Task<ActionResult> GetBySubjectIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -89,7 +89,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> AddGrade([FromBody] GradeDTO gradeDTO)
+        public async Task<ActionResult> AddAsync([FromBody] GradeDTO gradeDTO)
         {
             using (AppDbContext db = new())
             {
@@ -113,7 +113,7 @@ namespace api.Controllers
 
                 await db.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetGradeAsync), gradeDTO);
+                return CreatedAtAction(nameof(GetAsync), gradeDTO);
             }
         }
 
@@ -121,7 +121,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateGrade([FromBody] GradeDTO gradeDTO, [FromBody] GradeDTO gradeDTONew)
+        public async Task<IActionResult> UpdateAsync([FromBody] GradeDTO gradeDTO, [FromBody] GradeDTO gradeDTONew)
         {
             using (AppDbContext db = new())
             {
@@ -160,7 +160,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteGradeAsync([FromBody] GradeDTO gradeDTO)
+        public async Task<ActionResult> DeleteAsync([FromBody] GradeDTO gradeDTO)
         {
             if (gradeDTO.StudentId < 1 || gradeDTO.SubjectId < 1) return BadRequest();
 
