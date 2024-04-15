@@ -105,9 +105,7 @@ namespace api.Controllers
                 {
                     Value = gradeDTO.Value,
                     StudentId = gradeDTO.StudentId,
-                    Student = student,
                     SubjectId = gradeDTO.SubjectId,
-                    Subject = subject,
                     SetDate = DateTime.Now,
                 });
 

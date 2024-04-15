@@ -14,7 +14,5 @@ namespace api.Model.DTO
 
         [MaxLength(60)]
         public string TeacherName { get; set; } = "~преподаватель~";
-
-        public Grade[] GradeList { get; set; } = [];
     }
 }
