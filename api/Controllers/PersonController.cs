@@ -23,7 +23,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name = "GetPersonAsync")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -74,8 +74,7 @@ namespace api.Controllers
 
                 await db.SaveChangesAsync();
 
-                //Change to CreatedAtRoute/Action and another...
-                return Created();
+                return Created("Person", personDTO);
             }
         }
 

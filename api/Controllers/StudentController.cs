@@ -76,7 +76,7 @@ namespace api.Controllers
 
                 await db.SaveChangesAsync();
 
-                return Created();
+                return Created("Student", studentDTO);
             }
         }
 

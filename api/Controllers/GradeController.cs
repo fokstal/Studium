@@ -113,8 +113,7 @@ namespace api.Controllers
 
                 await db.SaveChangesAsync();
 
-                //Change to CreatedAtRoute/Action and another...
-                return Created();
+                return Created("Grade", gradeDTO);
             }
         }
 

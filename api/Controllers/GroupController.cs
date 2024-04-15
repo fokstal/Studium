@@ -67,7 +67,7 @@ namespace api.Controllers
 
                 await db.SaveChangesAsync();
 
-                return Created();
+                return Created("Group", groupDTO);
             }
         }
 
