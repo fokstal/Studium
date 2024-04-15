@@ -8,7 +8,7 @@ namespace api.Model
         public string Curator { get; set; } = null!;
         public string AuditoryName { get; set; } = null!;
 
-        public Student[] StudentList { get; set; } = [];
-        public Subject[] SubjectList { get; set; } = [];
+        public List<Student> StudentList { get; set; } = [];
+        public List<Subject> SubjectList { get; set; } = [];
     }
 }

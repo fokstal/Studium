@@ -68,9 +68,7 @@ namespace api.Controllers
 
                 await db.Student.AddAsync(new()
                 {
-                    Person = person,
                     PersonId = person.Id,
-                    Group = group,
                     GroupId = group.Id
                 });
 
@@ -110,9 +108,7 @@ namespace api.Controllers
 
                 if (group is null) return NotFound("Group is null!");
 
-                studentToUpdate.Person = person;
                 studentToUpdate.PersonId = person.Id;
-                studentToUpdate.Group = group;
                 studentToUpdate.GroupId = group.Id;
 
                 await db.SaveChangesAsync();
