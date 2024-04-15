@@ -1,7 +1,6 @@
 import { Flex } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
-import { Heading1 } from "../ui-kit/typoghraphy/typoghraphy";
-import { Select, Avatar } from "../ui-kit";
+import { Select, Avatar, Heading1 } from "../ui-kit";
 import { languages } from "../ui-kit/variables";
 import { AiOutlineEye } from "react-icons/ai";
 
