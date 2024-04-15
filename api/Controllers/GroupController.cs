@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
-    [Microsoft.AspNetCore.Components.Route("group")]
+    [Route("group")]
     [ApiController]
     public class GroupController : ControllerBase
     {
