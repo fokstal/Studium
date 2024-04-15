@@ -10,7 +10,7 @@ namespace api.Model
         public string LastName { get; set; } = null!;
         public DateTime BirthDate { get; set; } = new();
 
-        public int PassportId { get; set; }
+        public int? PassportId { get; set; }
         [ForeignKey(nameof(PassportId))]
         public Passport? Passport { get; set; }
     }

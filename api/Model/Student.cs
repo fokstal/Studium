@@ -10,8 +10,8 @@ namespace api.Model
         [ForeignKey(nameof(PersonId))]
         public Person Person { get; set; } = null!;
 
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
         [ForeignKey(nameof(GroupId))]
-        public Group Group { get; set; } = null!;
+        public Group? Group { get; set; } = null!;
     }
 }
