@@ -15,7 +15,5 @@ namespace api.Model.DTO
         [Length(3, 20)]
         public string LastName { get; set; } = "~фамилия~";
         public DateTime BirthDate { get; set; } = new();
-
-        public int PassportId { get; set; }
     }
 }

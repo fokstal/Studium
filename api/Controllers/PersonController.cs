@@ -23,7 +23,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int}", Name = "GetPersonAsync")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -34,7 +34,7 @@ namespace api.Controllers
 
             using (AppDbContext db = new())
             {
-                Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == id);
+                Person? person = await db.Person.Include(personDb => personDb.Passport).FirstOrDefaultAsync(personDb => personDb.Id == id);
 
                 if (person is null) return NotFound();
 
@@ -64,18 +64,12 @@ namespace api.Controllers
                     return BadRequest(ModelState);
                 }
 
-                Passport? passport = await db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == personDTO.PassportId);
-
-                if (passport is null) return NotFound("Passport is null!");
-
                 await db.Person.AddAsync(new()
                 {
                     FirstName = personDTO.FirstName,
                     MiddleName = personDTO.MiddleName,
                     LastName = personDTO.LastName,
                     BirthDate = personDTO.BirthDate,
-                    PassportId = passport.Id,
-                    Passport = passport,
                 });
 
                 await db.SaveChangesAsync();
@@ -113,16 +107,10 @@ namespace api.Controllers
                     return BadRequest(ModelState);
                 }
 
-                Passport? passport = await db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == personDTO.PassportId);
-
-                if (passport is null) return NotFound("Passport is null!");
-
                 personToUpdate.FirstName = personDTO.FirstName;
                 personToUpdate.MiddleName = personDTO.MiddleName;
                 personToUpdate.LastName = personDTO.LastName;
                 personToUpdate.BirthDate = personDTO.BirthDate;
-                personToUpdate.PassportId = passport.Id;
-                personToUpdate.Passport = passport;
 
                 await db.SaveChangesAsync();
 

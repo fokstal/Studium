@@ -44,14 +44,20 @@ namespace api.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CreateAsync([FromBody] PassportDTO passportDTO)
         {
             using (AppDbContext db = new())
             {
+                Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == passportDTO.PersonId);
+
+                if (person is null) return NotFound("Person is null!");
+
                 await db.Passport.AddAsync(new()
                 {
                     Photo = passportDTO.Photo,
+                    PersonId = person.Id,
                 });
 
                 await db.SaveChangesAsync();
@@ -76,7 +82,12 @@ namespace api.Controllers
 
                 if (passportToUpdate is null) return NotFound();
 
+                Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == passportDTO.PersonId);
+
+                if (person is null) return NotFound("Person is null!");
+
                 passportToUpdate.Photo = passportDTO.Photo;
+                passportToUpdate.PersonId = person.Id;
 
                 await db.SaveChangesAsync();
 
