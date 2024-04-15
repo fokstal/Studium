@@ -56,7 +56,8 @@ namespace api.Controllers
 
                 await db.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetAsync), new { id = passportDTO.Id }, passportDTO);
+                //Change to CreatedAtRoute/Action and another...
+                return Created();
             }
         }
 
