@@ -17,8 +17,5 @@ namespace api.Model.DTO
 
         [MaxLength(5)]
         public string AuditoryName { get; set; } = "~№0~";
-
-        public Student[] StudentList { get; set; } = [];
-        public Subject[] SubjectList { get; set; } = [];
     }
 }
