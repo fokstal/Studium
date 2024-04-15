@@ -17,7 +17,7 @@ namespace api.Controllers
         {
             using (AppDbContext db = new())
             {
-                IEnumerable<Subject> subjectList = await db.Subject.ToArrayAsync();
+                IEnumerable<Subject> subjectList = await db.Subject.Include(subjectDb => subjectDb.GradeList).ToArrayAsync();
 
                 return Ok(subjectList);
             }
@@ -34,7 +34,7 @@ namespace api.Controllers
 
             using (AppDbContext db = new())
             {
-                Subject? subject = await db.Subject.FirstOrDefaultAsync();
+                Subject? subject = await db.Subject.Include(subjectDb => subjectDb.GradeList).FirstOrDefaultAsync();
 
                 if (subject is null) return NotFound();
 
