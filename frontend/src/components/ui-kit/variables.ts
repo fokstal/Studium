@@ -9,3 +9,9 @@ export const colors = {
   red: "#FF4343",
   darkRed: "#E72727"
 }
+
+export const languages = [
+  {name: "RU"},
+  {name: "BE"},
+  {name: "EN"},
+]
