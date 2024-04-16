@@ -24,29 +24,6 @@ namespace api.Controllers
             }
         }
 
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetAsync([FromBody] GradeDTO gradeDTO)
-        {
-            if (gradeDTO.StudentId < 1 || gradeDTO.SubjectId < 1) return BadRequest();
-
-            using (AppDbContext db = new())
-            {
-                Grade? grade = await db.Grade.FirstOrDefaultAsync
-                    (gradeDb =>
-                        gradeDb.StudentId == gradeDTO.StudentId &&
-                        gradeDb.SubjectId == gradeDTO.SubjectId
-                    );
-
-                if (grade is null) return NotFound();
-
-                return Ok(grade);
-            }
-        }
-
         [HttpGet("list-by-student/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -60,7 +37,7 @@ namespace api.Controllers
             {
                 if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id) is null) return NotFound();
 
-                IEnumerable<Grade> gradeListByStudentId = db.Grade.Where(gradeDb => gradeDb.StudentId == id);
+                IEnumerable<Grade> gradeListByStudentId = await db.Grade.Where(gradeDb => gradeDb.StudentId == id).ToArrayAsync();
 
                 return Ok(gradeListByStudentId);
             }
@@ -79,7 +56,27 @@ namespace api.Controllers
             {
                 if (await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == id) is null) return NotFound();
 
-                IEnumerable<Grade> gradeListBySubjectId = db.Grade.Where(gradeDb => gradeDb.SubjectId == id);
+                IEnumerable<Grade> gradeListBySubjectId = await db.Grade.Where(gradeDb => gradeDb.SubjectId == id).ToArrayAsync();
+
+                return Ok(gradeListBySubjectId);
+            }
+        }
+
+        [HttpGet("list-by-student/{studentId:int}/by-subject/{subjectId:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetByStudentAndSubjectIdAsync(int studentId, int subjectId)
+        {
+            if (studentId < 1 || subjectId < 1) return BadRequest();
+
+            using (AppDbContext db = new())
+            {
+                if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == studentId) is null) return NotFound("Student is null!");
+                if (await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == subjectId) is null) return NotFound("Subject is null!");
+
+                IEnumerable<Grade> gradeListBySubjectId = await db.Grade.Where(gradeDb => gradeDb.StudentId == studentId && gradeDb.SubjectId == subjectId).ToArrayAsync();
 
                 return Ok(gradeListBySubjectId);
             }
