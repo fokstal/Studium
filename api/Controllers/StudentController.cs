@@ -62,14 +62,21 @@ namespace api.Controllers
 
                 if (person is null) return NotFound("Person is null!");
 
-                Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == studentDTO.GroupId);
+                int? groupId = null;
 
-                if (group is null) return NotFound("Group is null!");
+                if (studentDTO.GroupId is not null)
+                {
+                    Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == studentDTO.GroupId);
+
+                    if (group is null) return NotFound("Group is null!");
+
+                    groupId = group.Id;
+                }
 
                 await db.Student.AddAsync(new()
                 {
                     PersonId = person.Id,
-                    GroupId = group.Id,
+                    GroupId = groupId,
                 });
 
                 await db.SaveChangesAsync();
@@ -104,19 +111,26 @@ namespace api.Controllers
 
                 if (person is null) return NotFound("Person is null!");
 
-                Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == studentDTO.GroupId);
+                int? groupId = null;
 
-                if (group is null) return NotFound("Group is null!");
+                if (studentDTO.GroupId is not null)
+                {
+                    Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == studentDTO.GroupId);
+
+                    if (group is null) return NotFound("Group is null!");
+
+                    groupId = group.Id;
+                }
 
                 studentToUpdate.PersonId = person.Id;
-                studentToUpdate.GroupId = group.Id;
+                studentToUpdate.GroupId = groupId;
 
                 await db.SaveChangesAsync();
 
                 return NoContent();
             }
         }
-    
+
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -14,6 +14,6 @@ namespace api.Model.DTO
 
         [MaxLength(60)]
         public string TeacherName { get; set; } = "~преподаватель~";
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
     }
 }

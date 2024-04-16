@@ -7,7 +7,7 @@ namespace api.Model
         public string Descripton { get; set; } = null!;
         public string TeacherName { get; set; } = null!;
 
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
         public List<Grade> GradeList { get; set; } = [];
     }
 }

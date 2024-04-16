@@ -62,16 +62,23 @@ namespace api.Controllers
                     return BadRequest(ModelState);
                 }
 
-                Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == subjectDTO.GroupId);
+                int? groupId = null;
 
-                if (group is null) return NotFound("Group is null");
+                if (subjectDTO.GroupId is not null)
+                {
+                    Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == subjectDTO.GroupId);
+
+                    if (group is null) return NotFound("Group is null!");
+
+                    groupId = group.Id;
+                }
 
                 await db.Subject.AddAsync(new()
                 {
                     Name = subjectDTO.Name,
                     Descripton = subjectDTO.Descripton,
                     TeacherName = subjectDTO.TeacherName,
-                    GroupId = subjectDTO.GroupId,
+                    GroupId = groupId,
                 });
 
                 await db.SaveChangesAsync();
@@ -107,14 +114,21 @@ namespace api.Controllers
 
                 if (subjectToUpdate is null) return NotFound();
 
-                Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == subjectDTO.GroupId);
+                int? groupId = null;
 
-                if (group is null) return NotFound("Group is null");
+                if (subjectDTO.GroupId is not null)
+                {
+                    Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == subjectDTO.GroupId);
+
+                    if (group is null) return NotFound("Group is null!");
+
+                    groupId = group.Id;
+                }
 
                 subjectToUpdate.Name = subjectDTO.Name;
                 subjectToUpdate.Descripton = subjectDTO.Descripton;
                 subjectToUpdate.TeacherName = subjectDTO.TeacherName;
-                subjectToUpdate.GroupId = subjectDTO.GroupId;
+                subjectToUpdate.GroupId = groupId;
 
                 await db.SaveChangesAsync();
 

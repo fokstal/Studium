@@ -5,6 +5,6 @@ namespace api.Model
         public int Id { get; set; }
 
         public int PersonId { get; set; }
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
     }
 }
