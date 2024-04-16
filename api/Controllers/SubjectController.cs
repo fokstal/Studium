@@ -62,11 +62,16 @@ namespace api.Controllers
                     return BadRequest(ModelState);
                 }
 
+                Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Name == subjectDTO.GroupName);
+
+                if (group is null) return NotFound("Group is null");
+
                 await db.Subject.AddAsync(new()
                 {
                     Name = subjectDTO.Name,
                     Descripton = subjectDTO.Descripton,
                     TeacherName = subjectDTO.TeacherName,
+                    GroupName = subjectDTO.GroupName,
                 });
 
                 await db.SaveChangesAsync();
@@ -102,9 +107,14 @@ namespace api.Controllers
 
                 if (subjectToUpdate is null) return NotFound();
 
+                Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Name == subjectDTO.GroupName);
+
+                if (group is null) return NotFound("Group is null");
+
                 subjectToUpdate.Name = subjectDTO.Name;
                 subjectToUpdate.Descripton = subjectDTO.Descripton;
                 subjectToUpdate.TeacherName = subjectDTO.TeacherName;
+                subjectToUpdate.GroupName = subjectDTO.GroupName;
 
                 await db.SaveChangesAsync();
 
