@@ -13,7 +13,7 @@ namespace api.Controllers
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetListAsync()
+        public async Task<ActionResult<IEnumerable<Grade>>> GetListAsync()
         {
             using (AppDbContext db = new())
             {
@@ -29,7 +29,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetByStudentIdAsync(int id)
+        public async Task<ActionResult<IEnumerable<Grade>>> GetByStudentIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -48,7 +48,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetBySubjectIdAsync(int id)
+        public async Task<ActionResult<IEnumerable<Grade>>> GetBySubjectIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -67,7 +67,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetByStudentAndSubjectIdAsync(int studentId, int subjectId)
+        public async Task<ActionResult<Grade>> GetByStudentAndSubjectIdAsync(int studentId, int subjectId)
         {
             if (studentId < 1 || subjectId < 1) return BadRequest();
 
@@ -88,7 +88,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> AddAsync([FromBody] GradeDTO gradeDTO)
+        public async Task<ActionResult<Grade>> AddAsync([FromBody] GradeDTO gradeDTO)
         {
             using (AppDbContext db = new())
             {

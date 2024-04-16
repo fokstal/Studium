@@ -13,7 +13,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetListAsync()
+        public async Task<ActionResult<IEnumerable<Passport>>> GetListAsync()
         {
             using (AppDbContext db = new())
             {
@@ -28,7 +28,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetAsync(int id)
+        public async Task<ActionResult<Passport>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -46,7 +46,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> CreateAsync([FromBody] PassportDTO passportDTO)
+        public async Task<ActionResult<Passport>> CreateAsync([FromBody] PassportDTO passportDTO)
         {
             using (AppDbContext db = new())
             {
