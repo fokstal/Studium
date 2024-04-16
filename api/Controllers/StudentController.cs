@@ -51,25 +51,25 @@ namespace api.Controllers
         {
             using (AppDbContext db = new())
             {
-                if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.PersonId == studentDTO.PersonId && studentDb.GroupId == studentDTO.GroupId) is not null)
+                if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.PersonLastName == studentDTO.PersonLastName && studentDb.GroupName == studentDTO.GroupName) is not null)
                 {
                     ModelState.AddModelError("Custom Error", "Student already Exists!");
 
                     return BadRequest(ModelState);
                 }
 
-                Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == studentDTO.PersonId);
+                Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.LastName == studentDTO.PersonLastName);
 
                 if (person is null) return NotFound("Person is null!");
 
-                Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == studentDTO.GroupId);
+                Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Name == studentDTO.GroupName);
 
                 if (group is null) return NotFound("Group is null!");
 
                 await db.Student.AddAsync(new()
                 {
-                    PersonId = person.Id,
-                    GroupId = group.Id
+                    PersonLastName = person.LastName,
+                    GroupName = group.Name
                 });
 
                 await db.SaveChangesAsync();
@@ -89,7 +89,7 @@ namespace api.Controllers
 
             using (AppDbContext db = new())
             {
-                if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.PersonId == studentDTO.PersonId && studentDb.GroupId == studentDTO.GroupId) is not null)
+                if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.PersonLastName == studentDTO.PersonLastName && studentDb.GroupName == studentDTO.GroupName) is not null)
                 {
                     ModelState.AddModelError("Custom Error", "Student already Exists!");
 
@@ -100,16 +100,16 @@ namespace api.Controllers
 
                 if (studentToUpdate is null) return NotFound();
 
-                Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == studentDTO.PersonId);
+                Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.LastName == studentDTO.PersonLastName);
 
                 if (person is null) return NotFound("Person is null!");
 
-                Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == studentDTO.GroupId);
+                Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Name == studentDTO.GroupName);
 
                 if (group is null) return NotFound("Group is null!");
 
-                studentToUpdate.PersonId = person.Id;
-                studentToUpdate.GroupId = group.Id;
+                studentToUpdate.PersonLastName = person.LastName;
+                studentToUpdate.GroupName = group.Name;
 
                 await db.SaveChangesAsync();
 
