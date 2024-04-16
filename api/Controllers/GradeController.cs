@@ -37,7 +37,7 @@ namespace api.Controllers
             {
                 if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id) is null) return NotFound();
 
-                IEnumerable<Grade> gradeListByStudentId = await db.Grade.Where(gradeDb => gradeDb.StudentId == id).ToArrayAsync();
+                IEnumerable<Grade> gradeListByStudentId = db.Grade.Where(gradeDb => gradeDb.StudentId == id);
 
                 return Ok(gradeListByStudentId);
             }
@@ -56,7 +56,7 @@ namespace api.Controllers
             {
                 if (await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == id) is null) return NotFound();
 
-                IEnumerable<Grade> gradeListBySubjectId = await db.Grade.Where(gradeDb => gradeDb.SubjectId == id).ToArrayAsync();
+                IEnumerable<Grade> gradeListBySubjectId = db.Grade.Where(gradeDb => gradeDb.SubjectId == id);
 
                 return Ok(gradeListBySubjectId);
             }
@@ -76,9 +76,11 @@ namespace api.Controllers
                 if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == studentId) is null) return NotFound("Student is null!");
                 if (await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == subjectId) is null) return NotFound("Subject is null!");
 
-                IEnumerable<Grade> gradeListBySubjectId = await db.Grade.Where(gradeDb => gradeDb.StudentId == studentId && gradeDb.SubjectId == subjectId).ToArrayAsync();
+                Grade? grade = await db.Grade.FirstOrDefaultAsync(gradeDb => gradeDb.StudentId == studentId && gradeDb.SubjectId == subjectId);
 
-                return Ok(gradeListBySubjectId);
+                if (grade is null) return NotFound();
+
+                return Ok(grade);
             }
         }
 
