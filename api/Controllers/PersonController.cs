@@ -17,7 +17,7 @@ namespace api.Controllers
         {
             using (AppDbContext db = new())
             {
-                IEnumerable<Person> personList = await db.Person.Include(personDb => personDb.Passport).ToArrayAsync();
+                IEnumerable<Person> personList = await db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).ToArrayAsync();
 
                 return Ok(personList);
             }
@@ -34,7 +34,7 @@ namespace api.Controllers
 
             using (AppDbContext db = new())
             {
-                Person? person = await db.Person.Include(personDb => personDb.Passport).FirstOrDefaultAsync(personDb => personDb.Id == id);
+                Person? person = await db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).FirstOrDefaultAsync(personDb => personDb.Id == id);
 
                 if (person is null) return NotFound();
 

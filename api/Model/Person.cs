@@ -7,6 +7,8 @@ namespace api.Model
         public string MiddleName { get; set; } = null!;
         public string LastName { get; set; } = null!;
         public DateTime BirthDate { get; set; } = new();
+
         public Passport? Passport { get; set; }
+        public Student? Student { get; set; }
     }
 }
