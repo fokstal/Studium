@@ -130,7 +130,7 @@ namespace api.Controllers
 
             using (AppDbContext db = new())
             {
-                Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == id);
+                Person? person = await db.Person.Include(personDb => personDb.Passport).FirstOrDefaultAsync(personDb => personDb.Id == id);
 
                 if (person is null) return NotFound();
 
