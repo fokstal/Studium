@@ -5,17 +5,21 @@ namespace api.Model.DTO
     public class GroupDTO
     {
         public int Id { get; set; }
-
+        
+        [Required]
         [MaxLength(10)]
-        public string Name { get; set; } = "~группа~";
+        public string Name { get; set; } = null!;
 
+        [Required]
         [MaxLength(70)]
-        public string Description { get; set; } = "~описание~";
+        public string Description { get; set; } = null!;
 
+        [Required]
         [MaxLength(80)]
-        public string Curator { get; set; } = "~куратор~";
+        public string Curator { get; set; } = null!;
 
+        [Required]
         [MaxLength(5)]
-        public string AuditoryName { get; set; } = "~№0~";
+        public string AuditoryName { get; set; } = null!;
     }
 }
