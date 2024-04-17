@@ -45,11 +45,12 @@ namespace api.Controllers
         }
 
         [HttpPost]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Person>> CreateAsync([FromBody] PersonDTO personDTO)
+        public async Task<ActionResult<Person>> CreateAsync([FromForm] PersonDTO personDTO)
         {
             using (AppDbContext db = new())
             {
@@ -72,6 +73,8 @@ namespace api.Controllers
                     MiddleName = personDTO.MiddleName,
                     LastName = personDTO.LastName,
                     BirthDate = personDTO.BirthDate,
+                    Sex = personDTO.Sex,
+                    AvatarFileName = await UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
                 });
 
                 await db.SaveChangesAsync();
@@ -81,11 +84,12 @@ namespace api.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateAsync(int id, [FromBody] PersonDTO personDTO)
+        public async Task<ActionResult> UpdateAsync(int id, [FromForm] PersonDTO personDTO)
         {
             if (id < 1) return BadRequest();
 
@@ -108,10 +112,14 @@ namespace api.Controllers
                     return BadRequest(ModelState);
                 }
 
+                System.IO.File.Delete($"{picturesFolderPath}/Person/{personToUpdate.AvatarFileName}");
+
                 personToUpdate.FirstName = personDTO.FirstName;
                 personToUpdate.MiddleName = personDTO.MiddleName;
                 personToUpdate.LastName = personDTO.LastName;
                 personToUpdate.BirthDate = personDTO.BirthDate;
+                personToUpdate.Sex = personDTO.Sex;
+                personToUpdate.AvatarFileName = await UploadPersonAvatarAsync(personDTO.Avatar, personToUpdate.Sex);
 
                 await db.SaveChangesAsync();
 
@@ -138,6 +146,8 @@ namespace api.Controllers
                 {
                     System.IO.File.Delete($"{picturesFolderPath}/Passport/{person.Passport.ScanFileName}");
                 }
+
+                System.IO.File.Delete($"{picturesFolderPath}/Person/{person.AvatarFileName}");
 
                 db.Person.Remove(person);
 

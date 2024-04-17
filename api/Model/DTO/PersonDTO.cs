@@ -15,5 +15,10 @@ namespace api.Model.DTO
         [Length(3, 20)]
         public string LastName { get; set; } = "~фамилия~";
         public DateTime BirthDate { get; set; } = new();
+
+        [Range(0, 1)]
+        public int Sex { get; set; }
+
+        public IFormFile? Avatar { get; set; }
     }
 }
