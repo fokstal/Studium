@@ -4,6 +4,8 @@ using api.Model.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using static api.Service.PictureService;
+
 namespace api.Controllers
 {
     [Route("person")]
@@ -131,6 +133,11 @@ namespace api.Controllers
                 Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == id);
 
                 if (person is null) return NotFound();
+
+                if (person.Passport is not null)
+                {
+                    System.IO.File.Delete($"{picturesFolderPath}/Passport/{person.Passport.ScanFileName}");
+                }
 
                 db.Person.Remove(person);
 
