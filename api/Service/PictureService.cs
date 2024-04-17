@@ -21,6 +21,49 @@ namespace api.Service
             return passportScanFileName;
         }
 
+        public static async Task<string> UploadPersonAvatarAsync(IFormFile? personAvatar, int personSex = 0)
+        {
+            if (personAvatar is null)
+            {
+                string sex;
+                Random random = new();
+
+                switch (personSex)
+                {
+                    case 0:
+                        {
+                            sex = "Woman";
+                            break;
+                        }
+                    case 1:
+                        {
+                            sex = "Man";
+                            break;
+                        }
+                    default:
+                        {
+                            throw new Exception("Sex is incorrect!");
+                        }
+                }
+
+                string defaultAvatarName = sex + "-" + random.Next(1, 9) + ".png";
+
+                personAvatar = GetPictureByFolderAndFileName("Person/" + "Default/", defaultAvatarName);
+            }
+
+            string pictureGuidName = Guid.NewGuid().ToString();
+            string pictureExtension = Path.GetExtension(personAvatar.FileName);
+
+            using (FileStream fileStream = new(Path.Combine(picturesFolderPath + "Person/", pictureGuidName + pictureExtension), FileMode.Create))
+            {
+                await personAvatar.CopyToAsync(fileStream);
+            }
+
+            string passportScanFileName = pictureGuidName + pictureExtension;
+
+            return passportScanFileName;
+        }
+
         public static IFormFile GetPictureByFolderAndFileName(string folder, string fileName)
         {
             string pathToFileName = Path.Combine(picturesFolderPath + folder, fileName);
