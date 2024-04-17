@@ -1,4 +1,4 @@
-import { PageLayout } from "../../pages/PageLayout";
+import { PageLayout } from "../../layouts/page-layout/PageLayout";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./default.css";
 
