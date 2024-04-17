@@ -4,6 +4,8 @@ using api.Model.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using static api.Service.PictureService;
+
 namespace api.Controllers
 {
     [Route("passport")]
@@ -43,11 +45,14 @@ namespace api.Controllers
         }
 
         [HttpPost]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Passport>> CreateAsync([FromBody] PassportDTO passportDTO)
+        public async Task<ActionResult<Passport>> CreateAsync([FromForm] PassportDTO passportDTO)
         {
+            if (passportDTO.Scan is null) return BadRequest();
+
             using (AppDbContext db = new())
             {
                 Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == passportDTO.PersonId);
@@ -56,7 +61,7 @@ namespace api.Controllers
 
                 await db.Passport.AddAsync(new()
                 {
-                    Photo = passportDTO.Photo,
+                    ScanFileName = await UploadPassportScanAsync(passportDTO.Scan),
                     PersonId = person.Id,
                 });
 
@@ -67,13 +72,16 @@ namespace api.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] PassportDTO passportDTO)
+        public async Task<IActionResult> UpdateAsync(int id, [FromForm] PassportDTO passportDTO)
         {
             if (id < 1) return BadRequest();
+
+            if (passportDTO.Scan is null) return BadRequest();
 
             using (AppDbContext db = new())
             {
@@ -85,7 +93,9 @@ namespace api.Controllers
 
                 if (person is null) return NotFound("Person is null!");
 
-                passportToUpdate.Photo = passportDTO.Photo;
+                System.IO.File.Delete($"{picturesFolderPath}/Passport/{passportToUpdate.ScanFileName}");
+
+                passportToUpdate.ScanFileName = await UploadPassportScanAsync(passportDTO.Scan);
                 passportToUpdate.PersonId = person.Id;
 
                 await db.SaveChangesAsync();
@@ -108,6 +118,8 @@ namespace api.Controllers
                 Passport? passport = await db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == id);
 
                 if (passport is null) return NotFound();
+
+                System.IO.File.Delete($"{picturesFolderPath}/Passport/{passport.ScanFileName}");
 
                 db.Passport.Remove(passport);
 
