@@ -8,15 +8,7 @@ namespace api.Service
         {
             if (passportScan is null) throw new Exception("Passport.Scan is null!");
 
-            string pictureGuidName = Guid.NewGuid().ToString();
-            string pictureExtension = Path.GetExtension(passportScan.FileName);
-
-            using (FileStream fileStream = new(Path.Combine(picturesFolderPath + "Passport/", pictureGuidName + pictureExtension), FileMode.Create))
-            {
-                await passportScan.CopyToAsync(fileStream);
-            }
-
-            string passportScanFileName = pictureGuidName + pictureExtension;
+            string passportScanFileName = await UploadPictureToFolder(passportScan, "Passport");
 
             return passportScanFileName;
         }
@@ -25,38 +17,26 @@ namespace api.Service
         {
             if (personAvatar is null)
             {
-                string sex;
                 Random random = new();
 
-                switch (personSex)
-                {
-                    case 0:
-                        {
-                            sex = "Woman";
-                            break;
-                        }
-                    case 1:
-                        {
-                            sex = "Man";
-                            break;
-                        }
-                    default:
-                        {
-                            throw new Exception("Sex is incorrect!");
-                        }
-                }
+                string defaultAvatarName = PersonService.SexStringByInt(personSex) + "-" + random.Next(1, 9) + ".png";
 
-                string defaultAvatarName = sex + "-" + random.Next(1, 9) + ".png";
-
-                personAvatar = GetPictureByFolderAndFileName("Person/" + "Default/", defaultAvatarName);
+                personAvatar = GetPictureByFolderAndFileName("Person/Default", defaultAvatarName);
             }
 
-            string pictureGuidName = Guid.NewGuid().ToString();
-            string pictureExtension = Path.GetExtension(personAvatar.FileName);
+            string personAvatarFileName = await UploadPictureToFolder(personAvatar, "Person");
 
-            using (FileStream fileStream = new(Path.Combine(picturesFolderPath + "Person/", pictureGuidName + pictureExtension), FileMode.Create))
+            return personAvatarFileName;
+        }
+
+        public static async Task<string> UploadPictureToFolder(IFormFile picture, string folderName)
+        {
+            string pictureGuidName = Guid.NewGuid().ToString();
+            string pictureExtension = Path.GetExtension(picture.FileName);
+
+            using (FileStream fileStream = new(Path.Combine(picturesFolderPath + folderName + "/", pictureGuidName + pictureExtension), FileMode.Create))
             {
-                await personAvatar.CopyToAsync(fileStream);
+                await picture.CopyToAsync(fileStream);
             }
 
             string passportScanFileName = pictureGuidName + pictureExtension;
@@ -64,9 +44,9 @@ namespace api.Service
             return passportScanFileName;
         }
 
-        public static IFormFile GetPictureByFolderAndFileName(string folder, string fileName)
+        public static IFormFile GetPictureByFolderAndFileName(string folderName, string fileName)
         {
-            string pathToFileName = Path.Combine(picturesFolderPath + folder, fileName);
+            string pathToFileName = Path.Combine(picturesFolderPath + folderName + "/", fileName);
 
             FileStream fileStream = File.OpenRead(pathToFileName);
 
