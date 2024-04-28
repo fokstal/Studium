@@ -4,4 +4,4 @@ export * from "./radio";
 export * from "./checkbox";
 export * from "./avatar";
 export * from "./select";
-export * from "./typoghraphy";
+export * from "./variables";

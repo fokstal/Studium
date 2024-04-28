@@ -1,6 +1,6 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
-import { Select, Avatar, Text } from "../ui-kit";
+import { Select, Avatar } from "../ui-kit";
 import { colors, languages } from "../ui-kit/variables";
 import { AiOutlineEye } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
