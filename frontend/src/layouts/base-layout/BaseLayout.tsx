@@ -3,12 +3,13 @@ import { colors } from "../../components/ui-kit/variables";
 
 type BaseLayoutProps = {
   children: React.ReactNode;
+  bg?: string;
 }
 
-export function BaseLayout({children}: BaseLayoutProps) {
+export function BaseLayout({children, bg = colors.white}: BaseLayoutProps) {
   return (
-    <Box background={colors.white}>
-      <Container maxW="1440px" p="0 100px" h="100px" boxSizing="border-box" m="auto">
+    <Box background={bg}>
+      <Container maxW="1440px" p="0 100px" boxSizing="border-box" m="auto">
           {children}
       </Container>
     </Box>

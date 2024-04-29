@@ -48,6 +48,7 @@ export function Select({options, placeholder}: SelectProps) {
   return (
     <SelectWrapper style={{color: selectedItem ? colors.black : colors.lightGrey}}>
       <Dropdown 
+      style={{background: colors.white}}
       value={selectedItem} 
       onChange={(e) => setSelectedItem(e.value)} 
       options={options} 

@@ -10,7 +10,7 @@ export function Header() {
 
   return (
     <BaseLayout>
-      <Flex align="center" justify="space-between" h="100%">
+      <Flex align="center" justify="space-between" h="100px">
         <Link to="/">
           <img src={process.env.PUBLIC_URL + "/images/logo.svg"} alt="Studium" width="158" height="30"/>
         </Link>
