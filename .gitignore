@@ -1,0 +1,11 @@
+# api
+
+/api/bin
+/api/obj
+/api/AppData/Database.db
+
+Studium.sln
+
+## to help
+tasks.txt
+/api/Controllers/GodController.cs
