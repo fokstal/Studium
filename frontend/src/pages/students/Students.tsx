@@ -1,19 +1,45 @@
 import { Box, Flex, InputGroup, InputLeftElement, Text, Input as ChakraInput, VStack } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
 import { Button, Checkbox, Input, Select, colors, groups } from "../../components/ui-kit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineClose, AiOutlineFilter } from "react-icons/ai";
 import { FaSearch } from "react-icons/fa";
 import { StudentsTable } from "../../components/data-tables";
+import { Student, StudentsTableData } from "../../types";
+import { GroupService, PersonService, StudentService } from "../../services";
+
+const studentService = new StudentService();
+const groupService = new GroupService();
+const personService = new PersonService();
 
 export function Students() {
   const [isOpenToggleFilters, setIsOpenToggleFilters] = useState<boolean>(false);
   const [search, setSearch] = useState<string>();
-  const [students, setStudents] = useState();
+  const [students, setStudents] = useState<StudentsTableData[]>();
 
   const handleOpenToggleColumns = () => {
     setIsOpenToggleFilters(!isOpenToggleFilters);
   };
+
+  const updateStudents = async () => {
+    const students: Student[] = await studentService.get();
+
+    const studentsForTable = await Promise.all(students.map(async (student) => {
+      const person = await personService.getById(student.personId || 0);
+      const group = await groupService.getById(student.groupId || 0);
+      return ({
+        name: `${person.firstName} ${person.lastName} ${person.middleName}`,
+        groupName: group.name,
+        averageMark: 6.5,
+      })
+    }));
+
+    setStudents(studentsForTable);
+  }
+
+  useEffect(() => {
+    updateStudents();
+  }, []);
 
   return (
     <BaseLayout bg={colors.darkGrey}>
@@ -89,7 +115,7 @@ export function Students() {
               </Box>
             ) : null}
             <Box w="100%">
-              <StudentsTable/>
+              <StudentsTable data={students!}/>
             </Box>
           </Flex>
         </Flex>
