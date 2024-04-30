@@ -9,6 +9,7 @@ import { StudentsTable } from "../../components/data-tables";
 export function Students() {
   const [isOpenToggleFilters, setIsOpenToggleFilters] = useState<boolean>(false);
   const [search, setSearch] = useState<string>();
+  const [students, setStudents] = useState();
 
   const handleOpenToggleColumns = () => {
     setIsOpenToggleFilters(!isOpenToggleFilters);

@@ -1,11 +1,5 @@
-class StudentService {
-  public static getStudents = async () => {
-    const res = await fetch("https://freetestapi.com/api/v1/students");
+import { Service } from "./Service";
 
-    if (!res.ok) return [];
-
-    return await res.json();
-  }
+export class StudentService extends Service {
+  protected url = "http://localhost:5141/student";
 }
-
-export default StudentService;
