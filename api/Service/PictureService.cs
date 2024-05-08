@@ -18,8 +18,11 @@ namespace api.Service
             if (personAvatar is null)
             {
                 Random random = new();
+                int randomMaxValue = 9;
 
-                string defaultAvatarName = PersonService.SexStringByInt(personSex) + "-" + random.Next(1, 9) + ".png";
+                if (personSex == 1) randomMaxValue = 8;
+
+                string defaultAvatarName = PersonService.SexStringByInt(personSex) + "-" + random.Next(1, randomMaxValue) + ".png";
 
                 personAvatar = GetPictureByFolderAndFileName("Person/Default", defaultAvatarName);
             }
