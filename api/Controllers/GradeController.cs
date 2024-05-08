@@ -37,7 +37,7 @@ namespace api.Controllers
             {
                 if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id) is null) return NotFound();
 
-                IEnumerable<Grade> gradeListByStudentId = db.Grade.Where(gradeDb => gradeDb.StudentId == id);
+                IEnumerable<Grade> gradeListByStudentId = await db.Grade.Where(gradeDb => gradeDb.StudentId == id).ToListAsync();
 
                 return Ok(gradeListByStudentId);
             }
@@ -56,7 +56,7 @@ namespace api.Controllers
             {
                 if (await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == id) is null) return NotFound();
 
-                IEnumerable<Grade> gradeListBySubjectId = db.Grade.Where(gradeDb => gradeDb.SubjectId == id);
+                IEnumerable<Grade> gradeListBySubjectId = await db.Grade.Where(gradeDb => gradeDb.SubjectId == id).ToListAsync();
 
                 return Ok(gradeListBySubjectId);
             }
@@ -67,7 +67,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Grade>> GetByStudentAndSubjectIdAsync(int studentId, int subjectId)
+        public async Task<ActionResult<IEnumerable<Grade>>> GetByStudentAndSubjectIdAsync(int studentId, int subjectId)
         {
             if (studentId < 1 || subjectId < 1) return BadRequest();
 
@@ -76,11 +76,9 @@ namespace api.Controllers
                 if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == studentId) is null) return NotFound("Student is null!");
                 if (await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == subjectId) is null) return NotFound("Subject is null!");
 
-                Grade? grade = await db.Grade.FirstOrDefaultAsync(gradeDb => gradeDb.StudentId == studentId && gradeDb.SubjectId == subjectId);
+                IEnumerable<Grade> gradeList = await db.Grade.Where(gradeDb => gradeDb.StudentId == studentId && gradeDb.SubjectId == subjectId).ToListAsync();
 
-                if (grade is null) return NotFound();
-
-                return Ok(grade);
+                return Ok(gradeList);
             }
         }
 
