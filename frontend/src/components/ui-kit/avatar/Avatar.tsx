@@ -13,6 +13,7 @@ export const Avatar = styled.div<AvatarProps>`
   height: ${props => props.size === "lg" ? "150px" : props.size === "md" ? "100px" : "50px"};
   background-image: url(${props => props.img});
   background-size: cover;
+  flex-shrink: 0;
 `
 
 Avatar.defaultProps = {
