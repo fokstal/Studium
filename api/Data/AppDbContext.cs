@@ -12,6 +12,8 @@ namespace api.Data
         public DbSet<Student> Student { get; set; }
         public DbSet<Subject> Subject { get; set; }
 
+        public DbSet<User> User { get; set; }
+
         public AppDbContext()
         {
             Database.EnsureCreated();
