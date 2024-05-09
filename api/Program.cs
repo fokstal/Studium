@@ -5,33 +5,33 @@ using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 IConfiguration configuration = builder.Configuration;
+IServiceCollection services = builder.Services;
 
-string corsName = configuration["Cors:Name"] ?? "DefaultCorsPolicy";
-string connectionString = configuration.GetConnectionString("DefaultConnection") ?? "Data Source=AppData/Database.db";
+string? corsName = configuration["Cors:Name"];
+string? connectionString = configuration["ConnectionStrings:DefaultConnection"];
+
+if (corsName is null) throw new NullReferenceException(nameof(corsName));
+if (connectionString is null) throw new NullReferenceException(nameof(connectionString));
 
 // Add services to the container.
 
-builder.Services.AddDbContext<AppDbContext>
-(
-    options => options.UseSqlite(connectionString)
-);
+services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
 
-builder.Services.AddCors(options => options.AddPolicy(corsName,
-    policy =>
-    {
-        policy
-        .AllowAnyOrigin()
-        .WithHeaders("Content-Type");
-    }));
+services.AddCors(options => options.AddPolicy(corsName, policy =>
+{
+    policy
+    .AllowAnyOrigin()
+    .WithHeaders("Content-Type");
+}));
 
-builder.Services.AddAppAuthentication(builder.Configuration);
+services.AddAppAuthentication(builder.Configuration);
 
-builder.Services.AddControllers();
+services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();   
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseCors(corsName);
 
