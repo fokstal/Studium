@@ -12,13 +12,17 @@ namespace api.Extensions
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                     {
+                        string? jwtKey = configuration["Jwt:Key"];
+
+                        if (jwtKey is null) throw new NullReferenceException(nameof(jwtKey));
+
                         options.TokenValidationParameters = new()
                         {
                             ValidateIssuer = false,
                             ValidateAudience = false,
                             ValidateLifetime = true,
                             ValidateIssuerSigningKey = true,
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? JwtProvider.DefaultKey)),
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
                         };
 
                         options.Events = new()
