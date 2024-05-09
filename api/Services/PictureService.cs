@@ -2,13 +2,14 @@ namespace api.Service
 {
     public static class PictureService
     {
-        public static readonly string picturesFolderPath = "./AppData/Pictures/";
+        public static readonly string picturesFolderPath = "./wwwroot/pictures/";
+        public static readonly string defaultPersonPicturesFolderPath = "./AppData/Pictures/PersonDefault";
 
         public static async Task<string> UploadPassportScanAsync(IFormFile passportScan)
         {
             if (passportScan is null) throw new Exception("Passport.Scan is null!");
 
-            string passportScanFileName = await UploadPictureToFolder(passportScan, "Passport");
+            string passportScanFileName = await UploadPictureToFolder(passportScan, "passport");
 
             return passportScanFileName;
         }
@@ -24,10 +25,10 @@ namespace api.Service
 
                 string defaultAvatarName = PersonService.SexStringByInt(personSex) + "-" + random.Next(1, randomMaxValue) + ".png";
 
-                personAvatar = GetPictureByFolderAndFileName("Person/Default", defaultAvatarName);
+                personAvatar = GetPictureByFolderAndFileName(defaultPersonPicturesFolderPath, defaultAvatarName);
             }
 
-            string personAvatarFileName = await UploadPictureToFolder(personAvatar, "Person");
+            string personAvatarFileName = await UploadPictureToFolder(personAvatar, "person");
 
             return personAvatarFileName;
         }
@@ -49,7 +50,7 @@ namespace api.Service
 
         public static IFormFile GetPictureByFolderAndFileName(string folderName, string fileName)
         {
-            string pathToFileName = Path.Combine(picturesFolderPath + folderName + "/", fileName);
+            string pathToFileName = Path.Combine(folderName + "/", fileName);
 
             FileStream fileStream = File.OpenRead(pathToFileName);
 
