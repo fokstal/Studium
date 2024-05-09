@@ -7,18 +7,16 @@ namespace api.Services.DataServices
 {
     public class GradeService(AppDbContext db) : DataServiceBase<Grade, GradeDTO>(db)
     {
-        private readonly AppDbContext _db = db;
-
         public async Task<IEnumerable<Grade>> GetListByStudentIdAsync(int id)
         {
-            IEnumerable<Grade> gradeList = await _db.Grade.Where(grade_db => grade_db.StudentId == id).ToListAsync();
+            IEnumerable<Grade> gradeList = await _db.Grade.Where(grade_db => grade_db.StudentId == id).ToArrayAsync();
 
             return gradeList;
         }
 
         public async Task<IEnumerable<Grade>> GetListBySubjectIdAsync(int id)
         {
-            IEnumerable<Grade> gradeList = await _db.Grade.Where(grade_db => grade_db.SubjectId == id).ToListAsync();
+            IEnumerable<Grade> gradeList = await _db.Grade.Where(grade_db => grade_db.SubjectId == id).ToArrayAsync();
 
             return gradeList;
         }

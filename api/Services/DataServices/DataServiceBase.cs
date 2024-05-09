@@ -8,7 +8,7 @@ namespace api.Services.DataServices
         where TValue : class, IModel
         where TValueDTO : class
     {
-        private readonly AppDbContext _db = db;
+        protected readonly AppDbContext _db = db;
 
         public virtual async Task<bool> CheckExistsAsync(int id) => await _db.Set<TValue>().FirstOrDefaultAsync(valueDb => valueDb.Id == id) is not null;
 
