@@ -4,8 +4,6 @@ namespace api.Model.DTO
 {
     public class GradeDTO
     {
-        public int Id { get; set; }
-
         [Required]
         [Range(-1, 10)]
         public int Value { get; set; }

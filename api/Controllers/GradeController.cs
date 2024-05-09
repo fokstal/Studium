@@ -71,7 +71,13 @@ namespace api.Controllers
             if (await _studentService.CheckExistsAsync(gradeDTO.StudentId) is false) return NotFound("Student is null!");
             if (await _subjectService.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
 
-            await _gradeService.AddAsync(gradeDTO);
+            await _gradeService.AddAsync(new()
+            {
+                Value = gradeDTO.Value,
+                StudentId = gradeDTO.StudentId,
+                SubjectId = gradeDTO.SubjectId,
+                SetDate = DateTime.Now,
+            });
 
             return Created("Grade", gradeDTO);
         }
