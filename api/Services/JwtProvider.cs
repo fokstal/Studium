@@ -5,21 +5,21 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace api.Service
 {
-    public static class JwtProvider
+    public class JwtProvider(IConfiguration configuration)
     {
-        private static readonly string secretKey = "secretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKey";
-        private static readonly int expiresSecondsJWT = 3600;
+        private readonly IConfiguration _configuration = configuration;
+        private static readonly string defaultKey = "secretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKeysecretKey";
 
-        public static string SecretKey { get => secretKey; }
+        public static string DefaultKey { get => defaultKey; }
 
-        public static string GenerateToken(User user)
+        public string GenerateToken(User user)
         {
             JwtSecurityToken token = new
             (
                 claims: [new("userId", user.Id.ToString())],
-                expires: DateTime.Now.Add(TimeSpan.FromSeconds(expiresSecondsJWT)),
+                expires: DateTime.Now.Add(TimeSpan.FromSeconds(Convert.ToInt32(_configuration["Jwt:ExpiresSeconds"]))),
                 signingCredentials: new SigningCredentials(
-                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)), 
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? defaultKey)), 
                     SecurityAlgorithms.HmacSha256
                 )
             );

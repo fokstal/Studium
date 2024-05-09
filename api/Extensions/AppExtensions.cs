@@ -18,12 +18,12 @@ namespace api.Extensions
                             ValidateAudience = false,
                             ValidateLifetime = true,
                             ValidateIssuerSigningKey = true,
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtProvider.SecretKey)),
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? JwtProvider.DefaultKey)),
                         };
 
                         options.Events = new()
                         {
-                            OnMessageReceived = context => 
+                            OnMessageReceived = context =>
                             {
                                 context.Token = context.Request.Cookies["Cookie"];
 

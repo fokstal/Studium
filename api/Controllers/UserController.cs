@@ -9,8 +9,9 @@ namespace api.Controllers
 {
     [Route("user")]
     [ApiController]
-    public class UserController(AppDbContext db) : ControllerBase
+    public class UserController(IConfiguration configuration, AppDbContext db) : ControllerBase
     {
+        private readonly IConfiguration _configuration = configuration;
         private readonly AppDbContext _db = db;
 
         [HttpPost("register")]
@@ -54,7 +55,7 @@ namespace api.Controllers
 
             if (StringHasher.Verify(userDTO.Password, user.PasswordHash) is false) return BadRequest();
 
-            HttpContext.Response.Cookies.Append("Cookie", JwtProvider.GenerateToken(user));
+            HttpContext.Response.Cookies.Append("Cookie", new JwtProvider(_configuration).GenerateToken(user));
 
             return Ok();
         }
