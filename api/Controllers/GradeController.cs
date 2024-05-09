@@ -8,20 +8,18 @@ namespace api.Controllers
 {
     [Route("grade")]
     [ApiController]
-    public class GradeController : ControllerBase
+    public class GradeController(AppDbContext db) : ControllerBase
     {
+        private readonly AppDbContext _db = db;
+
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Grade>>> GetListAsync()
         {
-            using (AppDbContext db = new())
-            {
+            IEnumerable<Grade> gradeList = await _db.Grade.ToArrayAsync();
 
-                IEnumerable<Grade> gradeList = await db.Grade.ToArrayAsync();
-
-                return Ok(gradeList);
-            }
+            return Ok(gradeList);
         }
 
         [HttpGet("list-by-student/{id:int}")]
@@ -33,14 +31,11 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id) is null) return NotFound();
+            if (await _db.Student.FirstOrDefaultAsync(student_db => student_db.Id == id) is null) return NotFound();
 
-                IEnumerable<Grade> gradeListByStudentId = await db.Grade.Where(gradeDb => gradeDb.StudentId == id).ToListAsync();
+            IEnumerable<Grade> gradeListByStudentId = await _db.Grade.Where(grade_db => grade_db.StudentId == id).ToListAsync();
 
-                return Ok(gradeListByStudentId);
-            }
+            return Ok(gradeListByStudentId);
         }
 
         [HttpGet("list-by-subject/{id:int}")]
@@ -52,14 +47,11 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                if (await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == id) is null) return NotFound();
+            if (await _db.Subject.FirstOrDefaultAsync(subject_db => subject_db.Id == id) is null) return NotFound();
 
-                IEnumerable<Grade> gradeListBySubjectId = await db.Grade.Where(gradeDb => gradeDb.SubjectId == id).ToListAsync();
+            IEnumerable<Grade> gradeListBySubjectId = await _db.Grade.Where(grade_db => grade_db.SubjectId == id).ToListAsync();
 
-                return Ok(gradeListBySubjectId);
-            }
+            return Ok(gradeListBySubjectId);
         }
 
         [HttpGet("list-by-student/{studentId:int}/by-subject/{subjectId:int}")]
@@ -71,15 +63,12 @@ namespace api.Controllers
         {
             if (studentId < 1 || subjectId < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                if (await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == studentId) is null) return NotFound("Student is null!");
-                if (await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == subjectId) is null) return NotFound("Subject is null!");
+            if (await _db.Student.FirstOrDefaultAsync(student_db => student_db.Id == studentId) is null) return NotFound("Student is null!");
+            if (await _db.Subject.FirstOrDefaultAsync(subject_db => subject_db.Id == subjectId) is null) return NotFound("Subject is null!");
 
-                IEnumerable<Grade> gradeList = await db.Grade.Where(gradeDb => gradeDb.StudentId == studentId && gradeDb.SubjectId == subjectId).ToListAsync();
+            IEnumerable<Grade> gradeList = await _db.Grade.Where(grade_db => grade_db.StudentId == studentId && grade_db.SubjectId == subjectId).ToListAsync();
 
-                return Ok(gradeList);
-            }
+            return Ok(gradeList);
         }
 
         [HttpPost]
@@ -88,28 +77,25 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Grade>> AddAsync([FromBody] GradeDTO gradeDTO)
         {
-            using (AppDbContext db = new())
+            Student? student = await _db.Student.FirstOrDefaultAsync(student_db => student_db.Id == gradeDTO.StudentId);
+
+            if (student is null) return NotFound("Student is null!");
+
+            Subject? subject = await _db.Subject.FirstOrDefaultAsync(subject_db => subject_db.Id == gradeDTO.SubjectId);
+
+            if (subject is null) return NotFound("Subject is null!");
+
+            await _db.Grade.AddAsync(new()
             {
-                Student? student = await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == gradeDTO.StudentId);
+                Value = gradeDTO.Value,
+                StudentId = gradeDTO.StudentId,
+                SubjectId = gradeDTO.SubjectId,
+                SetDate = DateTime.Now,
+            });
 
-                if (student is null) return NotFound("Student is null!");
+            await _db.SaveChangesAsync();
 
-                Subject? subject = await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == gradeDTO.SubjectId);
-
-                if (subject is null) return NotFound("Subject is null!");
-
-                await db.Grade.AddAsync(new()
-                {
-                    Value = gradeDTO.Value,
-                    StudentId = gradeDTO.StudentId,
-                    SubjectId = gradeDTO.SubjectId,
-                    SetDate = DateTime.Now,
-                });
-
-                await db.SaveChangesAsync();
-
-                return Created("Grade", gradeDTO);
-            }
+            return Created("Grade", gradeDTO);
         }
 
         [HttpPut]
@@ -118,32 +104,29 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateAsync([FromBody] GradeDTO gradeDTO)
         {
-            using (AppDbContext db = new())
-            {
-                Grade? gradeToUpdate = await db.Grade.FirstOrDefaultAsync
-                    (
-                        gradeDb =>
-                            gradeDb.StudentId == gradeDTO.StudentId &&
-                            gradeDb.SubjectId == gradeDTO.SubjectId
-                    );
+            Grade? gradeToUpdate = await _db.Grade.FirstOrDefaultAsync
+                (
+                    grade_db =>
+                        grade_db.StudentId == gradeDTO.StudentId &&
+                        grade_db.SubjectId == gradeDTO.SubjectId
+                );
 
-                if (gradeToUpdate is null) return NotFound("Grade is null");
+            if (gradeToUpdate is null) return NotFound("Grade is null");
 
-                Student? student = await db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == gradeDTO.StudentId);
+            Student? student = await _db.Student.FirstOrDefaultAsync(student_db => student_db.Id == gradeDTO.StudentId);
 
-                if (student is null) return NotFound("Student is null!");
+            if (student is null) return NotFound("Student is null!");
 
-                Subject? subject = await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == gradeDTO.SubjectId);
+            Subject? subject = await _db.Subject.FirstOrDefaultAsync(subject_db => subject_db.Id == gradeDTO.SubjectId);
 
-                if (subject is null) return NotFound("Subject is null!");
+            if (subject is null) return NotFound("Subject is null!");
 
-                gradeToUpdate.Value = gradeDTO.Value;
-                gradeToUpdate.SetDate = DateTime.Now;
+            gradeToUpdate.Value = gradeDTO.Value;
+            gradeToUpdate.SetDate = DateTime.Now;
 
-                await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
-                return NoContent();
-            }
+            return NoContent();
         }
 
         [HttpDelete]
@@ -155,22 +138,19 @@ namespace api.Controllers
         {
             if (gradeDTO.StudentId < 1 || gradeDTO.SubjectId < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                Grade? grade = await db.Grade.FirstOrDefaultAsync
-                    (gradeDb =>
-                        gradeDb.StudentId == gradeDTO.StudentId &&
-                        gradeDb.SubjectId == gradeDTO.SubjectId
-                    );
+            Grade? grade = await _db.Grade.FirstOrDefaultAsync
+                (grade_db =>
+                    grade_db.StudentId == gradeDTO.StudentId &&
+                    grade_db.SubjectId == gradeDTO.SubjectId
+                );
 
-                if (grade is null) return NotFound();
+            if (grade is null) return NotFound();
 
-                db.Grade.Remove(grade);
+            _db.Grade.Remove(grade);
 
-                await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
-                return NoContent();
-            }
+            return NoContent();
         }
     }
 }

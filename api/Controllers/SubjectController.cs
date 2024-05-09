@@ -8,19 +8,18 @@ namespace api.Controllers
 {
     [Route("subject")]
     [ApiController]
-    public class SubjectController : ControllerBase
+    public class SubjectController(AppDbContext db) : ControllerBase
     {
+        private readonly AppDbContext _db = db;
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Subject>>> GetListAsync()
         {
-            using (AppDbContext db = new())
-            {
-                IEnumerable<Subject> subjectList = await db.Subject.Include(subjectDb => subjectDb.GradeList).ToArrayAsync();
+            IEnumerable<Subject> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradeList).ToArrayAsync();
 
-                return Ok(subjectList);
-            }
+            return Ok(subjectList);
         }
 
         [HttpGet("{id:int}")]
@@ -32,14 +31,11 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                Subject? subject = await db.Subject.Include(subjectDb => subjectDb.GradeList).FirstOrDefaultAsync();
+            Subject? subject = await _db.Subject.Include(subjectDb => subjectDb.GradeList).FirstOrDefaultAsync();
 
-                if (subject is null) return NotFound();
+            if (subject is null) return NotFound();
 
-                return Ok(subject);
-            }
+            return Ok(subject);
         }
 
         [HttpPost]
@@ -48,43 +44,40 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Subject>> CreateAsync([FromBody] SubjectDTO subjectDTO)
         {
-            using (AppDbContext db = new())
+            if (await _db.Subject.FirstOrDefaultAsync
+            (
+                subjectDb =>
+                    subjectDb.Name.ToLower() == subjectDTO.Name.ToLower() &&
+                    subjectDb.TeacherName.ToLower() == subjectDTO.TeacherName.ToLower()
+            ) is not null)
             {
-                if (await db.Subject.FirstOrDefaultAsync
-                (
-                    subjectDb =>
-                        subjectDb.Name.ToLower() == subjectDTO.Name.ToLower() &&
-                        subjectDb.TeacherName.ToLower() == subjectDTO.TeacherName.ToLower()
-                ) is not null)
-                {
-                    ModelState.AddModelError("Custom Error", "Subject already Exists!");
+                ModelState.AddModelError("Custom Error", "Subject already Exists!");
 
-                    return BadRequest(ModelState);
-                }
-
-                int? groupId = null;
-
-                if (subjectDTO.GroupId is not null)
-                {
-                    Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == subjectDTO.GroupId);
-
-                    if (group is null) return NotFound("Group is null!");
-
-                    groupId = group.Id;
-                }
-
-                await db.Subject.AddAsync(new()
-                {
-                    Name = subjectDTO.Name,
-                    Descripton = subjectDTO.Descripton,
-                    TeacherName = subjectDTO.TeacherName,
-                    GroupId = groupId,
-                });
-
-                await db.SaveChangesAsync();
-
-                return Created("Subject", subjectDTO);
+                return BadRequest(ModelState);
             }
+
+            int? groupId = null;
+
+            if (subjectDTO.GroupId is not null)
+            {
+                Group? group = await _db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == subjectDTO.GroupId);
+
+                if (group is null) return NotFound("Group is null!");
+
+                groupId = group.Id;
+            }
+
+            await _db.Subject.AddAsync(new()
+            {
+                Name = subjectDTO.Name,
+                Descripton = subjectDTO.Descripton,
+                TeacherName = subjectDTO.TeacherName,
+                GroupId = groupId,
+            });
+
+            await _db.SaveChangesAsync();
+
+            return Created("Subject", subjectDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -96,44 +89,41 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
+            if (await _db.Subject.FirstOrDefaultAsync
+            (
+                subjectDb =>
+                    subjectDb.Name.ToLower() == subjectDTO.Name.ToLower() &&
+                    subjectDb.TeacherName.ToLower() == subjectDTO.TeacherName.ToLower()
+            ) is not null)
             {
-                if (await db.Subject.FirstOrDefaultAsync
-                (
-                    subjectDb =>
-                        subjectDb.Name.ToLower() == subjectDTO.Name.ToLower() &&
-                        subjectDb.TeacherName.ToLower() == subjectDTO.TeacherName.ToLower()
-                ) is not null)
-                {
-                    ModelState.AddModelError("Custom Error", "Subject already Exists!");
+                ModelState.AddModelError("Custom Error", "Subject already Exists!");
 
-                    return BadRequest(ModelState);
-                }
-
-                Subject? subjectToUpdate = await db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
-
-                if (subjectToUpdate is null) return NotFound();
-
-                int? groupId = null;
-
-                if (subjectDTO.GroupId is not null)
-                {
-                    Group? group = await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == subjectDTO.GroupId);
-
-                    if (group is null) return NotFound("Group is null!");
-
-                    groupId = group.Id;
-                }
-
-                subjectToUpdate.Name = subjectDTO.Name;
-                subjectToUpdate.Descripton = subjectDTO.Descripton;
-                subjectToUpdate.TeacherName = subjectDTO.TeacherName;
-                subjectToUpdate.GroupId = groupId;
-
-                await db.SaveChangesAsync();
-
-                return NoContent();
+                return BadRequest(ModelState);
             }
+
+            Subject? subjectToUpdate = await _db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
+
+            if (subjectToUpdate is null) return NotFound();
+
+            int? groupId = null;
+
+            if (subjectDTO.GroupId is not null)
+            {
+                Group? group = await _db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == subjectDTO.GroupId);
+
+                if (group is null) return NotFound("Group is null!");
+
+                groupId = group.Id;
+            }
+
+            subjectToUpdate.Name = subjectDTO.Name;
+            subjectToUpdate.Descripton = subjectDTO.Descripton;
+            subjectToUpdate.TeacherName = subjectDTO.TeacherName;
+            subjectToUpdate.GroupId = groupId;
+
+            await _db.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
@@ -145,18 +135,15 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                Subject? subject = await db.Subject.FirstOrDefaultAsync();
+            Subject? subject = await _db.Subject.FirstOrDefaultAsync();
 
-                if (subject is null) return NotFound();
+            if (subject is null) return NotFound();
 
-                db.Subject.Remove(subject);
+            _db.Subject.Remove(subject);
 
-                await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
-                return NoContent();
-            }
+            return NoContent();
         }
     }
 }

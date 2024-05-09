@@ -1,10 +1,19 @@
+using api.Data;
 using api.Extensions;
 using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 string corsName = "MyCors";
 
 // Add services to the container.
+
+string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<AppDbContext>
+(
+    options => options.UseSqlite(connection)
+);
 
 builder.Services.AddCors(options => options.AddPolicy(corsName,
     policy =>
