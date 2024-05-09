@@ -88,6 +88,8 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] GradeDTO gradeDTO)
         {
+            if (id < 1) return BadRequest();
+
             Grade? gradeToUpdate = await _gradeService.GetAsync(id);
 
             if (gradeToUpdate is null) return NotFound("Grade is null");
@@ -107,6 +109,8 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> RemoveAsync(int id)
         {
+            if (id < 1) return BadRequest();
+
             Grade? gradeToRemove = await _gradeService.GetAsync(id);
 
             if (gradeToRemove is null) return NotFound();
