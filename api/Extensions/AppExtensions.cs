@@ -1,5 +1,4 @@
 using System.Text;
-using api.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,9 +11,7 @@ namespace api.Extensions
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                     {
-                        string? jwtKey = configuration["Jwt:Key"];
-
-                        if (jwtKey is null) throw new NullReferenceException(nameof(jwtKey));
+                        string? jwtKey = configuration["Jwt:Key"] ?? throw new NullReferenceException(nameof(jwtKey));
 
                         options.TokenValidationParameters = new()
                         {

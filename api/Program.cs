@@ -7,11 +7,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 IConfiguration configuration = builder.Configuration;
 IServiceCollection services = builder.Services;
 
-string? corsName = configuration["Cors:Name"];
-string? connectionString = configuration["ConnectionStrings:DefaultConnection"];
-
-if (corsName is null) throw new NullReferenceException(nameof(corsName));
-if (connectionString is null) throw new NullReferenceException(nameof(connectionString));
+string? corsName = configuration["Cors:Name"] ?? throw new NullReferenceException(nameof(corsName));
+string? connectionString = configuration["ConnectionStrings:DefaultConnection"] ?? throw new NullReferenceException(nameof(connectionString));
 
 // Add services to the container.
 

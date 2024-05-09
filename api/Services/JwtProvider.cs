@@ -11,11 +11,8 @@ namespace api.Service
 
         public string GenerateToken(User user)
         {
-            string? jwtKey = _configuration["Jwt:Key"];
-            string? jwtExpiresSeconds = _configuration["Jwt:ExpiresSeconds"];
-
-            if (jwtKey is null) throw new NullReferenceException(nameof(jwtKey));
-            if (jwtExpiresSeconds is null) throw new NullReferenceException(nameof(jwtExpiresSeconds));
+            string? jwtKey = _configuration["Jwt:Key"] ?? throw new NullReferenceException(nameof(jwtKey));
+            string? jwtExpiresSeconds = _configuration["Jwt:ExpiresSeconds"] ?? throw new NullReferenceException(nameof(jwtExpiresSeconds));
 
             JwtSecurityToken token = new
             (
