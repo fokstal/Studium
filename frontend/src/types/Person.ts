@@ -6,4 +6,5 @@ export type Person = {
   birthDate: string | Date;
   sex: boolean;
   avatarFileName: string;
+  passport: string | null;
 }

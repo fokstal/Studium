@@ -1,4 +1,4 @@
-import { Box, Flex, Text, VStack } from "@chakra-ui/react";
+import { Box, Flex, Link, Text, VStack } from "@chakra-ui/react";
 import { Avatar, colors } from "../ui-kit";
 import { useEffect, useState } from "react";
 import { Person } from "../../types";
@@ -15,6 +15,7 @@ type SelectedStudentProps = {
   id: number;
   setSelectedStudent: Function;
   group: string;
+  studentId: number;
 };
 
 const personService = new PersonService();
@@ -23,6 +24,7 @@ export function SelectedStudent({
   id,
   setSelectedStudent,
   group,
+  studentId,
 }: SelectedStudentProps) {
   const [person, setPerson] = useState<Person>();
 
@@ -53,12 +55,18 @@ export function SelectedStudent({
             />
             {/* TODO: FIX PATH TO SERVER IMAGE MB CREATE CUSTOM HOOK TO GET PATH */}
             <VStack align="stretch" gap="12px">
-              <Text
+              <Link
+                href={`/students/${studentId}`}
                 color={colors.white}
                 fontWeight="bold"
                 fontSize="24px"
-              >{`${person?.firstName} ${person?.lastName}`}</Text>
-              <Flex borderRadius="5px" bg={colors.white} gap="10px" paddingInline="10px">
+              >{`${person?.firstName} ${person?.lastName}`}</Link>
+              <Flex
+                borderRadius="5px"
+                bg={colors.white}
+                gap="10px"
+                paddingInline="10px"
+              >
                 <Flex gap="5px" align="center">
                   <AiOutlineGift size="24px" />
                   <Text color={colors.black}>
@@ -67,7 +75,7 @@ export function SelectedStudent({
                 </Flex>
                 <Box bg={colors.black} w="2px" h="34px"></Box>
                 <Flex gap="5px" align="center">
-                  <AiOutlineTeam size="24px"/>
+                  <AiOutlineTeam size="24px" />
                   <Text color={colors.black}>{group}</Text>
                 </Flex>
               </Flex>

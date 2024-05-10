@@ -44,6 +44,7 @@ export function Students() {
         const person = await personService.getById(student.personId || 0);
         const group = await groupService.getById(student.groupId || 0);
         return {
+          id: student.id,
           personId: student.personId,
           name: `${person.firstName} ${person.lastName} ${person.middleName}`,
           groupName: group.name,
@@ -121,6 +122,7 @@ export function Students() {
             {selectedStudent ? (
               <SelectedStudent
                 id={selectedStudent.personId || 0}
+                studentId={selectedStudent.id || 0}
                 setSelectedStudent={setSelectedStudent}
                 group={selectedStudent.groupName}
               />

@@ -1,7 +1,7 @@
 import { PageLayout } from "../../layouts";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./default.css";
-import { Error404Page, Home, Students } from "../../pages";
+import { Error404Page, Home, Student, Students } from "../../pages";
 
 export function App() {
   return (
@@ -11,7 +11,7 @@ export function App() {
         <Route path="/" element={<PageLayout/>}>
           <Route path="journal" element={<>Эл журнал</>}/>
           <Route path="students" element={<Students/>}/>
-          <Route path="students/:id" element={<>Студент</>}/>
+          <Route path="students/:id" element={<Student/>}/>
           <Route path="profile" element={<>Профиль</>}/>
         </Route>
         <Route path="*" element={<Error404Page/>}/>
