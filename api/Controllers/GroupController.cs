@@ -8,19 +8,18 @@ namespace api.Controllers
 {
     [Route("group")]
     [ApiController]
-    public class GroupController : ControllerBase
+    public class GroupController(AppDbContext db) : ControllerBase
     {
+        private readonly AppDbContext _db = db;
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Group>>> GetListAsync()
         {
-            using (AppDbContext db = new())
-            {
-                IEnumerable<Group> groupList = await db.Group.Include(groupDb => groupDb.StudentList).Include(groupDb => groupDb.SubjectList).ToArrayAsync();
+            IEnumerable<Group> groupList = await _db.Group.Include(group_db => group_db.StudentList).Include(group_db => group_db.SubjectList).ToArrayAsync();
 
-                return Ok(groupList);
-            }
+            return Ok(groupList);
         }
 
         [HttpGet("{id:int}")]
@@ -32,14 +31,11 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                Group? group = await db.Group.Include(groupDb => groupDb.StudentList).Include(groupDb => groupDb.SubjectList).FirstOrDefaultAsync(groupDb => groupDb.Id == id);
+            Group? group = await _db.Group.Include(group_db => group_db.StudentList).Include(group_db => group_db.SubjectList).FirstOrDefaultAsync(group_db => group_db.Id == id);
 
-                if (group is null) return NotFound();
+            if (group is null) return NotFound();
 
-                return Ok(group);
-            }
+            return Ok(group);
         }
 
         [HttpPost]
@@ -48,27 +44,24 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Group>> CreateAsync([FromBody] GroupDTO groupDTO)
         {
-            using (AppDbContext db = new())
+            if (await _db.Group.FirstOrDefaultAsync(group_db => group_db.Name.ToLower() == groupDTO.Name.ToLower()) is not null)
             {
-                if (await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Name.ToLower() == groupDTO.Name.ToLower()) is not null)
-                {
-                    ModelState.AddModelError("Custom Error", "Group already Exists!");
+                ModelState.AddModelError("Custom Error", "Group already Exists!");
 
-                    return BadRequest(ModelState);
-                }
-
-                await db.Group.AddAsync(new()
-                {
-                    Name = groupDTO.Name,
-                    Description = groupDTO.Description,
-                    Curator = groupDTO.Curator,
-                    AuditoryName = groupDTO.AuditoryName,
-                });
-
-                await db.SaveChangesAsync();
-
-                return Created("Group", groupDTO);
+                return BadRequest(ModelState);
             }
+
+            await _db.Group.AddAsync(new()
+            {
+                Name = groupDTO.Name,
+                Description = groupDTO.Description,
+                Curator = groupDTO.Curator,
+                AuditoryName = groupDTO.AuditoryName,
+            });
+
+            await _db.SaveChangesAsync();
+
+            return Created("Group", groupDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -80,28 +73,25 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
+            if (await _db.Group.FirstOrDefaultAsync(group_db => group_db.Name.ToLower() == groupDTO.Name.ToLower()) is not null)
             {
-                if (await db.Group.FirstOrDefaultAsync(groupDb => groupDb.Name.ToLower() == groupDTO.Name.ToLower()) is not null)
-                {
-                    ModelState.AddModelError("Custom Error", "Group already Exists!");
+                ModelState.AddModelError("Custom Error", "Group already Exists!");
 
-                    return BadRequest(ModelState);
-                }
-
-                Group? groupToUpdate = await db.Group.Include(groupDb => groupDb.StudentList).Include(groupDb => groupDb.SubjectList).FirstOrDefaultAsync(groupDb => groupDb.Id == id);
-
-                if (groupToUpdate is null) return NotFound();
-
-                groupToUpdate.Name = groupDTO.Name;
-                groupToUpdate.Description = groupDTO.Name;
-                groupToUpdate.Curator = groupDTO.Curator;
-                groupToUpdate.AuditoryName = groupDTO.AuditoryName;
-
-                await db.SaveChangesAsync();
-
-                return NoContent();
+                return BadRequest(ModelState);
             }
+
+            Group? groupToUpdate = await _db.Group.Include(group_db => group_db.StudentList).Include(group_db => group_db.SubjectList).FirstOrDefaultAsync(group_db => group_db.Id == id);
+
+            if (groupToUpdate is null) return NotFound();
+
+            groupToUpdate.Name = groupDTO.Name;
+            groupToUpdate.Description = groupDTO.Name;
+            groupToUpdate.Curator = groupDTO.Curator;
+            groupToUpdate.AuditoryName = groupDTO.AuditoryName;
+
+            await _db.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
@@ -113,18 +103,15 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                Group? group = await db.Group.Include(groupDb => groupDb.StudentList).Include(groupDb => groupDb.SubjectList).FirstOrDefaultAsync(groupDb => groupDb.Id == id);
+            Group? group = await _db.Group.Include(group_db => group_db.StudentList).Include(group_db => group_db.SubjectList).FirstOrDefaultAsync(group_db => group_db.Id == id);
 
-                if (group is null) return NotFound();
+            if (group is null) return NotFound();
 
-                db.Group.Remove(group);
+            _db.Group.Remove(group);
 
-                await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
-                return NoContent();
-            }
+            return NoContent();
         }
     }
 }

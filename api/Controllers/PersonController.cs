@@ -10,19 +10,18 @@ namespace api.Controllers
 {
     [Route("person")]
     [ApiController]
-    public class PersonController : ControllerBase
+    public class PersonController(AppDbContext db) : ControllerBase
     {
+        private readonly AppDbContext _db = db;
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Person>>> GetListAsync()
         {
-            using (AppDbContext db = new())
-            {
-                IEnumerable<Person> personList = await db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).ToArrayAsync();
+            IEnumerable<Person> personList = await _db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).ToArrayAsync();
 
-                return Ok(personList);
-            }
+            return Ok(personList);
         }
 
         [HttpGet("{id:int}")]
@@ -34,14 +33,11 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                Person? person = await db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).FirstOrDefaultAsync(personDb => personDb.Id == id);
+            Person? person = await _db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).FirstOrDefaultAsync(personDb => personDb.Id == id);
 
-                if (person is null) return NotFound();
+            if (person is null) return NotFound();
 
-                return Ok(person);
-            }
+            return Ok(person);
         }
 
         [HttpPost]
@@ -52,35 +48,32 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Person>> CreateAsync([FromForm] PersonDTO personDTO)
         {
-            using (AppDbContext db = new())
+            if (await _db.Person.FirstOrDefaultAsync
+            (
+                personDb =>
+                    personDb.FirstName.ToLower() == personDTO.FirstName.ToLower() &&
+                    personDb.MiddleName.ToLower() == personDTO.MiddleName.ToLower() &&
+                    personDb.LastName.ToLower() == personDTO.LastName.ToLower()
+            ) is not null)
             {
-                if (await db.Person.FirstOrDefaultAsync
-                (
-                    personDb =>
-                        personDb.FirstName.ToLower() == personDTO.FirstName.ToLower() &&
-                        personDb.MiddleName.ToLower() == personDTO.MiddleName.ToLower() &&
-                        personDb.LastName.ToLower() == personDTO.LastName.ToLower()
-                ) is not null)
-                {
-                    ModelState.AddModelError("Custom Error", "Person already Exists!");
+                ModelState.AddModelError("Custom Error", "Person already Exists!");
 
-                    return BadRequest(ModelState);
-                }
-
-                await db.Person.AddAsync(new()
-                {
-                    FirstName = personDTO.FirstName,
-                    MiddleName = personDTO.MiddleName,
-                    LastName = personDTO.LastName,
-                    BirthDate = personDTO.BirthDate,
-                    Sex = personDTO.Sex,
-                    AvatarFileName = await UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
-                });
-
-                await db.SaveChangesAsync();
-
-                return Created("Person", personDTO);
+                return BadRequest(ModelState);
             }
+
+            await _db.Person.AddAsync(new()
+            {
+                FirstName = personDTO.FirstName,
+                MiddleName = personDTO.MiddleName,
+                LastName = personDTO.LastName,
+                BirthDate = personDTO.BirthDate,
+                Sex = personDTO.Sex,
+                AvatarFileName = await UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
+            });
+
+            await _db.SaveChangesAsync();
+
+            return Created("Person", personDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -93,38 +86,35 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
+            Person? personToUpdate = await _db.Person.FirstOrDefaultAsync(personDb => personDb.Id == id);
+
+            if (personToUpdate is null) return NotFound();
+
+            if (await _db.Person.FirstOrDefaultAsync
+            (
+                personDb =>
+                    personDb.FirstName.ToLower() == personDTO.FirstName.ToLower() &&
+                    personDb.MiddleName.ToLower() == personDTO.MiddleName.ToLower() &&
+                    personDb.LastName.ToLower() == personDTO.LastName.ToLower()
+            ) is not null)
             {
-                Person? personToUpdate = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == id);
+                ModelState.AddModelError("Custom Error", "Person already Exists!");
 
-                if (personToUpdate is null) return NotFound();
-
-                if (await db.Person.FirstOrDefaultAsync
-                (
-                    personDb =>
-                        personDb.FirstName.ToLower() == personDTO.FirstName.ToLower() &&
-                        personDb.MiddleName.ToLower() == personDTO.MiddleName.ToLower() &&
-                        personDb.LastName.ToLower() == personDTO.LastName.ToLower()
-                ) is not null)
-                {
-                    ModelState.AddModelError("Custom Error", "Person already Exists!");
-
-                    return BadRequest(ModelState);
-                }
-
-                System.IO.File.Delete($"{picturesFolderPath}/Person/{personToUpdate.AvatarFileName}");
-
-                personToUpdate.FirstName = personDTO.FirstName;
-                personToUpdate.MiddleName = personDTO.MiddleName;
-                personToUpdate.LastName = personDTO.LastName;
-                personToUpdate.BirthDate = personDTO.BirthDate;
-                personToUpdate.Sex = personDTO.Sex;
-                personToUpdate.AvatarFileName = await UploadPersonAvatarAsync(personDTO.Avatar, personToUpdate.Sex);
-
-                await db.SaveChangesAsync();
-
-                return NoContent();
+                return BadRequest(ModelState);
             }
+
+            System.IO.File.Delete($"{picturesFolderPath}/Person/{personToUpdate.AvatarFileName}");
+
+            personToUpdate.FirstName = personDTO.FirstName;
+            personToUpdate.MiddleName = personDTO.MiddleName;
+            personToUpdate.LastName = personDTO.LastName;
+            personToUpdate.BirthDate = personDTO.BirthDate;
+            personToUpdate.Sex = personDTO.Sex;
+            personToUpdate.AvatarFileName = await UploadPersonAvatarAsync(personDTO.Avatar, personToUpdate.Sex);
+
+            await _db.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
@@ -136,25 +126,22 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
+            Person? person = await _db.Person.Include(personDb => personDb.Passport).FirstOrDefaultAsync(personDb => personDb.Id == id);
+
+            if (person is null) return NotFound();
+
+            if (person.Passport is not null)
             {
-                Person? person = await db.Person.Include(personDb => personDb.Passport).FirstOrDefaultAsync(personDb => personDb.Id == id);
-
-                if (person is null) return NotFound();
-
-                if (person.Passport is not null)
-                {
-                    System.IO.File.Delete($"{picturesFolderPath}/Passport/{person.Passport.ScanFileName}");
-                }
-
-                System.IO.File.Delete($"{picturesFolderPath}/Person/{person.AvatarFileName}");
-
-                db.Person.Remove(person);
-
-                await db.SaveChangesAsync();
-
-                return NoContent();
+                System.IO.File.Delete($"{picturesFolderPath}/Passport/{person.Passport.ScanFileName}");
             }
+
+            System.IO.File.Delete($"{picturesFolderPath}/Person/{person.AvatarFileName}");
+
+            _db.Person.Remove(person);
+
+            await _db.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

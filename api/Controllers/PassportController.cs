@@ -10,19 +10,18 @@ namespace api.Controllers
 {
     [Route("passport")]
     [ApiController]
-    public class PassportController : ControllerBase
+    public class PassportController(AppDbContext db) : ControllerBase
     {
+        private readonly AppDbContext _db = db;
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Passport>>> GetListAsync()
         {
-            using (AppDbContext db = new())
-            {
-                IEnumerable<Passport> passportList = await db.Passport.ToArrayAsync();
+            IEnumerable<Passport> passportList = await _db.Passport.ToArrayAsync();
 
-                return Ok(passportList);
-            }
+            return Ok(passportList);
         }
 
         [HttpGet("{id:int}")]
@@ -34,14 +33,11 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                Passport? passport = await db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == id);
+            Passport? passport = await _db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == id);
 
-                if (passport is null) return NotFound();
+            if (passport is null) return NotFound();
 
-                return Ok(passport);
-            }
+            return Ok(passport);
         }
 
         [HttpPost]
@@ -53,22 +49,19 @@ namespace api.Controllers
         {
             if (passportDTO.Scan is null) return BadRequest();
 
-            using (AppDbContext db = new())
+            Person? person = await _db.Person.FirstOrDefaultAsync(personDb => personDb.Id == passportDTO.PersonId);
+
+            if (person is null) return NotFound("Person is null!");
+
+            await _db.Passport.AddAsync(new()
             {
-                Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == passportDTO.PersonId);
+                ScanFileName = await UploadPassportScanAsync(passportDTO.Scan),
+                PersonId = person.Id,
+            });
 
-                if (person is null) return NotFound("Person is null!");
+            await _db.SaveChangesAsync();
 
-                await db.Passport.AddAsync(new()
-                {
-                    ScanFileName = await UploadPassportScanAsync(passportDTO.Scan),
-                    PersonId = person.Id,
-                });
-
-                await db.SaveChangesAsync();
-
-                return Created("Passport", passportDTO);
-            }
+            return Created("Passport", passportDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -83,25 +76,22 @@ namespace api.Controllers
 
             if (passportDTO.Scan is null) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                Passport? passportToUpdate = await db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == id);
+            Passport? passportToUpdate = await _db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == id);
 
-                if (passportToUpdate is null) return NotFound();
+            if (passportToUpdate is null) return NotFound();
 
-                Person? person = await db.Person.FirstOrDefaultAsync(personDb => personDb.Id == passportDTO.PersonId);
+            Person? person = await _db.Person.FirstOrDefaultAsync(personDb => personDb.Id == passportDTO.PersonId);
 
-                if (person is null) return NotFound("Person is null!");
+            if (person is null) return NotFound("Person is null!");
 
-                System.IO.File.Delete($"{picturesFolderPath}/Passport/{passportToUpdate.ScanFileName}");
+            System.IO.File.Delete($"{picturesFolderPath}/Passport/{passportToUpdate.ScanFileName}");
 
-                passportToUpdate.ScanFileName = await UploadPassportScanAsync(passportDTO.Scan);
-                passportToUpdate.PersonId = person.Id;
+            passportToUpdate.ScanFileName = await UploadPassportScanAsync(passportDTO.Scan);
+            passportToUpdate.PersonId = person.Id;
 
-                await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
-                return NoContent();
-            }
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
@@ -113,20 +103,17 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            using (AppDbContext db = new())
-            {
-                Passport? passport = await db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == id);
+            Passport? passport = await _db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == id);
 
-                if (passport is null) return NotFound();
+            if (passport is null) return NotFound();
 
-                System.IO.File.Delete($"{picturesFolderPath}/Passport/{passport.ScanFileName}");
+            System.IO.File.Delete($"{picturesFolderPath}/Passport/{passport.ScanFileName}");
 
-                db.Passport.Remove(passport);
+            _db.Passport.Remove(passport);
 
-                await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
-                return NoContent();
-            }
+            return NoContent();
         }
     }
 }

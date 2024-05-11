@@ -12,14 +12,11 @@ namespace api.Data
         public DbSet<Student> Student { get; set; }
         public DbSet<Subject> Subject { get; set; }
 
-        public AppDbContext()
+        public DbSet<User> User { get; set; }
+
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
             Database.EnsureCreated();
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Data Source=AppData/Database.db");
         }
     }
 }
