@@ -33,7 +33,16 @@ export function Students() {
   >(null);
 
   const handleOpenToggleColumns = () => {
+    if (selectedStudent) setSelectedStudent(null);
     setIsOpenToggleFilters(!isOpenToggleFilters);
+  };
+
+  const handleOpenSelectedStudent = (
+    value: (StudentsTableData & Student) | null
+  ) => {
+    if (isOpenToggleFilters) setIsOpenToggleFilters(false);
+    console.log("ck")
+    setSelectedStudent(value);
   };
 
   const updateStudents = async () => {
@@ -114,19 +123,19 @@ export function Students() {
             <Box w="100%">
               <StudentsTable
                 data={students!}
-                setSelectedStudent={setSelectedStudent}
+                setSelectedStudent={handleOpenSelectedStudent}
                 selectedStudent={selectedStudent}
               />
             </Box>
             <Box w="340">
-            {selectedStudent ? (
-              <SelectedStudent
-                id={selectedStudent.personId || 0}
-                studentId={selectedStudent.id || 0}
-                setSelectedStudent={setSelectedStudent}
-                group={selectedStudent.groupName}
-              />
-            ) : null}
+              {selectedStudent ? (
+                <SelectedStudent
+                  id={selectedStudent.personId || 0}
+                  studentId={selectedStudent.id || 0}
+                  setSelectedStudent={handleOpenSelectedStudent}
+                  group={selectedStudent.groupName}
+                />
+              ) : null}
             </Box>
           </Flex>
         </Flex>
