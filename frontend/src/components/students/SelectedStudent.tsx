@@ -9,7 +9,7 @@ import {
   AiOutlineTeam,
 } from "react-icons/ai";
 import { PersonService } from "../../services";
-import { calculateAge } from "../../lib";
+import { calculateAge, getAvatarPath } from "../../lib";
 
 type SelectedStudentProps = {
   id: number;
@@ -50,17 +50,20 @@ export function SelectedStudent({
           </Flex>
           <Flex gap="20px">
             <Avatar
-              // img={`http://localhost:5141/Pictures/Person/${person?.avatarFileName}`}
+              img={
+                person?.avatarFileName
+                  ? getAvatarPath(person?.avatarFileName)
+                  : ""
+              }
               size="lg"
             />
-            {/* TODO: FIX PATH TO SERVER IMAGE MB CREATE CUSTOM HOOK TO GET PATH */}
             <VStack align="stretch" gap="12px">
               <Link
                 href={`/students/${studentId}`}
                 color={colors.white}
                 fontWeight="bold"
                 fontSize="24px"
-              >{`${person?.firstName} ${person?.lastName}`}</Link>
+              >{`${person?.firstName} ${person?.middleName}`}</Link>
               <Flex
                 borderRadius="5px"
                 bg={colors.white}
