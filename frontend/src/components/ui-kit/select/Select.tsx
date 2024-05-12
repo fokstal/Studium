@@ -8,6 +8,8 @@ import "./overide-select-panel.css";
 type SelectProps = {
   options: SelectItemOptionsType;
   placeholder: string;
+  value: any;
+  setValue: Function;
 }
 
 const SelectWrapper = styled.div`
@@ -34,23 +36,22 @@ const Option = styled.li`
   }
 `
 
-export function Select({options, placeholder}: SelectProps) {
-  const [selectedItem, setSelectedItem] = useState(null);
+export function Select({options, placeholder, value, setValue}: SelectProps) {
 
   const OptionlTemplate = (option: any) => {
     return (
-      <Option style={{color: selectedItem === option ? colors.green : colors.black}}>
+      <Option style={{color: value === option ? colors.green : colors.black}}>
         {option.name}
       </Option>
     )
   }
 
   return (
-    <SelectWrapper style={{color: selectedItem ? colors.black : colors.lightGrey}}>
+    <SelectWrapper style={{color: value ? colors.black : colors.lightGrey}}>
       <Dropdown 
       style={{background: colors.white}}
-      value={selectedItem} 
-      onChange={(e) => setSelectedItem(e.value)} 
+      value={value} 
+      onChange={(e) => setValue(e.value)} 
       options={options} 
       optionLabel="name" 
       placeholder={placeholder} 

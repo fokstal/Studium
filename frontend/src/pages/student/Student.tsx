@@ -87,7 +87,7 @@ export function Student() {
               <Flex gap="10px" align="center">
                 <Text>Группа:</Text>
                 <Input
-                  value={`${student?.firstName} ${student?.middleName} ${student?.lastName}`}
+                  value={student?.name}
                   disabled
                 />
               </Flex>

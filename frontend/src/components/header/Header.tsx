@@ -33,7 +33,7 @@ export function Header() {
         </Flex>
         <Flex gap="20px" align="center">
           <AiOutlineEye size="24"/>
-          <Select options={languages} placeholder="RU"/>
+          {/* <Select options={languages} placeholder="RU"/> */}
           <Link to="/profile">
             <Avatar/>
           </Link>

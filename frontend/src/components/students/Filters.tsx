@@ -14,7 +14,7 @@ export function Filters() {
       <Flex direction="column" gap="20px" w="max-content">
         <VStack align="stretch">
           <Text fontWeight="bold">Учебная группа</Text>
-          <Select placeholder="Выберите группу" options={groups} />
+          {/* <Select placeholder="Выберите группу" options={groups} /> */}
         </VStack>
         <VStack align="stretch">
           <Text fontWeight="bold">Дата зачисления</Text>
