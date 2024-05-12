@@ -1,10 +1,10 @@
 using api.Data;
+using api.Helpers.Constants;
 using api.Model;
 using api.Model.DTO;
+using api.Services;
 using api.Services.DataServices;
 using Microsoft.AspNetCore.Mvc;
-
-using static api.Services.PictureWorker;
 
 namespace api.Controllers
 {
@@ -57,7 +57,7 @@ namespace api.Controllers
                 LastName = personDTO.LastName,
                 BirthDate = personDTO.BirthDate,
                 Sex = personDTO.Sex,
-                AvatarFileName = await UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
+                AvatarFileName = await PictureWorker.UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
             });
 
             return Created("Person", personDTO);
@@ -84,7 +84,7 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            System.IO.File.Delete($"{picturesFolderPath}/Person/{personToUpdate.AvatarFileName}");
+            PictureWorker.RemovePicture(PictureFolders.Person, personToUpdate.AvatarFileName);
 
             await _personService.UpdateAsync(personToUpdate, personDTO);
 
@@ -106,10 +106,10 @@ namespace api.Controllers
 
             if (personToRemove.Passport is not null)
             {
-                System.IO.File.Delete($"{picturesFolderPath}/Passport/{personToRemove.Passport.ScanFileName}");
+                PictureWorker.RemovePicture(PictureFolders.Passport, personToRemove.Passport.ScanFileName);
             }
 
-            System.IO.File.Delete($"{picturesFolderPath}/Person/{personToRemove.AvatarFileName}");
+            PictureWorker.RemovePicture(PictureFolders.Person, personToRemove.AvatarFileName);
 
             await _personService.RemoveAsync(personToRemove);
 

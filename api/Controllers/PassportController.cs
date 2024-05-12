@@ -1,10 +1,10 @@
 using api.Data;
 using api.Model;
 using api.Model.DTO;
+using api.Services;
 using api.Services.DataServices;
+using api.Helpers.Constants;
 using Microsoft.AspNetCore.Mvc;
-
-using static api.Services.PictureWorker;
 
 namespace api.Controllers
 {
@@ -51,7 +51,7 @@ namespace api.Controllers
 
             await _passportService.AddAsync(new()
             {
-                ScanFileName = await UploadPassportScanAsync(passportDTO.Scan),
+                ScanFileName = await PictureWorker.UploadPassportScanAsync(passportDTO.Scan),
                 PersonId = person.Id,
             });
 
@@ -78,7 +78,7 @@ namespace api.Controllers
 
             if (person is null) return NotFound("Person is null!");
 
-            System.IO.File.Delete($"{picturesFolderPath}/Passport/{passportToUpdate.ScanFileName}");
+            PictureWorker.RemovePicture(PictureFolders.Passport, passportToUpdate.ScanFileName);
 
             await _passportService.UpdateAsync(passportToUpdate, passportDTO);
 
@@ -98,7 +98,7 @@ namespace api.Controllers
 
             if (passportToRemove is null) return NotFound();
 
-            System.IO.File.Delete($"{picturesFolderPath}/Passport/{passportToRemove.ScanFileName}");
+            PictureWorker.RemovePicture(PictureFolders.Passport, passportToRemove.ScanFileName);
 
             await _passportService.RemoveAsync(passportToRemove);
 
