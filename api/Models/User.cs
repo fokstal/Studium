@@ -1,6 +1,8 @@
+using api.Models;
+
 namespace api.Model
 {
-    public class User
+    public class User : IModel
     {
         public int Id { get; set; }
         public string Login { get; set; } = null!;

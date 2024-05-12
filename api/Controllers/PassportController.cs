@@ -1,8 +1,8 @@
 using api.Data;
 using api.Model;
 using api.Model.DTO;
+using api.Services.DataServices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 using static api.Service.PictureService;
 
@@ -12,17 +12,13 @@ namespace api.Controllers
     [ApiController]
     public class PassportController(AppDbContext db) : ControllerBase
     {
-        private readonly AppDbContext _db = db;
+        private readonly PassportService _passportService = new(db);
+        private readonly PersonService _personService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Passport>>> GetListAsync()
-        {
-            IEnumerable<Passport> passportList = await _db.Passport.ToArrayAsync();
-
-            return Ok(passportList);
-        }
+        public async Task<ActionResult<IEnumerable<Passport>>> GetListAsync() => Ok(await _passportService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -33,7 +29,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Passport? passport = await _db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == id);
+            Passport? passport = await _passportService.GetAsync(id);
 
             if (passport is null) return NotFound();
 
@@ -49,17 +45,15 @@ namespace api.Controllers
         {
             if (passportDTO.Scan is null) return BadRequest();
 
-            Person? person = await _db.Person.FirstOrDefaultAsync(personDb => personDb.Id == passportDTO.PersonId);
+            Person? person = await _personService.GetAsync(passportDTO.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
-            await _db.Passport.AddAsync(new()
+            await _passportService.AddAsync(new()
             {
                 ScanFileName = await UploadPassportScanAsync(passportDTO.Scan),
                 PersonId = person.Id,
             });
-
-            await _db.SaveChangesAsync();
 
             return Created("Passport", passportDTO);
         }
@@ -76,20 +70,17 @@ namespace api.Controllers
 
             if (passportDTO.Scan is null) return BadRequest();
 
-            Passport? passportToUpdate = await _db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == id);
+            Passport? passportToUpdate = await _passportService.GetAsync(id);
 
             if (passportToUpdate is null) return NotFound();
 
-            Person? person = await _db.Person.FirstOrDefaultAsync(personDb => personDb.Id == passportDTO.PersonId);
+            Person? person = await _personService.GetAsync(passportToUpdate.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
             System.IO.File.Delete($"{picturesFolderPath}/Passport/{passportToUpdate.ScanFileName}");
 
-            passportToUpdate.ScanFileName = await UploadPassportScanAsync(passportDTO.Scan);
-            passportToUpdate.PersonId = person.Id;
-
-            await _db.SaveChangesAsync();
+            await _passportService.UpdateAsync(passportToUpdate, passportDTO);
 
             return NoContent();
         }
@@ -103,15 +94,13 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Passport? passport = await _db.Passport.FirstOrDefaultAsync(passportDb => passportDb.Id == id);
+            Passport? passportToRemove = await _passportService.GetAsync(id);
 
-            if (passport is null) return NotFound();
+            if (passportToRemove is null) return NotFound();
 
-            System.IO.File.Delete($"{picturesFolderPath}/Passport/{passport.ScanFileName}");
+            System.IO.File.Delete($"{picturesFolderPath}/Passport/{passportToRemove.ScanFileName}");
 
-            _db.Passport.Remove(passport);
-
-            await _db.SaveChangesAsync();
+            await _passportService.RemoveAsync(passportToRemove);
 
             return NoContent();
         }

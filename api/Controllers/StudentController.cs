@@ -1,8 +1,8 @@
 using api.Data;
 using api.Model;
 using api.Model.DTO;
+using api.Services.DataServices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -10,17 +10,14 @@ namespace api.Controllers
     [ApiController]
     public class StudentController(AppDbContext db) : ControllerBase
     {
-        private readonly AppDbContext _db = db;
+        private readonly StudentService _studentService = new(db);
+        private readonly PersonService _personService = new(db);
+        private readonly GroupService _groupService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Student>>> GetListAsync()
-        {
-            IEnumerable<Student> studentList = await _db.Student.ToArrayAsync();
-
-            return Ok(studentList);
-        }
+        public async Task<ActionResult<IEnumerable<Student>>> GetListAsync() => Ok(await _studentService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -31,7 +28,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Student? student = await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id);
+            Student? student = await _studentService.GetAsync(id);
 
             if (student is null) return NotFound();
 
@@ -45,14 +42,14 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Student>> CreateAsync([FromBody] StudentDTO studentDTO)
         {
-            if (await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.PersonId == studentDTO.PersonId && studentDb.GroupId == studentDTO.GroupId) is not null)
+            if (await _studentService.GetAsync(studentDTO.PersonId, studentDTO.GroupId) is not null)
             {
                 ModelState.AddModelError("Custom Error", "Student already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            Person? person = await _db.Person.FirstOrDefaultAsync(personDb => personDb.Id == studentDTO.PersonId);
+            Person? person = await _personService.GetAsync(studentDTO.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
@@ -60,20 +57,20 @@ namespace api.Controllers
 
             if (studentDTO.GroupId is not null)
             {
-                Group? group = await _db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == studentDTO.GroupId);
+                Group? group = await _groupService.GetAsync(studentDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
                 groupId = group.Id;
             }
 
-            await _db.Student.AddAsync(new()
+            studentDTO.GroupId = groupId;
+
+            await _studentService.AddAsync(new()
             {
                 PersonId = person.Id,
                 GroupId = groupId,
             });
-
-            await _db.SaveChangesAsync();
 
             return Created("Student", studentDTO);
         }
@@ -87,18 +84,18 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            if (await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.PersonId == studentDTO.PersonId && studentDb.GroupId == studentDTO.GroupId) is not null)
+            if (await _studentService.GetAsync(studentDTO.PersonId, studentDTO.GroupId) is not null)
             {
                 ModelState.AddModelError("Custom Error", "Student already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            Student? studentToUpdate = await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id);
+            Student? studentToUpdate = await _studentService.GetAsync(id);
 
             if (studentToUpdate is null) return NotFound();
 
-            Person? person = await _db.Person.FirstOrDefaultAsync(personDb => personDb.Id == studentDTO.PersonId);
+            Person? person = await _personService.GetAsync(studentDTO.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
@@ -106,17 +103,16 @@ namespace api.Controllers
 
             if (studentDTO.GroupId is not null)
             {
-                Group? group = await _db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == studentDTO.GroupId);
+                Group? group = await _groupService.GetAsync(studentDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
                 groupId = group.Id;
             }
 
-            studentToUpdate.PersonId = person.Id;
-            studentToUpdate.GroupId = groupId;
+            studentDTO.GroupId = groupId;
 
-            await _db.SaveChangesAsync();
+            await _studentService.UpdateAsync(studentToUpdate, studentDTO);
 
             return NoContent();
         }
@@ -130,13 +126,11 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Student? student = await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id);
+            Student? studentToRemove = await _studentService.GetAsync(id);
 
-            if (student is null) return NotFound();
+            if (studentToRemove is null) return NotFound();
 
-            _db.Student.Remove(student);
-
-            await _db.SaveChangesAsync();
+            await _studentService.RemoveAsync(studentToRemove);
 
             return NoContent();
         }

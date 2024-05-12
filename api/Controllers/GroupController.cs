@@ -1,8 +1,8 @@
 using api.Data;
 using api.Model;
 using api.Model.DTO;
+using api.Services.DataServices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -10,17 +10,12 @@ namespace api.Controllers
     [ApiController]
     public class GroupController(AppDbContext db) : ControllerBase
     {
-        private readonly AppDbContext _db = db;
+        private readonly GroupService _groupService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Group>>> GetListAsync()
-        {
-            IEnumerable<Group> groupList = await _db.Group.Include(group_db => group_db.StudentList).Include(group_db => group_db.SubjectList).ToArrayAsync();
-
-            return Ok(groupList);
-        }
+        public async Task<ActionResult<IEnumerable<Group>>> GetListAsync() => Ok(await _groupService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -31,7 +26,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Group? group = await _db.Group.Include(group_db => group_db.StudentList).Include(group_db => group_db.SubjectList).FirstOrDefaultAsync(group_db => group_db.Id == id);
+            Group? group = await _groupService.GetAsync(id);
 
             if (group is null) return NotFound();
 
@@ -44,22 +39,20 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Group>> CreateAsync([FromBody] GroupDTO groupDTO)
         {
-            if (await _db.Group.FirstOrDefaultAsync(group_db => group_db.Name.ToLower() == groupDTO.Name.ToLower()) is not null)
+            if (await _groupService.GetAsync(groupDTO.Name) is not null)
             {
                 ModelState.AddModelError("Custom Error", "Group already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            await _db.Group.AddAsync(new()
+            await _groupService.AddAsync(new()
             {
                 Name = groupDTO.Name,
                 Description = groupDTO.Description,
                 Curator = groupDTO.Curator,
                 AuditoryName = groupDTO.AuditoryName,
             });
-
-            await _db.SaveChangesAsync();
 
             return Created("Group", groupDTO);
         }
@@ -73,23 +66,18 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            if (await _db.Group.FirstOrDefaultAsync(group_db => group_db.Name.ToLower() == groupDTO.Name.ToLower()) is not null)
+            if (await _groupService.GetAsync(groupDTO.Name) is not null)
             {
                 ModelState.AddModelError("Custom Error", "Group already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            Group? groupToUpdate = await _db.Group.Include(group_db => group_db.StudentList).Include(group_db => group_db.SubjectList).FirstOrDefaultAsync(group_db => group_db.Id == id);
+            Group? groupToUpdate = await _groupService.GetAsync(id);
 
             if (groupToUpdate is null) return NotFound();
 
-            groupToUpdate.Name = groupDTO.Name;
-            groupToUpdate.Description = groupDTO.Name;
-            groupToUpdate.Curator = groupDTO.Curator;
-            groupToUpdate.AuditoryName = groupDTO.AuditoryName;
-
-            await _db.SaveChangesAsync();
+            await _groupService.UpdateAsync(groupToUpdate, groupDTO);
 
             return NoContent();
         }
@@ -103,13 +91,11 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Group? group = await _db.Group.Include(group_db => group_db.StudentList).Include(group_db => group_db.SubjectList).FirstOrDefaultAsync(group_db => group_db.Id == id);
+            Group? groupToRemove = await _groupService.GetAsync(id);
 
-            if (group is null) return NotFound();
+            if (groupToRemove is null) return NotFound();
 
-            _db.Group.Remove(group);
-
-            await _db.SaveChangesAsync();
+            await _groupService.RemoveAsync(groupToRemove);
 
             return NoContent();
         }
