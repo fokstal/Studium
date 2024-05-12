@@ -37,7 +37,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Group>> CreateAsync([FromBody] GroupDTO groupDTO)
+        public async Task<ActionResult<GroupDTO>> CreateAsync([FromBody] GroupDTO groupDTO)
         {
             if (await _groupService.GetAsync(groupDTO.Name) is not null)
             {
@@ -62,7 +62,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateAsync(int id, [FromBody] GroupDTO groupDTO)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] GroupDTO groupDTO)
         {
             if (id < 1) return BadRequest();
 
@@ -87,7 +87,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 

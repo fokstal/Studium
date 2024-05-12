@@ -41,7 +41,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Passport>> CreateAsync([FromForm] PassportDTO passportDTO)
+        public async Task<ActionResult<PassportDTO>> CreateAsync([FromForm] PassportDTO passportDTO)
         {
             if (passportDTO.Scan is null) return BadRequest();
 
@@ -90,7 +90,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 

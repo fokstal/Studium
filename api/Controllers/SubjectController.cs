@@ -38,7 +38,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Subject>> CreateAsync([FromBody] SubjectDTO subjectDTO)
+        public async Task<ActionResult<SubjectDTO>> CreateAsync([FromBody] SubjectDTO subjectDTO)
         {
             if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherName) is not null)
             {
@@ -74,7 +74,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateAsync(int id, [FromBody] SubjectDTO subjectDTO)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] SubjectDTO subjectDTO)
         {
             if (id < 1) return BadRequest();
 
@@ -112,7 +112,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 

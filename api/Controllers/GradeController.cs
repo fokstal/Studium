@@ -17,14 +17,14 @@ namespace api.Controllers
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetListAsync() => Ok(await _gradeService.GetListAsync());
+        public async Task<ActionResult<IEnumerable<Grade>>> GetListAsync() => Ok(await _gradeService.GetListAsync());
 
         [HttpGet("list-by-student/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Grade>>> GetByStudentIdAsync(int id)
+        public async Task<ActionResult<IEnumerable<Grade>>> GetListByStudentIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -38,7 +38,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Grade>>> GetBySubjectIdAsync(int id)
+        public async Task<ActionResult<IEnumerable<Grade>>> GetListBySubjectIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -66,7 +66,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Grade>> AddAsync([FromBody] GradeDTO gradeDTO)
+        public async Task<ActionResult<GradeDTO>> AddAsync([FromBody] GradeDTO gradeDTO)
         {
             if (await _studentService.CheckExistsAsync(gradeDTO.StudentId) is false) return NotFound("Student is null!");
             if (await _subjectService.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");

@@ -45,7 +45,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<string>> LoginAsync([FromBody] LoginUserDTO userDTO)
+        public async Task<IActionResult> LoginAsync([FromBody] LoginUserDTO userDTO)
         {
             User? user = await _userService.GetAsync(userDTO.Login);
 
