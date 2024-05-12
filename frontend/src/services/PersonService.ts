@@ -11,4 +11,13 @@ export class PersonService extends Service {
     
     return await res.json();
   }
+
+  public async put(id: number, data: any) {
+    const res = await fetch(`${this.url}/${id}`, {
+      method: "PUT",
+      body: data,
+    });
+
+    return await res.json();
+  }
 }

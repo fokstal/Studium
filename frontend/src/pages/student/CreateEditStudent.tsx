@@ -4,7 +4,7 @@ import { Button, Input, Select, colors } from "../../components/ui-kit";
 import { Group, Person, Student } from "../../types";
 import { useEffect, useState, useTransition } from "react";
 import { GroupService } from "../../services";
-import { createStudent } from "../../lib";
+import { createStudent, editStudent } from "../../lib";
 
 type CreateEditStudentProps = {
   studentToEdit?: Student & Person;
@@ -43,11 +43,19 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
   const handleSubmit = () => {
     if (!studentData) return;
     startTransaction(() => {
-      createStudent({
-        ...studentData,
-        sex: (studentData.sex as unknown as { name: string; code: boolean })
-          .code,
-      });
+      if (studentToEdit) {
+        editStudent({
+          ...studentData,
+          sex: (studentData.sex as unknown as { name: string; code: boolean })
+            .code,
+        });
+      } else {
+        createStudent({
+          ...studentData,
+          sex: (studentData.sex as unknown as { name: string; code: boolean })
+            .code,
+        });
+      }
     });
   };
 
