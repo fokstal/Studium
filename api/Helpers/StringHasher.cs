@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace api.Service
+namespace api.Helpers
 {
     public static class StringHasher
     {

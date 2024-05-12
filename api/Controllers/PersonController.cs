@@ -4,7 +4,7 @@ using api.Model.DTO;
 using api.Services.DataServices;
 using Microsoft.AspNetCore.Mvc;
 
-using static api.Service.PictureService;
+using static api.Services.PictureWorker;
 
 namespace api.Controllers
 {

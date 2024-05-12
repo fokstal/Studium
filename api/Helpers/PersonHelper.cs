@@ -1,6 +1,6 @@
-namespace api.Service
+namespace api.Helpers
 {
-    public static class PersonService
+    public static class PersonHelper
     {
         public static string SexStringByInt(int sexInt)
         {

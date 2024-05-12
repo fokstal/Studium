@@ -2,7 +2,7 @@ using api.Data;
 using api.Model;
 using api.Model.DTO;
 
-using static api.Service.PictureService;
+using static api.Services.PictureWorker;
 
 namespace api.Services.DataServices
 {

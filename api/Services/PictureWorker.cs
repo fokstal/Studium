@@ -1,6 +1,8 @@
-namespace api.Service
+using api.Helpers;
+
+namespace api.Services
 {
-    public static class PictureService
+    public static class PictureWorker
     {
         public static readonly string picturesFolderPath = "./wwwroot/pictures/";
         public static readonly string defaultPersonPicturesFolderPath = "./AppData/Pictures/PersonDefault";
@@ -23,7 +25,7 @@ namespace api.Service
 
                 if (personSex == 1) randomMaxValue = 8;
 
-                string defaultAvatarName = PersonService.SexStringByInt(personSex) + "-" + random.Next(1, randomMaxValue) + ".png";
+                string defaultAvatarName = PersonHelper.SexStringByInt(personSex) + "-" + random.Next(1, randomMaxValue) + ".png";
 
                 personAvatar = GetPictureByFolderAndFileName(defaultPersonPicturesFolderPath, defaultAvatarName);
             }

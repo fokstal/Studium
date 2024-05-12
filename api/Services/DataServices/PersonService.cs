@@ -3,7 +3,7 @@ using api.Model;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 
-using static api.Service.PictureService;
+using static api.Services.PictureWorker;
 
 namespace api.Services.DataServices
 {
