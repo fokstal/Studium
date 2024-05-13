@@ -1,0 +1,10 @@
+namespace api.Models
+{
+    public class Permission
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
+
+        public List<Role> RoleList { get; set; } = [];
+    }
+}

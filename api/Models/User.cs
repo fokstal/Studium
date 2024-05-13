@@ -9,5 +9,7 @@ namespace api.Model
         public string? Email { get; set; }
         public string PasswordHash { get; set; } = null!;
         public DateTime DateCreated { get; set; }
+
+        public List<Role> RoleList { get; set; } = [];
     }
 }

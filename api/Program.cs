@@ -1,5 +1,6 @@
 using api.Data;
 using api.Extensions;
+using api.Models;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,8 @@ services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
+services.Configure<AuthorizationOptions>(configuration.GetSection(nameof(AuthorizationOptions)));
+
 WebApplication app = builder.Build();
 
 app.UseCors(corsName);
@@ -54,5 +57,26 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseStaticFiles();
+
+app.MapGet("get", () => 
+{
+    return Results.Ok("get is ok!");
+}).RequirePermissions(api.Helpers.Enums.Permission.Read);
+
+app.MapPost("post", () => 
+{
+    return Results.Ok("post is ok!");
+}).RequirePermissions(api.Helpers.Enums.Permission.Create);
+
+app.MapPut("update", () => 
+{
+    return Results.Ok("update is ok!");
+}).RequirePermissions(api.Helpers.Enums.Permission.Update);
+
+app.MapDelete("delete", () => 
+{
+    return Results.Ok("delete is ok!");
+}).RequirePermissions(api.Helpers.Enums.Permission.Delete);
+
 
 app.Run();

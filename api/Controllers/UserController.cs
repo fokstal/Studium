@@ -14,13 +14,18 @@ namespace api.Controllers
         private readonly IConfiguration _configuration = configuration;
         private readonly UserService _userService = new(db);
 
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<User>>> GetListAsync() => Ok(await _userService.GetListAsync());
+
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<RegisterUserDTO>> RegisterAsync([FromBody] RegisterUserDTO userDTO)
         {
-            if (_userService.GetAsync(userDTO.Login) is not null)
+            if (await _userService.GetAsync(userDTO.Login) is not null)
             {
                 ModelState.AddModelError("Custom", "User already Exists!");
 
