@@ -19,7 +19,7 @@ namespace api.Helpers
 
             using IServiceScope scope = serviceScopeFactory.CreateScope();
 
-            IPermissionService permissionService = scope.ServiceProvider.GetRequiredService<IPermissionService>();
+            PermissionService permissionService = scope.ServiceProvider.GetRequiredService<PermissionService>();
 
             HashSet<Enums.Permission> permissionList = await permissionService.GetPermissionListAsync(id);
 

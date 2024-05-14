@@ -2,6 +2,7 @@ using System.Text;
 using api.Helpers;
 using api.Models;
 using api.Services;
+using api.Services.DataServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -37,7 +38,9 @@ namespace api.Extensions
                         };
                     });
 
-            services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<PermissionService>();
+            services.AddScoped<UserService>();
+            
             services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
             services.AddAuthorization();
