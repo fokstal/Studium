@@ -2,6 +2,7 @@ import { PageLayout } from "../../layouts";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./default.css";
 import { CreateEditStudent, Error404Page, Home, Student, Students } from "../../pages";
+import { Journal } from "../../pages/journal";
 
 export function App() {
   return (
@@ -9,7 +10,7 @@ export function App() {
       <Routes>
         <Route index element={<Home/>}/>
         <Route path="/" element={<PageLayout/>}>
-          <Route path="journal" element={<>Эл журнал</>}/>
+          <Route path="journal" element={<Journal/>}/>
           <Route path="students" element={<Students/>}/>
           <Route path="students/new" element={<CreateEditStudent/>}/>
           <Route path="students/:id" element={<Student/>}/>

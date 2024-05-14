@@ -1,8 +1,8 @@
-import { Dropdown } from 'primereact/dropdown';
-import { SelectItemOptionsType } from 'primereact/selectitem';
-import { useState } from 'react';
-import styled from 'styled-components';
-import { colors } from '../variables';
+import { Dropdown } from "primereact/dropdown";
+import { SelectItemOptionsType } from "primereact/selectitem";
+import { useState } from "react";
+import styled from "styled-components";
+import { colors } from "../variables";
 import "./overide-select-panel.css";
 
 type SelectProps = {
@@ -10,7 +10,8 @@ type SelectProps = {
   placeholder: string;
   value: any;
   setValue: Function;
-}
+  name?: string;
+};
 
 const SelectWrapper = styled.div`
   border: 1px solid ${colors.lightGrey};
@@ -23,7 +24,7 @@ const SelectWrapper = styled.div`
     font-weight: 400;
     padding: 6px 10px;
   }
-`
+`;
 
 const Option = styled.li`
   background: ${colors.white};
@@ -34,29 +35,34 @@ const Option = styled.li`
     background: ${colors.lightGrey};
     color: ${colors.black};
   }
-`
+`;
 
-export function Select({options, placeholder, value, setValue}: SelectProps) {
-
+export function Select({
+  options,
+  placeholder,
+  value,
+  setValue,
+  name = "name",
+}: SelectProps) {
   const OptionlTemplate = (option: any) => {
     return (
-      <Option style={{color: value === option ? colors.green : colors.black}}>
-        {option.name}
+      <Option style={{ color: value === option ? colors.green : colors.black }}>
+        {option[name]}
       </Option>
-    )
-  }
+    );
+  };
 
   return (
-    <SelectWrapper style={{color: value ? colors.black : colors.lightGrey}}>
-      <Dropdown 
-      style={{background: colors.white}}
-      value={value} 
-      onChange={(e) => setValue(e.value)} 
-      options={options} 
-      optionLabel="name" 
-      placeholder={placeholder} 
-      itemTemplate={OptionlTemplate}
+    <SelectWrapper style={{ color: value ? colors.black : colors.lightGrey }}>
+      <Dropdown
+        style={{ background: colors.white }}
+        value={value}
+        onChange={(e) => setValue(e.value)}
+        options={options}
+        optionLabel={name}
+        placeholder={placeholder}
+        itemTemplate={OptionlTemplate}
       />
     </SelectWrapper>
-  )
-};
+  );
+}
