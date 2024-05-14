@@ -10,7 +10,7 @@ namespace api.Model.DTO
         public string? Email { get; set; }
 
         [Required]
-        // [Length(10, 15)]
+        [Length(10, 15)]
         public string Password { get; set; } = null!;
     }
 }

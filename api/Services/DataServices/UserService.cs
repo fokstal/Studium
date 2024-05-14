@@ -19,7 +19,7 @@ namespace api.Services.DataServices
         {
             Models.Role role =
                 await _db.Role
-                    .SingleOrDefaultAsync(roleDb => roleDb.Id == Convert.ToInt32(Role.Admin))
+                    .SingleOrDefaultAsync(roleDb => roleDb.Id == Convert.ToInt32(Role.User))
                     ?? throw new InvalidOperationException();
 
             user.RoleList.Add(role);
