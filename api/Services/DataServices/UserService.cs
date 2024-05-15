@@ -17,9 +17,9 @@ namespace api.Services.DataServices
 
         public override async Task AddAsync(UserEntity user)
         {
-            Models.RoleEntity role =
+            RoleEntity role =
                 await _db.Role
-                    .SingleOrDefaultAsync(roleDb => roleDb.Id == Convert.ToInt32(Role.User))
+                    .SingleOrDefaultAsync(roleDb => roleDb.Id == Convert.ToInt32(RoleEnum.User))
                     ?? throw new InvalidOperationException();
 
             user.RoleList.Add(role);
@@ -34,9 +34,9 @@ namespace api.Services.DataServices
             throw new NotImplementedException();
         }
 
-        public HashSet<Permission> GetPermissionList(int id)
+        public HashSet<PermissionEnum> GetPermissionList(int id)
         {
-            List<Models.RoleEntity>[] roleList =
+            List<RoleEntity>[] roleList =
                 _db.User
                     .AsNoTracking()
                     .Include(user => user.RoleList)
@@ -48,7 +48,7 @@ namespace api.Services.DataServices
             return roleList
                 .SelectMany(role => role)
                 .SelectMany(role => role.PermissionList)
-                .Select(permission => (Permission)permission.Id)
+                .Select(permission => (PermissionEnum)permission.Id)
                 .ToHashSet();
         }
     }

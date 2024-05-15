@@ -1,3 +1,4 @@
+using api.Helpers.Enums;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -18,7 +19,7 @@ namespace api.Configurations
                     l => l.HasOne<RoleEntity>().WithMany().HasForeignKey(l => l.RoleId)
                 );
 
-            IEnumerable<RoleEntity> roleList = Enum.GetValues<Helpers.Enums.Role>().Select(roleEnum => new RoleEntity
+            IEnumerable<RoleEntity> roleList = Enum.GetValues<RoleEnum>().Select(roleEnum => new RoleEntity
                 {
                     Id = Convert.ToInt32(roleEnum),
                     Name = roleEnum.ToString(),

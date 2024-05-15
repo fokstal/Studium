@@ -1,6 +1,6 @@
 namespace api.Helpers.Enums
 {
-    public enum Permission
+    public enum PermissionEnum
     {
         Read = 1,
         Create = 2,

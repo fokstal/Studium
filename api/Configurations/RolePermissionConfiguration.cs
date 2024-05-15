@@ -1,3 +1,4 @@
+using api.Helpers.Enums;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -22,8 +23,8 @@ namespace api.Configurations
                 rolePermission => 
                     rolePermission.PermissionList.Select(permission => new RolePermissionEntity
                     {
-                        RoleId = Convert.ToInt32(Enum.Parse<Helpers.Enums.Role>(rolePermission.Role)),
-                        PermissionId = Convert.ToInt32(Enum.Parse<Helpers.Enums.Permission>(permission)),
+                        RoleId = Convert.ToInt32(Enum.Parse<RoleEnum>(rolePermission.Role)),
+                        PermissionId = Convert.ToInt32(Enum.Parse<PermissionEnum>(permission)),
                     })
             ).ToArray();
         }

@@ -4,12 +4,13 @@ using api.Models;
 using api.Model.DTO;
 using api.Services.DataServices;
 using Microsoft.AspNetCore.Mvc;
+using api.Helpers.Enums;
 
 namespace api.Controllers
 {
     [Route("grade")]
     [ApiController]
-    [RequirePermissions([Helpers.Enums.Permission.Create])]
+    [RequirePermissions([PermissionEnum.Create])]
     public class GradeController(AppDbContext db) : ControllerBase
     {
         private readonly StudentService _studentService = new(db);

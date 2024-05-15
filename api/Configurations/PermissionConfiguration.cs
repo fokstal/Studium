@@ -1,3 +1,4 @@
+using api.Helpers.Enums;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,7 +11,7 @@ namespace api.Configurations
         {
             builder.HasKey(permission => permission.Id);
 
-            IEnumerable<PermissionEntity> permissionList = Enum.GetValues<Helpers.Enums.Permission>().Select(permissionEnum => new PermissionEntity
+            IEnumerable<PermissionEntity> permissionList = Enum.GetValues<PermissionEnum>().Select(permissionEnum => new PermissionEntity
                 {
                     Id = Convert.ToInt32(permissionEnum),
                     Name = permissionEnum.ToString(),
