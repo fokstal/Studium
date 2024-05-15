@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace api.Repositories.Data
 {
     public abstract class DataRepositoryBase<TValue, TValueDTO>(AppDbContext db) 
-        where TValue : class, IModelEntity
+        where TValue : ModelEntity
         where TValueDTO : class
     {
         protected readonly AppDbContext _db = db;

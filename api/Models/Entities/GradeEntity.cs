@@ -1,8 +1,7 @@
 namespace api.Models
 {
-    public class GradeEntity : IModelEntity
+    public class GradeEntity : ModelEntity
     {
-        public int Id { get; set; }
         public int Value { get; set; }
         public DateTime SetDate { get; set; }
         public int StudentId { get; set; }

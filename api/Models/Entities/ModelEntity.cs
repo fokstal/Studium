@@ -1,6 +1,6 @@
 namespace api.Models
 {
-    public interface IModelEntity
+    public abstract class ModelEntity
     {
         public int Id { get; set; }
     }

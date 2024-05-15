@@ -1,8 +1,7 @@
 namespace api.Models
 {
-    public class PersonEntity : IModelEntity
+    public class PersonEntity : ModelEntity
     {
-        public int Id { get; set; }
         public string FirstName { get; set; } = null!;
         public string MiddleName { get; set; } = null!;
         public string LastName { get; set; } = null!;

@@ -1,8 +1,7 @@
 namespace api.Models
 {
-    public class GroupEntity : IModelEntity
+    public class GroupEntity : ModelEntity
     {
-        public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string Curator { get; set; } = null!;

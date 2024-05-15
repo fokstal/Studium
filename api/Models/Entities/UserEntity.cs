@@ -1,8 +1,7 @@
 namespace api.Models
 {
-    public class UserEntity : IModelEntity
+    public class UserEntity : ModelEntity
     {
-        public int Id { get; set; }
         public string Login { get; set; } = null!;
         public string? Email { get; set; }
         public string PasswordHash { get; set; } = null!;
