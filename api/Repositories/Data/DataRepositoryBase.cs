@@ -2,9 +2,9 @@ using api.Data;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace api.Services.DataServices
+namespace api.Repositories.Data
 {
-    public abstract class DataServiceBase<TValue, TValueDTO>(AppDbContext db) 
+    public abstract class DataRepositoryBase<TValue, TValueDTO>(AppDbContext db) 
         where TValue : class, IModelEntity
         where TValueDTO : class
     {

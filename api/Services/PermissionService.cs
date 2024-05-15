@@ -1,9 +1,9 @@
 using api.Helpers.Enums;
-using api.Services.DataServices;
+using api.Repositories.Data;
 
 namespace api.Services
 {
-    public class PermissionService(UserService userService)
+    public class PermissionService(UserRepository userService)
     {
         public HashSet<PermissionEnum> GetPermissionList(int userId)
         {

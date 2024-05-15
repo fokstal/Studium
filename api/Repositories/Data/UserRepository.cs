@@ -4,9 +4,9 @@ using api.Model.DTO;
 using api.Helpers.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace api.Services.DataServices
+namespace api.Repositories.Data
 {
-    public class UserService(AppDbContext db) : DataServiceBase<UserEntity, RegisterUserDTO>(db)
+    public class UserRepository(AppDbContext db) : DataRepositoryBase<UserEntity, RegisterUserDTO>(db)
     {
         public async Task<UserEntity?> GetAsync(string login)
         {

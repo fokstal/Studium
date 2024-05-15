@@ -3,9 +3,9 @@ using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 
-namespace api.Services.DataServices
+namespace api.Repositories.Data
 {
-    public class GradeService(AppDbContext db) : DataServiceBase<GradeEntity, GradeDTO>(db)
+    public class GradeRepository(AppDbContext db) : DataRepositoryBase<GradeEntity, GradeDTO>(db)
     {
         public async Task<IEnumerable<GradeEntity>> GetListByStudentIdAsync(int id)
         {

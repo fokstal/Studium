@@ -1,9 +1,9 @@
 using api.Helpers;
 using api.Helpers.Constants;
 
-namespace api.Services
+namespace api.Repositories
 {
-    public static class PictureWorker
+    public static class PictureRepository
     {
         private static readonly string picturesFolderPath = "./wwwroot/pictures/";
         private static readonly string defaultPersonPicturesFolderPath = "./AppData/Pictures/PersonDefault";

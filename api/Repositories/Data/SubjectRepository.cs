@@ -3,9 +3,9 @@ using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 
-namespace api.Services.DataServices
+namespace api.Repositories.Data
 {
-    public class SubjectService(AppDbContext db) : DataServiceBase<SubjectEntity, SubjectDTO>(db)
+    public class SubjectRepository(AppDbContext db) : DataRepositoryBase<SubjectEntity, SubjectDTO>(db)
     {
         public async override Task<IEnumerable<SubjectEntity>> GetListAsync()
         {

@@ -1,8 +1,8 @@
 using api.Data;
 using api.Models;
 using api.Model.DTO;
-using api.Services;
-using api.Services.DataServices;
+using api.Repositories;
+using api.Repositories.Data;
 using api.Helpers.Constants;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +12,8 @@ namespace api.Controllers
     [ApiController]
     public class PassportController(AppDbContext db) : ControllerBase
     {
-        private readonly PassportService _passportService = new(db);
-        private readonly PersonService _personService = new(db);
+        private readonly PassportRepository _passportService = new(db);
+        private readonly PersonRepository _personService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -51,7 +51,7 @@ namespace api.Controllers
 
             await _passportService.AddAsync(new()
             {
-                ScanFileName = await PictureWorker.UploadPassportScanAsync(passportDTO.Scan),
+                ScanFileName = await PictureRepository.UploadPassportScanAsync(passportDTO.Scan),
                 PersonId = person.Id,
             });
 
@@ -78,7 +78,7 @@ namespace api.Controllers
 
             if (person is null) return NotFound("Person is null!");
 
-            PictureWorker.RemovePicture(PictureFolders.Passport, passportToUpdate.ScanFileName);
+            PictureRepository.RemovePicture(PictureFolders.Passport, passportToUpdate.ScanFileName);
 
             await _passportService.UpdateAsync(passportToUpdate, passportDTO);
 
@@ -98,7 +98,7 @@ namespace api.Controllers
 
             if (passportToRemove is null) return NotFound();
 
-            PictureWorker.RemovePicture(PictureFolders.Passport, passportToRemove.ScanFileName);
+            PictureRepository.RemovePicture(PictureFolders.Passport, passportToRemove.ScanFileName);
 
             await _passportService.RemoveAsync(passportToRemove);
 

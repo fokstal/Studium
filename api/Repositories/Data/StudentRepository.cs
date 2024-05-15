@@ -3,9 +3,9 @@ using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 
-namespace api.Services.DataServices
+namespace api.Repositories.Data
 {
-    public class StudentService(AppDbContext db) : DataServiceBase<StudentEntity, StudentDTO>(db)
+    public class StudentRepository(AppDbContext db) : DataRepositoryBase<StudentEntity, StudentDTO>(db)
     {
         public async Task<StudentEntity?> GetAsync(int personId, int? groupId)
         {

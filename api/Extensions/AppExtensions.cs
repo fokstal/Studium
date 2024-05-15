@@ -1,6 +1,6 @@
 using System.Text;
 using api.Services;
-using api.Services.DataServices;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -36,7 +36,7 @@ namespace api.Extensions
                     });
 
             services.AddScoped<PermissionService>();
-            services.AddScoped<UserService>();
+            services.AddScoped<UserRepository>();
 
             services.AddAuthorization();
         }

@@ -2,7 +2,7 @@ using api.Data;
 using api.Models;
 using api.Model.DTO;
 using api.Helpers;
-using api.Services.DataServices;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -12,7 +12,7 @@ namespace api.Controllers
     public class UserController(IConfiguration configuration, AppDbContext db) : ControllerBase
     {
         private readonly IConfiguration _configuration = configuration;
-        private readonly UserService _userService = new(db);
+        private readonly UserRepository _userService = new(db);
 
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]

@@ -1,7 +1,7 @@
 using api.Data;
 using api.Models;
 using api.Model.DTO;
-using api.Services.DataServices;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -10,7 +10,7 @@ namespace api.Controllers
     [ApiController]
     public class GroupEntityController(AppDbContext db) : ControllerBase
     {
-        private readonly GroupService _groupService = new(db);
+        private readonly GroupRepository _groupService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]

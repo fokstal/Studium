@@ -2,7 +2,7 @@ using api.Data;
 using api.Extensions;
 using api.Models;
 using api.Model.DTO;
-using api.Services.DataServices;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
 using api.Helpers.Enums;
 
@@ -13,9 +13,9 @@ namespace api.Controllers
     [RequirePermissions([PermissionEnum.Create])]
     public class GradeController(AppDbContext db) : ControllerBase
     {
-        private readonly StudentService _studentService = new(db);
-        private readonly SubjectService _subjectService = new(db);
-        private readonly GradeService _gradeService = new(db);
+        private readonly StudentRepository _studentService = new(db);
+        private readonly SubjectRepository _subjectService = new(db);
+        private readonly GradeRepository _gradeService = new(db);
 
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]

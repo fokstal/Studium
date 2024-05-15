@@ -3,9 +3,9 @@ using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 
-namespace api.Services.DataServices
+namespace api.Repositories.Data
 {
-    public class GroupService(AppDbContext db) : DataServiceBase<GroupEntity, GroupDTO>(db)
+    public class GroupRepository(AppDbContext db) : DataRepositoryBase<GroupEntity, GroupDTO>(db)
     {
         public override async Task<IEnumerable<GroupEntity>> GetListAsync()
         {

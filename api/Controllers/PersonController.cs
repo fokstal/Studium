@@ -2,8 +2,8 @@ using api.Data;
 using api.Helpers.Constants;
 using api.Models;
 using api.Model.DTO;
-using api.Services;
-using api.Services.DataServices;
+using api.Repositories;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -12,7 +12,7 @@ namespace api.Controllers
     [ApiController]
     public class PersonController(AppDbContext db) : ControllerBase
     {
-        private readonly PersonService _personService = new(db);
+        private readonly PersonRepository _personService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -57,7 +57,7 @@ namespace api.Controllers
                 LastName = personDTO.LastName,
                 BirthDate = personDTO.BirthDate,
                 Sex = personDTO.Sex,
-                AvatarFileName = await PictureWorker.UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
+                AvatarFileName = await PictureRepository.UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
             });
 
             return Created("PersonEntity", personDTO);
@@ -84,7 +84,7 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            PictureWorker.RemovePicture(PictureFolders.Person, personToUpdate.AvatarFileName);
+            PictureRepository.RemovePicture(PictureFolders.Person, personToUpdate.AvatarFileName);
 
             await _personService.UpdateAsync(personToUpdate, personDTO);
 
@@ -106,10 +106,10 @@ namespace api.Controllers
 
             if (personToRemove.Passport is not null)
             {
-                PictureWorker.RemovePicture(PictureFolders.Passport, personToRemove.Passport.ScanFileName);
+                PictureRepository.RemovePicture(PictureFolders.Passport, personToRemove.Passport.ScanFileName);
             }
 
-            PictureWorker.RemovePicture(PictureFolders.Person, personToRemove.AvatarFileName);
+            PictureRepository.RemovePicture(PictureFolders.Person, personToRemove.AvatarFileName);
 
             await _personService.RemoveAsync(personToRemove);
 

@@ -1,11 +1,11 @@
 using api.Data;
 using api.Model.DTO;
 using api.Models;
-using static api.Services.PictureWorker;
+using static api.Repositories.PictureRepository;
 
-namespace api.Services.DataServices
+namespace api.Repositories.Data
 {
-    public class PassportService(AppDbContext db) : DataServiceBase<PassportEntity, PassportDTO>(db)
+    public class PassportRepository(AppDbContext db) : DataRepositoryBase<PassportEntity, PassportDTO>(db)
     {
         public override async Task UpdateAsync(PassportEntity passportToUpdate, PassportDTO passportDTO)
         {

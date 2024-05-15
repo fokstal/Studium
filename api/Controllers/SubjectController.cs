@@ -1,7 +1,7 @@
 using api.Data;
 using api.Models;
 using api.Model.DTO;
-using api.Services.DataServices;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -10,8 +10,8 @@ namespace api.Controllers
     [ApiController]
     public class SubjectController(AppDbContext db) : ControllerBase
     {
-        private readonly SubjectService _subjectService = new(db);
-        private readonly GroupService _groupService = new(db);
+        private readonly SubjectRepository _subjectService = new(db);
+        private readonly GroupRepository _groupService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]

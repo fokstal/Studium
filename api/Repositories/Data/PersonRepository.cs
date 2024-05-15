@@ -3,11 +3,11 @@ using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 
-using static api.Services.PictureWorker;
+using static api.Repositories.PictureRepository;
 
-namespace api.Services.DataServices
+namespace api.Repositories.Data
 {
-    public class PersonService(AppDbContext db) : DataServiceBase<PersonEntity, PersonDTO>(db)
+    public class PersonRepository(AppDbContext db) : DataRepositoryBase<PersonEntity, PersonDTO>(db)
     {
         public async override Task<IEnumerable<PersonEntity>> GetListAsync()
         {
