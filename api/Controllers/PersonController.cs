@@ -41,7 +41,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<PersonDTO>> CreateAsync([FromForm] PersonDTO personDTO)
+        public async Task<ActionResult<PersonEntity>> CreateAsync([FromForm] PersonDTO personDTO)
         {
             if (await _personService.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
             {
@@ -50,7 +50,7 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            await _personService.AddAsync(new()
+            PersonEntity personToAdd = new()
             {
                 FirstName = personDTO.FirstName,
                 MiddleName = personDTO.MiddleName,
@@ -58,9 +58,11 @@ namespace api.Controllers
                 BirthDate = personDTO.BirthDate,
                 Sex = personDTO.Sex,
                 AvatarFileName = await PictureRepository.UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
-            });
+            };
 
-            return Created("PersonEntity", personDTO);
+            await _personService.AddAsync(personToAdd);
+
+            return Created("PersonEntity", personToAdd);
         }
 
         [HttpPut("{id:int}")]
