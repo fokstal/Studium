@@ -34,16 +34,16 @@ namespace api.Services.DataServices
             throw new NotImplementedException();
         }
 
-        public async Task<HashSet<Permission>> GetPermissionListAsync(int id)
+        public HashSet<Permission> GetPermissionList(int id)
         {
             List<Models.Role>[] roleList =
-                await _db.User
+                _db.User
                     .AsNoTracking()
                     .Include(user => user.RoleList)
                     .ThenInclude(role => role.PermissionList)
                     .Where(user => user.Id == id)
                     .Select(user => user.RoleList)
-                    .ToArrayAsync();
+                    .ToArray();
 
             return roleList
                 .SelectMany(role => role)

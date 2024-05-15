@@ -1,10 +1,7 @@
 using System.Text;
-using api.Helpers;
-using api.Models;
 using api.Services;
 using api.Services.DataServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace api.Extensions
@@ -40,20 +37,8 @@ namespace api.Extensions
 
             services.AddScoped<PermissionService>();
             services.AddScoped<UserService>();
-            
-            services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
             services.AddAuthorization();
-        }
-
-        public static IEndpointConventionBuilder RequirePermissions<TBuilder>
-            (this TBuilder builder, params Helpers.Enums.Permission[] permissionList)
-            where TBuilder : IEndpointConventionBuilder
-        {
-            return builder.RequireAuthorization
-            (
-                policy => policy.AddRequirements(new PermissionRequirement(permissionList))
-            );
         }
     }
 }

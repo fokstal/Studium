@@ -1,4 +1,5 @@
 using api.Data;
+using api.Extensions;
 using api.Model;
 using api.Model.DTO;
 using api.Services.DataServices;
@@ -8,6 +9,7 @@ namespace api.Controllers
 {
     [Route("grade")]
     [ApiController]
+    [RequirePermissions([Helpers.Enums.Permission.Create])]
     public class GradeController(AppDbContext db) : ControllerBase
     {
         private readonly StudentService _studentService = new(db);

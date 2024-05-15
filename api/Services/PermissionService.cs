@@ -4,9 +4,9 @@ namespace api.Services
 {
     public class PermissionService(UserService userService)
     {
-        public Task<HashSet<Helpers.Enums.Permission>> GetPermissionListAsync(int userId)
+        public HashSet<Helpers.Enums.Permission> GetPermissionList(int userId)
         {
-            return userService.GetPermissionListAsync(userId);
+            return userService.GetPermissionList(userId);
         }
     }
 }
