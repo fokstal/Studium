@@ -18,8 +18,10 @@ services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionStrin
 services.AddCors(options => options.AddPolicy(corsName, policy =>
 {
     policy
-    .AllowAnyOrigin()
-    .WithHeaders("Content-Type");
+    .WithOrigins("http//localhost:3000")
+    .WithHeaders("Content-Type")
+    .WithMethods("PUT", "DELETE")
+    .AllowCredentials();
 }));
 
 services.AddAppAuthentication(builder.Configuration);
