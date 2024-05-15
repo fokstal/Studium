@@ -3,6 +3,8 @@ using api.Models;
 using api.Model.DTO;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
+using api.Extensions;
+using api.Helpers.Enums;
 
 namespace api.Controllers
 {
@@ -15,6 +17,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([PermissionEnum.Read])]
         public async Task<ActionResult<IEnumerable<GroupEntity>>> GetListAsync() => Ok(await _groupService.GetListAsync());
 
         [HttpGet("{id:int}")]
@@ -22,6 +25,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([PermissionEnum.Read])]
         public async Task<ActionResult<GroupEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
@@ -37,6 +41,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([PermissionEnum.Create])]
         public async Task<ActionResult<GroupDTO>> CreateAsync([FromBody] GroupDTO groupDTO)
         {
             if (await _groupService.GetAsync(groupDTO.Name) is not null)
@@ -62,6 +67,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([PermissionEnum.Update])]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] GroupDTO groupDTO)
         {
             if (id < 1) return BadRequest();
@@ -87,6 +93,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([PermissionEnum.Delete])]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
