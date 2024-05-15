@@ -3,7 +3,7 @@ using System.Text;
 using api.Models;
 using Microsoft.IdentityModel.Tokens;
 
-namespace api.Helpers
+namespace api.Services
 {
     public class JwtProvider(IConfiguration configuration)
     {
