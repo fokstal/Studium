@@ -1,8 +1,6 @@
-using api.Models;
-
-namespace api.Model
+namespace api.Models
 {
-    public class Group : IModel
+    public class GroupEntity : IModelEntity
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
@@ -10,7 +8,7 @@ namespace api.Model
         public string Curator { get; set; } = null!;
         public string AuditoryName { get; set; } = null!;
 
-        public List<Student> StudentList { get; set; } = [];
-        public List<Subject> SubjectList { get; set; } = [];
+        public List<StudentEntity> StudentList { get; set; } = [];
+        public List<SubjectEntity> SubjectList { get; set; } = [];
     }
 }

@@ -1,5 +1,5 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using api.Helpers;
 using api.Services.DataServices;
@@ -47,7 +47,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> LoginAsync([FromBody] LoginUserDTO userDTO)
         {
-            User? user = await _userService.GetAsync(userDTO.Login);
+            UserEntity? user = await _userService.GetAsync(userDTO.Login);
 
             if (user is null) return NotFound();
 

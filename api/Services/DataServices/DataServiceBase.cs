@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace api.Services.DataServices
 {
     public abstract class DataServiceBase<TValue, TValueDTO>(AppDbContext db) 
-        where TValue : class, IModel
+        where TValue : class, IModelEntity
         where TValueDTO : class
     {
         protected readonly AppDbContext _db = db;

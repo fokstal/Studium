@@ -1,23 +1,23 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using api.Helpers.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Services.DataServices
 {
-    public class UserService(AppDbContext db) : DataServiceBase<User, RegisterUserDTO>(db)
+    public class UserService(AppDbContext db) : DataServiceBase<UserEntity, RegisterUserDTO>(db)
     {
-        public async Task<User?> GetAsync(string login)
+        public async Task<UserEntity?> GetAsync(string login)
         {
-            User? user = await _db.User.FirstOrDefaultAsync(userDb => userDb.Login.ToLower() == login.ToLower());
+            UserEntity? user = await _db.User.FirstOrDefaultAsync(userDb => userDb.Login.ToLower() == login.ToLower());
 
             return user;
         }
 
-        public override async Task AddAsync(User user)
+        public override async Task AddAsync(UserEntity user)
         {
-            Models.Role role =
+            Models.RoleEntity role =
                 await _db.Role
                     .SingleOrDefaultAsync(roleDb => roleDb.Id == Convert.ToInt32(Role.User))
                     ?? throw new InvalidOperationException();
@@ -29,14 +29,14 @@ namespace api.Services.DataServices
             await _db.SaveChangesAsync();
         }
 
-        public override Task UpdateAsync(User valueToUpdate, RegisterUserDTO valueDTO)
+        public override Task UpdateAsync(UserEntity valueToUpdate, RegisterUserDTO valueDTO)
         {
             throw new NotImplementedException();
         }
 
         public HashSet<Permission> GetPermissionList(int id)
         {
-            List<Models.Role>[] roleList =
+            List<Models.RoleEntity>[] roleList =
                 _db.User
                     .AsNoTracking()
                     .Include(user => user.RoleList)

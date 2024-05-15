@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace api.Configurations
 {
-    public class UserConfiguration : IEntityTypeConfiguration<User>
+    public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
     {
-        public void Configure(EntityTypeBuilder<User> builder)
+        public void Configure(EntityTypeBuilder<UserEntity> builder)
         {
             builder.HasKey(user => user.Id);
 
@@ -15,8 +15,8 @@ namespace api.Configurations
                 .WithMany(role => role.UserList)
                 .UsingEntity<UserRole>
                 (
-                    l => l.HasOne<Role>().WithMany().HasForeignKey(l => l.RoleId),
-                    r => r.HasOne<User>().WithMany().HasForeignKey(r => r.UserId)
+                    l => l.HasOne<RoleEntity>().WithMany().HasForeignKey(l => l.RoleId),
+                    r => r.HasOne<UserEntity>().WithMany().HasForeignKey(r => r.UserId)
                 );
         }
     }

@@ -1,6 +1,6 @@
 using api.Data;
 using api.Helpers.Constants;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using api.Services;
 using api.Services.DataServices;
@@ -17,18 +17,18 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Person>>> GetListAsync() => Ok(await _personService.GetListAsync());
+        public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListAsync() => Ok(await _personService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Person>> GetAsync(int id)
+        public async Task<ActionResult<PersonEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Person? person = await _personService.GetAsync(id);
+            PersonEntity? person = await _personService.GetAsync(id);
 
             if (person is null) return NotFound();
 
@@ -45,7 +45,7 @@ namespace api.Controllers
         {
             if (await _personService.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Person already Exists!");
+                ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
@@ -60,7 +60,7 @@ namespace api.Controllers
                 AvatarFileName = await PictureWorker.UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
             });
 
-            return Created("Person", personDTO);
+            return Created("PersonEntity", personDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -73,13 +73,13 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Person? personToUpdate = await _personService.GetAsync(id);
+            PersonEntity? personToUpdate = await _personService.GetAsync(id);
 
             if (personToUpdate is null) return NotFound();
 
             if (await _personService.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Person already Exists!");
+                ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
@@ -100,7 +100,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Person? personToRemove = await _personService.GetAsync(id);
+            PersonEntity? personToRemove = await _personService.GetAsync(id);
 
             if (personToRemove is null) return NotFound();
 

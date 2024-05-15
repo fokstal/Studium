@@ -1,6 +1,6 @@
 using api.Data;
 using api.Extensions;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using api.Services.DataServices;
 using Microsoft.AspNetCore.Mvc;
@@ -19,14 +19,14 @@ namespace api.Controllers
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Grade>>> GetListAsync() => Ok(await _gradeService.GetListAsync());
+        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListAsync() => Ok(await _gradeService.GetListAsync());
 
         [HttpGet("list-by-student/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Grade>>> GetListByStudentIdAsync(int id)
+        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -40,7 +40,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Grade>>> GetListBySubjectIdAsync(int id)
+        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListBySubjectIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -54,7 +54,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Grade>>> GetListByStudentAndSubjectIdAsync(int studentId, int subjectId)
+        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentAndSubjectIdAsync(int studentId, int subjectId)
         {
             if (studentId < 1 || subjectId < 1) return BadRequest();
 
@@ -81,7 +81,7 @@ namespace api.Controllers
                 SetDate = DateTime.Now,
             });
 
-            return Created("Grade", gradeDTO);
+            return Created("GradeEntity", gradeDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -92,9 +92,9 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Grade? gradeToUpdate = await _gradeService.GetAsync(id);
+            GradeEntity? gradeToUpdate = await _gradeService.GetAsync(id);
 
-            if (gradeToUpdate is null) return NotFound("Grade is null");
+            if (gradeToUpdate is null) return NotFound("GradeEntity is null");
 
             if (await _studentService.CheckExistsAsync(gradeDTO.StudentId) is false) return NotFound("Student is null!");
             if (await _subjectService.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
@@ -113,7 +113,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Grade? gradeToRemove = await _gradeService.GetAsync(id);
+            GradeEntity? gradeToRemove = await _gradeService.GetAsync(id);
 
             if (gradeToRemove is null) return NotFound();
 

@@ -1,8 +1,6 @@
-using api.Models;
-
-namespace api.Model
+namespace api.Models
 {
-    public class Grade : IModel
+    public class GradeEntity : IModelEntity
     {
         public int Id { get; set; }
         public int Value { get; set; }

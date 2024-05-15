@@ -1,10 +1,10 @@
 namespace api.Models
 {
-    public class Permission
+    public class PermissionEntity
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
 
-        public List<Role> RoleList { get; set; } = [];
+        public List<RoleEntity> RoleList { get; set; } = [];
     }
 }

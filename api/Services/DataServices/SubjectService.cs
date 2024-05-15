@@ -1,29 +1,29 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Services.DataServices
 {
-    public class SubjectService(AppDbContext db) : DataServiceBase<Subject, SubjectDTO>(db)
+    public class SubjectService(AppDbContext db) : DataServiceBase<SubjectEntity, SubjectDTO>(db)
     {
-        public async override Task<IEnumerable<Subject>> GetListAsync()
+        public async override Task<IEnumerable<SubjectEntity>> GetListAsync()
         {
-            IEnumerable<Subject> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradeList).ToArrayAsync();
+            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradeList).ToArrayAsync();
 
             return subjectList;
         }
 
-        public async override Task<Subject?> GetAsync(int id)
+        public async override Task<SubjectEntity?> GetAsync(int id)
         {
-            Subject? subject = await _db.Subject.Include(subjectDb => subjectDb.GradeList).FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
+            SubjectEntity? subject = await _db.Subject.Include(subjectDb => subjectDb.GradeList).FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
 
             return subject;
         }
 
-        public async Task<Subject?> GetAsync(string name, string teacherName)
+        public async Task<SubjectEntity?> GetAsync(string name, string teacherName)
         {
-            Subject? subject =
+            SubjectEntity? subject =
             await _db.Subject
                 .Include(subjectDb => subjectDb.GradeList)
                 .FirstOrDefaultAsync
@@ -36,7 +36,7 @@ namespace api.Services.DataServices
             return subject;
         }
 
-        public async override Task UpdateAsync(Subject subjectToUpdate, SubjectDTO subjectDTO)
+        public async override Task UpdateAsync(SubjectEntity subjectToUpdate, SubjectDTO subjectDTO)
         {
             subjectToUpdate.Name = subjectDTO.Name;
             subjectToUpdate.Descripton = subjectDTO.Descripton;

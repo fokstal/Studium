@@ -1,8 +1,6 @@
-using api.Models;
-
-namespace api.Model
+namespace api.Models
 {
-    public class Person : IModel
+    public class PersonEntity : IModelEntity
     {
         public int Id { get; set; }
         public string FirstName { get; set; } = null!;
@@ -12,7 +10,7 @@ namespace api.Model
         public int Sex { get; set; }
         public string AvatarFileName { get; set; } = null!;
 
-        public Passport? Passport { get; set; }
-        public Student? Student { get; set; }
+        public PassportEntity? Passport { get; set; }
+        public StudentEntity? Student { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using api.Services.DataServices;
 using Microsoft.AspNetCore.Mvc;
@@ -8,25 +8,25 @@ namespace api.Controllers
 {
     [Route("group")]
     [ApiController]
-    public class GroupController(AppDbContext db) : ControllerBase
+    public class GroupEntityController(AppDbContext db) : ControllerBase
     {
         private readonly GroupService _groupService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Group>>> GetListAsync() => Ok(await _groupService.GetListAsync());
+        public async Task<ActionResult<IEnumerable<GroupEntity>>> GetListAsync() => Ok(await _groupService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Group>> GetAsync(int id)
+        public async Task<ActionResult<GroupEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Group? group = await _groupService.GetAsync(id);
+            GroupEntity? group = await _groupService.GetAsync(id);
 
             if (group is null) return NotFound();
 
@@ -41,7 +41,7 @@ namespace api.Controllers
         {
             if (await _groupService.GetAsync(groupDTO.Name) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Group already Exists!");
+                ModelState.AddModelError("Custom Error", "GroupEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
@@ -54,7 +54,7 @@ namespace api.Controllers
                 AuditoryName = groupDTO.AuditoryName,
             });
 
-            return Created("Group", groupDTO);
+            return Created("GroupEntity", groupDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -68,12 +68,12 @@ namespace api.Controllers
 
             if (await _groupService.GetAsync(groupDTO.Name) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Group already Exists!");
+                ModelState.AddModelError("Custom Error", "GroupEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            Group? groupToUpdate = await _groupService.GetAsync(id);
+            GroupEntity? groupToUpdate = await _groupService.GetAsync(id);
 
             if (groupToUpdate is null) return NotFound();
 
@@ -91,7 +91,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Group? groupToRemove = await _groupService.GetAsync(id);
+            GroupEntity? groupToRemove = await _groupService.GetAsync(id);
 
             if (groupToRemove is null) return NotFound();
 

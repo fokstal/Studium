@@ -1,8 +1,6 @@
-using api.Models;
-
-namespace api.Model
+namespace api.Models
 {
-    public class Student : IModel
+    public class StudentEntity : IModelEntity
     {
         public int Id { get; set; }
 

@@ -1,8 +1,6 @@
-using api.Models;
-
-namespace api.Model
+namespace api.Models
 {
-    public class User : IModel
+    public class UserEntity : IModelEntity
     {
         public int Id { get; set; }
         public string Login { get; set; } = null!;
@@ -10,6 +8,6 @@ namespace api.Model
         public string PasswordHash { get; set; } = null!;
         public DateTime DateCreated { get; set; }
 
-        public List<Role> RoleList { get; set; } = [];
+        public List<RoleEntity> RoleList { get; set; } = [];
     }
 }

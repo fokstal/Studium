@@ -1,5 +1,5 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,25 +7,25 @@ using static api.Services.PictureWorker;
 
 namespace api.Services.DataServices
 {
-    public class PersonService(AppDbContext db) : DataServiceBase<Person, PersonDTO>(db)
+    public class PersonService(AppDbContext db) : DataServiceBase<PersonEntity, PersonDTO>(db)
     {
-        public async override Task<IEnumerable<Person>> GetListAsync()
+        public async override Task<IEnumerable<PersonEntity>> GetListAsync()
         {
-            IEnumerable<Person> personList = await _db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).ToArrayAsync();
+            IEnumerable<PersonEntity> personList = await _db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).ToArrayAsync();
 
             return personList;
         }
 
-        public async override Task<Person?> GetAsync(int id)
+        public async override Task<PersonEntity?> GetAsync(int id)
         {
-            Person? person = await _db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).FirstOrDefaultAsync(personDb => personDb.Id == id);
+            PersonEntity? person = await _db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).FirstOrDefaultAsync(personDb => personDb.Id == id);
 
             return person;
         }
 
-        public async Task<Person?> GetAsync(string firstName, string middleName, string lastName)
+        public async Task<PersonEntity?> GetAsync(string firstName, string middleName, string lastName)
         {
-            Person? person = 
+            PersonEntity? person = 
             await _db.Person
                 .Include(personDb => personDb.Passport)
                 .Include(personDb => personDb.Student)
@@ -40,7 +40,7 @@ namespace api.Services.DataServices
             return person;
         }
 
-        public async override Task UpdateAsync(Person personToUpdate, PersonDTO personDTO)
+        public async override Task UpdateAsync(PersonEntity personToUpdate, PersonDTO personDTO)
         {
             personToUpdate.FirstName = personDTO.FirstName;
             personToUpdate.MiddleName = personDTO.MiddleName;

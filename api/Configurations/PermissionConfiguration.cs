@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace api.Configurations
 {
-    public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
+    public class PermissionConfiguration : IEntityTypeConfiguration<PermissionEntity>
     {
-        public void Configure(EntityTypeBuilder<Permission> builder)
+        public void Configure(EntityTypeBuilder<PermissionEntity> builder)
         {
             builder.HasKey(permission => permission.Id);
 
-            IEnumerable<Permission> permissionList = Enum.GetValues<Helpers.Enums.Permission>().Select(permissionEnum => new Permission
+            IEnumerable<PermissionEntity> permissionList = Enum.GetValues<Helpers.Enums.Permission>().Select(permissionEnum => new PermissionEntity
                 {
                     Id = Convert.ToInt32(permissionEnum),
                     Name = permissionEnum.ToString(),

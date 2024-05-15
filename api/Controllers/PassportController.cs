@@ -1,5 +1,5 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using api.Services;
 using api.Services.DataServices;
@@ -18,18 +18,18 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Passport>>> GetListAsync() => Ok(await _passportService.GetListAsync());
+        public async Task<ActionResult<IEnumerable<PassportEntity>>> GetListAsync() => Ok(await _passportService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Passport>> GetAsync(int id)
+        public async Task<ActionResult<PassportEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Passport? passport = await _passportService.GetAsync(id);
+            PassportEntity? passport = await _passportService.GetAsync(id);
 
             if (passport is null) return NotFound();
 
@@ -45,7 +45,7 @@ namespace api.Controllers
         {
             if (passportDTO.Scan is null) return BadRequest();
 
-            Person? person = await _personService.GetAsync(passportDTO.PersonId);
+            PersonEntity? person = await _personService.GetAsync(passportDTO.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
@@ -55,7 +55,7 @@ namespace api.Controllers
                 PersonId = person.Id,
             });
 
-            return Created("Passport", passportDTO);
+            return Created("PassportEntity", passportDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -70,11 +70,11 @@ namespace api.Controllers
 
             if (passportDTO.Scan is null) return BadRequest();
 
-            Passport? passportToUpdate = await _passportService.GetAsync(id);
+            PassportEntity? passportToUpdate = await _passportService.GetAsync(id);
 
             if (passportToUpdate is null) return NotFound();
 
-            Person? person = await _personService.GetAsync(passportToUpdate.PersonId);
+            PersonEntity? person = await _personService.GetAsync(passportToUpdate.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
@@ -94,7 +94,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Passport? passportToRemove = await _passportService.GetAsync(id);
+            PassportEntity? passportToRemove = await _passportService.GetAsync(id);
 
             if (passportToRemove is null) return NotFound();
 

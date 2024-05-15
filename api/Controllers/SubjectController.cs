@@ -1,5 +1,5 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using api.Services.DataServices;
 using Microsoft.AspNetCore.Mvc;
@@ -16,18 +16,18 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Subject>>> GetListAsync() => Ok(await _subjectService.GetListAsync());
+        public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync() => Ok(await _subjectService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Subject>> GetByIdAsync(int id)
+        public async Task<ActionResult<SubjectEntity>> GetByIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Subject? subject = await _subjectService.GetAsync(id);
+            SubjectEntity? subject = await _subjectService.GetAsync(id);
 
             if (subject is null) return NotFound();
 
@@ -42,7 +42,7 @@ namespace api.Controllers
         {
             if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherName) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Subject already Exists!");
+                ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
@@ -51,7 +51,7 @@ namespace api.Controllers
 
             if (subjectDTO.GroupId is not null)
             {
-                Group? group = await _groupService.GetAsync(subjectDTO.GroupId);
+                GroupEntity? group = await _groupService.GetAsync(subjectDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
@@ -66,7 +66,7 @@ namespace api.Controllers
                 GroupId = groupId,
             });
 
-            return Created("Subject", subjectDTO);
+            return Created("SubjectEntity", subjectDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -80,12 +80,12 @@ namespace api.Controllers
 
             if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherName) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Subject already Exists!");
+                ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            Subject? subjectToUpdate = await _subjectService.GetAsync(id);
+            SubjectEntity? subjectToUpdate = await _subjectService.GetAsync(id);
 
             if (subjectToUpdate is null) return NotFound();
 
@@ -93,7 +93,7 @@ namespace api.Controllers
 
             if (subjectDTO.GroupId is not null)
             {
-                Group? group = await _groupService.GetAsync(subjectDTO.GroupId);
+                GroupEntity? group = await _groupService.GetAsync(subjectDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
@@ -116,7 +116,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Subject? subjectToRemove = await _subjectService.GetAsync(id);
+            SubjectEntity? subjectToRemove = await _subjectService.GetAsync(id);
 
             if (subjectToRemove is null) return NotFound();
 

@@ -1,34 +1,34 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Services.DataServices
 {
-    public class GradeService(AppDbContext db) : DataServiceBase<Grade, GradeDTO>(db)
+    public class GradeService(AppDbContext db) : DataServiceBase<GradeEntity, GradeDTO>(db)
     {
-        public async Task<IEnumerable<Grade>> GetListByStudentIdAsync(int id)
+        public async Task<IEnumerable<GradeEntity>> GetListByStudentIdAsync(int id)
         {
-            IEnumerable<Grade> gradeList = await _db.Grade.Where(grade_db => grade_db.StudentId == id).ToArrayAsync();
+            IEnumerable<GradeEntity> gradeList = await _db.Grade.Where(grade_db => grade_db.StudentId == id).ToArrayAsync();
 
             return gradeList;
         }
 
-        public async Task<IEnumerable<Grade>> GetListBySubjectIdAsync(int id)
+        public async Task<IEnumerable<GradeEntity>> GetListBySubjectIdAsync(int id)
         {
-            IEnumerable<Grade> gradeList = await _db.Grade.Where(grade_db => grade_db.SubjectId == id).ToArrayAsync();
+            IEnumerable<GradeEntity> gradeList = await _db.Grade.Where(grade_db => grade_db.SubjectId == id).ToArrayAsync();
 
             return gradeList;
         }
 
-        public async Task<IEnumerable<Grade>> GetListByStudentAndSubjectIdAsync(int studentId, int subjectId)
+        public async Task<IEnumerable<GradeEntity>> GetListByStudentAndSubjectIdAsync(int studentId, int subjectId)
         {
-            IEnumerable<Grade> gradeList = await _db.Grade.Where(grade_db => grade_db.StudentId == studentId && grade_db.SubjectId == subjectId).ToListAsync();
+            IEnumerable<GradeEntity> gradeList = await _db.Grade.Where(grade_db => grade_db.StudentId == studentId && grade_db.SubjectId == subjectId).ToListAsync();
 
             return gradeList;
         }
 
-        public override async Task UpdateAsync(Grade gradeToUpdate, GradeDTO gradeDTO)
+        public override async Task UpdateAsync(GradeEntity gradeToUpdate, GradeDTO gradeDTO)
         {
             gradeToUpdate.Value = gradeDTO.Value;
             gradeToUpdate.SetDate = DateTime.Now;

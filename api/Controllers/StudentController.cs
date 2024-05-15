@@ -1,5 +1,5 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
 using api.Services.DataServices;
 using Microsoft.AspNetCore.Mvc;
@@ -17,18 +17,18 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Student>>> GetListAsync() => Ok(await _studentService.GetListAsync());
+        public async Task<ActionResult<IEnumerable<StudentEntity>>> GetListAsync() => Ok(await _studentService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Student>> GetAsync(int id)
+        public async Task<ActionResult<StudentEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Student? student = await _studentService.GetAsync(id);
+            StudentEntity? student = await _studentService.GetAsync(id);
 
             if (student is null) return NotFound();
 
@@ -44,12 +44,12 @@ namespace api.Controllers
         {
             if (await _studentService.GetAsync(studentDTO.PersonId, studentDTO.GroupId) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Student already Exists!");
+                ModelState.AddModelError("Custom Error", "StudentEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            Person? person = await _personService.GetAsync(studentDTO.PersonId);
+            PersonEntity? person = await _personService.GetAsync(studentDTO.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
@@ -57,7 +57,7 @@ namespace api.Controllers
 
             if (studentDTO.GroupId is not null)
             {
-                Group? group = await _groupService.GetAsync(studentDTO.GroupId);
+                GroupEntity? group = await _groupService.GetAsync(studentDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
@@ -72,7 +72,7 @@ namespace api.Controllers
                 GroupId = groupId,
             });
 
-            return Created("Student", studentDTO);
+            return Created("StudentEntity", studentDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -86,16 +86,16 @@ namespace api.Controllers
 
             if (await _studentService.GetAsync(studentDTO.PersonId, studentDTO.GroupId) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Student already Exists!");
+                ModelState.AddModelError("Custom Error", "StudentEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            Student? studentToUpdate = await _studentService.GetAsync(id);
+            StudentEntity? studentToUpdate = await _studentService.GetAsync(id);
 
             if (studentToUpdate is null) return NotFound();
 
-            Person? person = await _personService.GetAsync(studentDTO.PersonId);
+            PersonEntity? person = await _personService.GetAsync(studentDTO.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
@@ -103,7 +103,7 @@ namespace api.Controllers
 
             if (studentDTO.GroupId is not null)
             {
-                Group? group = await _groupService.GetAsync(studentDTO.GroupId);
+                GroupEntity? group = await _groupService.GetAsync(studentDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
@@ -126,7 +126,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            Student? studentToRemove = await _studentService.GetAsync(id);
+            StudentEntity? studentToRemove = await _studentService.GetAsync(id);
 
             if (studentToRemove is null) return NotFound();
 
