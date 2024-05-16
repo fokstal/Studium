@@ -6,6 +6,7 @@ const imagesUrl = process.env.PUBLIC_URL + "/images";
 
 export function Error401Page() {
   const navigator = useNavigate();
+  document.body.style.overflow = "hidden";
 
   return (
     <Box w="100vw" h="100vh" bg={colors.white}>

@@ -1,13 +1,17 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
-import { Select, Avatar } from "../ui-kit";
-import { colors, languages } from "../ui-kit/variables";
+import { Avatar } from "../ui-kit";
+import { colors } from "../ui-kit/variables";
 import { AiOutlineEye } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { Error401Page } from "../../pages";
 
 export function Header() {
   const location = useLocation();
+  const isAuth = useAuth();
 
+  if (!isAuth) return Error401Page();
   return (
     <BaseLayout>
       <Flex align="center" justify="space-between" h="100px">
