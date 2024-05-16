@@ -1,4 +1,4 @@
-import { Box, InputGroup, Text, VStack } from "@chakra-ui/react";
+import { Box, InputGroup, Text, VStack, cookieStorageManager } from "@chakra-ui/react";
 import { Button, Input, colors } from "../../ui-kit";
 import { useState, useTransition } from "react";
 import { AuthServise } from "../../../services/AuthService";
@@ -15,8 +15,8 @@ export function AuthForm() {
   const authorize = () => {
     startTransaction(() => {
       if (!login || !password) return;
-      authService.login(login, password).then((status) => {
-        if (status === 200) navigator("/students");
+      authService.login(login, password).then((res) => {
+        if (res.status === 200) return navigator("/students")
       });
     });
   };

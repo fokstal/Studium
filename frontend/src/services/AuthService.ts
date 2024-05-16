@@ -11,10 +11,11 @@ export class AuthServise {
         login,
         password,
       }),
+      credentials: "include",
     });
 
     if (!res.ok) throw new Error("Not correct password or login");
 
-    return res.status;
+    return res;
   }
 }

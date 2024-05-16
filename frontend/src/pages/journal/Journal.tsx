@@ -1,20 +1,13 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
 import { colors } from "../../components/ui-kit";
-import {
-  GroupService,
-  PersonService,
-  StudentService,
-  SubjectService,
-} from "../../services";
-import { useState } from "react";
-import { Group, Person, Subject } from "../../types";
-import { JournalFilters } from "../../components/journal";
+import { useEffect, useState } from "react";
+import { Grade, Group, Person, Subject } from "../../types";
+import { JournalFilters, JournalTable } from "../../components/journal";
+import { GradeService } from "../../services";
+import { formatGrades } from "../../lib";
 
-const groupService = new GroupService();
-const studentService = new StudentService();
-const personService = new PersonService();
-const subjectService = new SubjectService();
+const gradeService = new GradeService();
 
 export function Journal() {
   const [filters, setFilters] = useState<{
@@ -22,6 +15,13 @@ export function Journal() {
     person?: Person;
     subject?: Subject;
   }>();
+  const [grades, setGrades] = useState<Grade[]>();
+  const [data, setData] = useState<any[]>();
+
+  useEffect(() => {
+    gradeService.get().then(grades => setGrades(grades));
+    formatGrades(filters!, grades).then((data) => setData(data));
+  }, [filters]);
 
   return (
     <BaseLayout bg={colors.darkGrey}>
@@ -36,8 +36,12 @@ export function Journal() {
           <Text fontSize="32px" fontWeight="bold" as="h1">
             Журнал
           </Text>
-          <JournalFilters filters={filters || {}} setFilters={setFilters}/>
+          <JournalFilters filters={filters || {}} setFilters={setFilters} />
         </Flex>
+        <JournalTable
+          data={data || []}
+          columns={[{name: "Name", field: "name"}, {field: "9.4_0", name: "9.4"}, {field: "9.4_1", name: "9.4"}, {field: "9.4_2", name: "9.4"},  {field: "9.4_3", name: "9.4"}]}
+        />
       </Flex>
     </BaseLayout>
   );
