@@ -5,3 +5,4 @@ export * from "./checkbox";
 export * from "./avatar";
 export * from "./select";
 export * from "./variables";
+export * from "./image-picker";

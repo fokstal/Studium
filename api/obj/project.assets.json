@@ -3297,19 +3297,19 @@
     ]
   },
   "packageFolders": {
-    "/home/fokstal/.nuget/packages/": {}
+    "/home/alexander/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/fokstal/Репозитории/Диплом/Studium/api/api.csproj",
+      "projectUniqueName": "/home/alexander/work/Studium/api/api.csproj",
       "projectName": "api",
-      "projectPath": "/home/fokstal/Репозитории/Диплом/Studium/api/api.csproj",
-      "packagesPath": "/home/fokstal/.nuget/packages/",
-      "outputPath": "/home/fokstal/Репозитории/Диплом/Studium/api/obj/",
+      "projectPath": "/home/alexander/work/Studium/api/api.csproj",
+      "packagesPath": "/home/alexander/.nuget/packages/",
+      "outputPath": "/home/alexander/work/Studium/api/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/fokstal/.nuget/NuGet/NuGet.Config"
+        "/home/alexander/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -3327,6 +3327,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -3371,7 +3376,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/8.0.104/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/snap/dotnet-sdk/245/sdk/8.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
