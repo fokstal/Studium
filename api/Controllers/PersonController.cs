@@ -1,10 +1,12 @@
 using api.Data;
-using api.Model;
+using api.Helpers.Constants;
+using api.Models;
 using api.Model.DTO;
+using api.Repositories;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-using static api.Service.PictureService;
+using api.Helpers.Enums;
+using api.Extensions;
 
 namespace api.Controllers
 {
@@ -12,28 +14,25 @@ namespace api.Controllers
     [ApiController]
     public class PersonController(AppDbContext db) : ControllerBase
     {
-        private readonly AppDbContext _db = db;
+        private readonly PersonRepository _personService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Person>>> GetListAsync()
-        {
-            IEnumerable<Person> personList = await _db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).ToArrayAsync();
-
-            return Ok(personList);
-        }
+        [RequirePermissions([PermissionEnum.Read])]
+        public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListAsync() => Ok(await _personService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Person>> GetAsync(int id)
+        [RequirePermissions([PermissionEnum.Read])]
+        public async Task<ActionResult<PersonEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Person? person = await _db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).FirstOrDefaultAsync(personDb => personDb.Id == id);
+            PersonEntity? person = await _personService.GetAsync(id);
 
             if (person is null) return NotFound();
 
@@ -46,34 +45,29 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Person>> CreateAsync([FromForm] PersonDTO personDTO)
+        [RequirePermissions([PermissionEnum.Create])]
+        public async Task<ActionResult<PersonEntity>> CreateAsync([FromForm] PersonDTO personDTO)
         {
-            if (await _db.Person.FirstOrDefaultAsync
-            (
-                personDb =>
-                    personDb.FirstName.ToLower() == personDTO.FirstName.ToLower() &&
-                    personDb.MiddleName.ToLower() == personDTO.MiddleName.ToLower() &&
-                    personDb.LastName.ToLower() == personDTO.LastName.ToLower()
-            ) is not null)
+            if (await _personService.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Person already Exists!");
+                ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            await _db.Person.AddAsync(new()
+            PersonEntity personToAdd = new()
             {
                 FirstName = personDTO.FirstName,
                 MiddleName = personDTO.MiddleName,
                 LastName = personDTO.LastName,
                 BirthDate = personDTO.BirthDate,
                 Sex = personDTO.Sex,
-                AvatarFileName = await UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
-            });
+                AvatarFileName = await PictureRepository.UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
+            };
 
-            await _db.SaveChangesAsync();
+            await _personService.AddAsync(personToAdd);
 
-            return Created("Person", personDTO);
+            return Created("PersonEntity", personToAdd);
         }
 
         [HttpPut("{id:int}")]
@@ -82,37 +76,25 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateAsync(int id, [FromForm] PersonDTO personDTO)
+        [RequirePermissions([PermissionEnum.Update])]
+        public async Task<IActionResult> UpdateAsync(int id, [FromForm] PersonDTO personDTO)
         {
             if (id < 1) return BadRequest();
 
-            Person? personToUpdate = await _db.Person.FirstOrDefaultAsync(personDb => personDb.Id == id);
+            PersonEntity? personToUpdate = await _personService.GetAsync(id);
 
             if (personToUpdate is null) return NotFound();
 
-            if (await _db.Person.FirstOrDefaultAsync
-            (
-                personDb =>
-                    personDb.FirstName.ToLower() == personDTO.FirstName.ToLower() &&
-                    personDb.MiddleName.ToLower() == personDTO.MiddleName.ToLower() &&
-                    personDb.LastName.ToLower() == personDTO.LastName.ToLower()
-            ) is not null)
+            if (await _personService.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Person already Exists!");
+                ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            System.IO.File.Delete($"{picturesFolderPath}/Person/{personToUpdate.AvatarFileName}");
+            PictureRepository.RemovePicture(PictureFolders.Person, personToUpdate.AvatarFileName);
 
-            personToUpdate.FirstName = personDTO.FirstName;
-            personToUpdate.MiddleName = personDTO.MiddleName;
-            personToUpdate.LastName = personDTO.LastName;
-            personToUpdate.BirthDate = personDTO.BirthDate;
-            personToUpdate.Sex = personDTO.Sex;
-            personToUpdate.AvatarFileName = await UploadPersonAvatarAsync(personDTO.Avatar, personToUpdate.Sex);
-
-            await _db.SaveChangesAsync();
+            await _personService.UpdateAsync(personToUpdate, personDTO);
 
             return NoContent();
         }
@@ -122,24 +104,23 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteAsync(int id)
+        [RequirePermissions([PermissionEnum.Delete])]
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Person? person = await _db.Person.Include(personDb => personDb.Passport).FirstOrDefaultAsync(personDb => personDb.Id == id);
+            PersonEntity? personToRemove = await _personService.GetAsync(id);
 
-            if (person is null) return NotFound();
+            if (personToRemove is null) return NotFound();
 
-            if (person.Passport is not null)
+            if (personToRemove.Passport is not null)
             {
-                System.IO.File.Delete($"{picturesFolderPath}/Passport/{person.Passport.ScanFileName}");
+                PictureRepository.RemovePicture(PictureFolders.Passport, personToRemove.Passport.ScanFileName);
             }
 
-            System.IO.File.Delete($"{picturesFolderPath}/Person/{person.AvatarFileName}");
+            PictureRepository.RemovePicture(PictureFolders.Person, personToRemove.AvatarFileName);
 
-            _db.Person.Remove(person);
-
-            await _db.SaveChangesAsync();
+            await _personService.RemoveAsync(personToRemove);
 
             return NoContent();
         }

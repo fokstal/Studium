@@ -2,13 +2,13 @@ using api.Data;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace api.Services.DataServices
+namespace api.Repositories.Data
 {
-    public abstract class DataServiceBase<TValue, TValueDTO>(AppDbContext db) 
-        where TValue : class, IModel
+    public abstract class DataRepositoryBase<TValue, TValueDTO>(AppDbContext db) 
+        where TValue : ModelEntity
         where TValueDTO : class
     {
-        private readonly AppDbContext _db = db;
+        protected readonly AppDbContext _db = db;
 
         public virtual async Task<bool> CheckExistsAsync(int id) => await _db.Set<TValue>().FirstOrDefaultAsync(valueDb => valueDb.Id == id) is not null;
 

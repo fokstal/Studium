@@ -1,8 +1,7 @@
-namespace api.Model
+namespace api.Models
 {
-    public class Passport
+    public class PassportEntity : ModelEntity
     {
-        public int Id { get; set; }
         public string ScanFileName { get; set; } = null!;
         public int PersonId { get; set; }
     }

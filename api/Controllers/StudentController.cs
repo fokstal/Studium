@@ -1,8 +1,10 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using api.Helpers.Enums;
+using api.Extensions;
 
 namespace api.Controllers
 {
@@ -10,28 +12,27 @@ namespace api.Controllers
     [ApiController]
     public class StudentController(AppDbContext db) : ControllerBase
     {
-        private readonly AppDbContext _db = db;
+        private readonly StudentRepository _studentService = new(db);
+        private readonly PersonRepository _personService = new(db);
+        private readonly GroupRepository _groupService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Student>>> GetListAsync()
-        {
-            IEnumerable<Student> studentList = await _db.Student.ToArrayAsync();
-
-            return Ok(studentList);
-        }
+        [RequirePermissions([PermissionEnum.Read])]
+        public async Task<ActionResult<IEnumerable<StudentEntity>>> GetListAsync() => Ok(await _studentService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Student>> GetAsync(int id)
+        [RequirePermissions([PermissionEnum.Read])]
+        public async Task<ActionResult<StudentEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Student? student = await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id);
+            StudentEntity? student = await _studentService.GetAsync(id);
 
             if (student is null) return NotFound();
 
@@ -43,16 +44,17 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Student>> CreateAsync([FromBody] StudentDTO studentDTO)
+        [RequirePermissions([PermissionEnum.Create])]
+        public async Task<ActionResult<StudentDTO>> CreateAsync([FromBody] StudentDTO studentDTO)
         {
-            if (await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.PersonId == studentDTO.PersonId && studentDb.GroupId == studentDTO.GroupId) is not null)
+            if (await _studentService.GetAsync(studentDTO.PersonId, studentDTO.GroupId) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Student already Exists!");
+                ModelState.AddModelError("Custom Error", "StudentEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            Person? person = await _db.Person.FirstOrDefaultAsync(personDb => personDb.Id == studentDTO.PersonId);
+            PersonEntity? person = await _personService.GetAsync(studentDTO.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
@@ -60,22 +62,22 @@ namespace api.Controllers
 
             if (studentDTO.GroupId is not null)
             {
-                Group? group = await _db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == studentDTO.GroupId);
+                GroupEntity? group = await _groupService.GetAsync(studentDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
                 groupId = group.Id;
             }
 
-            await _db.Student.AddAsync(new()
+            studentDTO.GroupId = groupId;
+
+            await _studentService.AddAsync(new()
             {
                 PersonId = person.Id,
                 GroupId = groupId,
             });
 
-            await _db.SaveChangesAsync();
-
-            return Created("Student", studentDTO);
+            return Created("StudentEntity", studentDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -83,22 +85,23 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateAsync(int id, [FromBody] StudentDTO studentDTO)
+        [RequirePermissions([PermissionEnum.Update])]
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] StudentDTO studentDTO)
         {
             if (id < 1) return BadRequest();
 
-            if (await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.PersonId == studentDTO.PersonId && studentDb.GroupId == studentDTO.GroupId) is not null)
+            if (await _studentService.GetAsync(studentDTO.PersonId, studentDTO.GroupId) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Student already Exists!");
+                ModelState.AddModelError("Custom Error", "StudentEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            Student? studentToUpdate = await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id);
+            StudentEntity? studentToUpdate = await _studentService.GetAsync(id);
 
             if (studentToUpdate is null) return NotFound();
 
-            Person? person = await _db.Person.FirstOrDefaultAsync(personDb => personDb.Id == studentDTO.PersonId);
+            PersonEntity? person = await _personService.GetAsync(studentDTO.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
@@ -106,17 +109,16 @@ namespace api.Controllers
 
             if (studentDTO.GroupId is not null)
             {
-                Group? group = await _db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == studentDTO.GroupId);
+                GroupEntity? group = await _groupService.GetAsync(studentDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
                 groupId = group.Id;
             }
 
-            studentToUpdate.PersonId = person.Id;
-            studentToUpdate.GroupId = groupId;
+            studentDTO.GroupId = groupId;
 
-            await _db.SaveChangesAsync();
+            await _studentService.UpdateAsync(studentToUpdate, studentDTO);
 
             return NoContent();
         }
@@ -126,17 +128,16 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteAsync(int id)
+        [RequirePermissions([PermissionEnum.Delete])]
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Student? student = await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id);
+            StudentEntity? studentToRemove = await _studentService.GetAsync(id);
 
-            if (student is null) return NotFound();
+            if (studentToRemove is null) return NotFound();
 
-            _db.Student.Remove(student);
-
-            await _db.SaveChangesAsync();
+            await _studentService.RemoveAsync(studentToRemove);
 
             return NoContent();
         }

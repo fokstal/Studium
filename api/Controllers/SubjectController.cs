@@ -1,8 +1,10 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using api.Helpers.Enums;
+using api.Extensions;
 
 namespace api.Controllers
 {
@@ -10,28 +12,26 @@ namespace api.Controllers
     [ApiController]
     public class SubjectController(AppDbContext db) : ControllerBase
     {
-        private readonly AppDbContext _db = db;
+        private readonly SubjectRepository _subjectService = new(db);
+        private readonly GroupRepository _groupService = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Subject>>> GetListAsync()
-        {
-            IEnumerable<Subject> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradeList).ToArrayAsync();
-
-            return Ok(subjectList);
-        }
+        [RequirePermissions([PermissionEnum.Read])]
+        public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync() => Ok(await _subjectService.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Subject>> GetByIdAsync(int id)
+        [RequirePermissions([PermissionEnum.Read])]
+        public async Task<ActionResult<SubjectEntity>> GetByIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Subject? subject = await _db.Subject.Include(subjectDb => subjectDb.GradeList).FirstOrDefaultAsync();
+            SubjectEntity? subject = await _subjectService.GetAsync(id);
 
             if (subject is null) return NotFound();
 
@@ -42,16 +42,12 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Subject>> CreateAsync([FromBody] SubjectDTO subjectDTO)
+        [RequirePermissions([PermissionEnum.Create])]
+        public async Task<ActionResult<SubjectDTO>> CreateAsync([FromBody] SubjectDTO subjectDTO)
         {
-            if (await _db.Subject.FirstOrDefaultAsync
-            (
-                subjectDb =>
-                    subjectDb.Name.ToLower() == subjectDTO.Name.ToLower() &&
-                    subjectDb.TeacherName.ToLower() == subjectDTO.TeacherName.ToLower()
-            ) is not null)
+            if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherName) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Subject already Exists!");
+                ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
@@ -60,14 +56,14 @@ namespace api.Controllers
 
             if (subjectDTO.GroupId is not null)
             {
-                Group? group = await _db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == subjectDTO.GroupId);
+                GroupEntity? group = await _groupService.GetAsync(subjectDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
                 groupId = group.Id;
             }
 
-            await _db.Subject.AddAsync(new()
+            await _subjectService.AddAsync(new()
             {
                 Name = subjectDTO.Name,
                 Descripton = subjectDTO.Descripton,
@@ -75,9 +71,7 @@ namespace api.Controllers
                 GroupId = groupId,
             });
 
-            await _db.SaveChangesAsync();
-
-            return Created("Subject", subjectDTO);
+            return Created("SubjectEntity", subjectDTO);
         }
 
         [HttpPut("{id:int}")]
@@ -85,23 +79,19 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateAsync(int id, [FromBody] SubjectDTO subjectDTO)
+        [RequirePermissions([PermissionEnum.Update])]
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] SubjectDTO subjectDTO)
         {
             if (id < 1) return BadRequest();
 
-            if (await _db.Subject.FirstOrDefaultAsync
-            (
-                subjectDb =>
-                    subjectDb.Name.ToLower() == subjectDTO.Name.ToLower() &&
-                    subjectDb.TeacherName.ToLower() == subjectDTO.TeacherName.ToLower()
-            ) is not null)
+            if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherName) is not null)
             {
-                ModelState.AddModelError("Custom Error", "Subject already Exists!");
+                ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            Subject? subjectToUpdate = await _db.Subject.FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
+            SubjectEntity? subjectToUpdate = await _subjectService.GetAsync(id);
 
             if (subjectToUpdate is null) return NotFound();
 
@@ -109,19 +99,16 @@ namespace api.Controllers
 
             if (subjectDTO.GroupId is not null)
             {
-                Group? group = await _db.Group.FirstOrDefaultAsync(groupDb => groupDb.Id == subjectDTO.GroupId);
+                GroupEntity? group = await _groupService.GetAsync(subjectDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
                 groupId = group.Id;
             }
 
-            subjectToUpdate.Name = subjectDTO.Name;
-            subjectToUpdate.Descripton = subjectDTO.Descripton;
-            subjectToUpdate.TeacherName = subjectDTO.TeacherName;
-            subjectToUpdate.GroupId = groupId;
+            subjectDTO.GroupId = groupId;
 
-            await _db.SaveChangesAsync();
+            await _subjectService.UpdateAsync(subjectToUpdate, subjectDTO);
 
             return NoContent();
         }
@@ -131,17 +118,16 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> DeleteAsync(int id)
+        [RequirePermissions([PermissionEnum.Delete])]
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            Subject? subject = await _db.Subject.FirstOrDefaultAsync();
+            SubjectEntity? subjectToRemove = await _subjectService.GetAsync(id);
 
-            if (subject is null) return NotFound();
+            if (subjectToRemove is null) return NotFound();
 
-            _db.Subject.Remove(subject);
-
-            await _db.SaveChangesAsync();
+            await _subjectService.RemoveAsync(subjectToRemove);
 
             return NoContent();
         }

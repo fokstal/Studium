@@ -1,15 +1,15 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using api.Model;
+using api.Models;
 using Microsoft.IdentityModel.Tokens;
 
-namespace api.Service
+namespace api.Services
 {
     public class JwtProvider(IConfiguration configuration)
     {
         private readonly IConfiguration _configuration = configuration;
 
-        public string GenerateToken(User user)
+        public string GenerateToken(UserEntity user)
         {
             string? jwtKey = _configuration["Jwt:Key"] ?? throw new NullReferenceException(nameof(jwtKey));
             string? jwtExpiresSeconds = _configuration["Jwt:ExpiresSeconds"] ?? throw new NullReferenceException(nameof(jwtExpiresSeconds));

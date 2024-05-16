@@ -1,9 +1,9 @@
 using api.Data;
-using api.Model;
+using api.Models;
 using api.Model.DTO;
-using api.Service;
+using api.Services;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -12,7 +12,7 @@ namespace api.Controllers
     public class UserController(IConfiguration configuration, AppDbContext db) : ControllerBase
     {
         private readonly IConfiguration _configuration = configuration;
-        private readonly AppDbContext _db = db;
+        private readonly UserRepository _userService = new(db);
 
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -20,7 +20,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<RegisterUserDTO>> RegisterAsync([FromBody] RegisterUserDTO userDTO)
         {
-            if (await _db.User.FirstOrDefaultAsync(userDb => userDb.Login.ToLower() == userDTO.Login.ToLower()) is not null)
+            if (await _userService.GetAsync(userDTO.Login) is not null)
             {
                 ModelState.AddModelError("Custom", "User already Exists!");
 
@@ -29,15 +29,13 @@ namespace api.Controllers
 
             string passwordHash = StringHasher.Generate(userDTO.Password);
 
-            await _db.User.AddAsync(new()
+            await _userService.AddAsync(new()
             {
                 Login = userDTO.Login,
                 Email = userDTO.Email,
                 PasswordHash = passwordHash,
                 DateCreated = DateTime.Now,
             });
-
-            await _db.SaveChangesAsync();
 
             return Created("User", userDTO);
         }
@@ -47,9 +45,9 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<string>> LoginAsync([FromBody] LoginUserDTO userDTO)
+        public async Task<IActionResult> LoginAsync([FromBody] LoginUserDTO userDTO)
         {
-            User? user = await _db.User.FirstOrDefaultAsync(userDb => userDb.Login.ToLower() == userDTO.Login.ToLower());
+            UserEntity? user = await _userService.GetAsync(userDTO.Login);
 
             if (user is null) return NotFound();
 

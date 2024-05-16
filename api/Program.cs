@@ -1,5 +1,6 @@
 using api.Data;
 using api.Extensions;
+using api.Models;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +18,10 @@ services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionStrin
 services.AddCors(options => options.AddPolicy(corsName, policy =>
 {
     policy
-    .AllowAnyOrigin()
-    .WithHeaders("Content-Type");
+    .WithOrigins("http//localhost:3000")
+    .WithHeaders("Content-Type")
+    .WithMethods("PUT", "DELETE")
+    .AllowCredentials();
 }));
 
 services.AddAppAuthentication(builder.Configuration);
@@ -27,6 +30,8 @@ services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
+
+services.Configure<AuthorizationOptions>(configuration.GetSection(nameof(AuthorizationOptions)));
 
 WebApplication app = builder.Build();
 

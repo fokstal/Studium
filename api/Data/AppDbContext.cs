@@ -1,22 +1,37 @@
-using api.Model;
+using api.Configurations;
+using api.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace api.Data
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<Grade> Grade { get; set; }
-        public DbSet<Group> Group { get; set; }
-        public DbSet<Passport> Passport { get; set; }
-        public DbSet<Person> Person { get; set; }
-        public DbSet<Student> Student { get; set; }
-        public DbSet<Subject> Subject { get; set; }
+        private readonly AuthorizationOptions _authOptions;
 
-        public DbSet<User> User { get; set; }
+        public DbSet<GradeEntity> Grade { get; set; }
+        public DbSet<GroupEntity> Group { get; set; }
+        public DbSet<PassportEntity> Passport { get; set; }
+        public DbSet<PersonEntity> Person { get; set; }
+        public DbSet<StudentEntity> Student { get; set; }
+        public DbSet<SubjectEntity> Subject { get; set; }
 
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public DbSet<UserEntity> User { get; set; }
+        public DbSet<RoleEntity> Role { get; set;}
+        public DbSet<UserRole> UserRole { get; set; }
+
+        public AppDbContext(DbContextOptions<AppDbContext> options, IOptions<AuthorizationOptions> authOptions) : base(options)
         {
+            _authOptions = authOptions.Value;
+
             Database.EnsureCreated();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+            modelBuilder.ApplyConfiguration(new RolePermissionConfiguration(_authOptions));
         }
     }
 }

@@ -1,8 +1,10 @@
 using api.Data;
-using api.Model;
+using api.Extensions;
+using api.Models;
 using api.Model.DTO;
-using api.Services.DataServices;
+using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
+using api.Helpers.Enums;
 
 namespace api.Controllers
 {
@@ -10,21 +12,23 @@ namespace api.Controllers
     [ApiController]
     public class GradeController(AppDbContext db) : ControllerBase
     {
-        private readonly StudentService _studentService = new(db);
-        private readonly SubjectService _subjectService = new(db);
-        private readonly GradeService _gradeService = new(db);
+        private readonly StudentRepository _studentService = new(db);
+        private readonly SubjectRepository _subjectService = new(db);
+        private readonly GradeRepository _gradeService = new(db);
 
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetListAsync() => Ok(await _gradeService.GetListAsync());
+        [RequirePermissions([PermissionEnum.Read])]
+        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListAsync() => Ok(await _gradeService.GetListAsync());
 
         [HttpGet("list-by-student/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Grade>>> GetByStudentIdAsync(int id)
+        [RequirePermissions([PermissionEnum.Read])]
+        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -38,7 +42,8 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Grade>>> GetBySubjectIdAsync(int id)
+        [RequirePermissions([PermissionEnum.Read])]
+        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListBySubjectIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
@@ -52,7 +57,8 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Grade>>> GetListByStudentAndSubjectIdAsync(int studentId, int subjectId)
+        [RequirePermissions([PermissionEnum.Read])]
+        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentAndSubjectIdAsync(int studentId, int subjectId)
         {
             if (studentId < 1 || subjectId < 1) return BadRequest();
 
@@ -66,7 +72,8 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Grade>> AddAsync([FromBody] GradeDTO gradeDTO)
+        [RequirePermissions([PermissionEnum.Create])]
+        public async Task<ActionResult<GradeDTO>> AddAsync([FromBody] GradeDTO gradeDTO)
         {
             if (await _studentService.CheckExistsAsync(gradeDTO.StudentId) is false) return NotFound("Student is null!");
             if (await _subjectService.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
@@ -79,18 +86,21 @@ namespace api.Controllers
                 SetDate = DateTime.Now,
             });
 
-            return Created("Grade", gradeDTO);
+            return Created("GradeEntity", gradeDTO);
         }
 
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([PermissionEnum.Update])]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] GradeDTO gradeDTO)
         {
-            Grade? gradeToUpdate = await _gradeService.GetAsync(id);
+            if (id < 1) return BadRequest();
 
-            if (gradeToUpdate is null) return NotFound("Grade is null");
+            GradeEntity? gradeToUpdate = await _gradeService.GetAsync(id);
+
+            if (gradeToUpdate is null) return NotFound("GradeEntity is null");
 
             if (await _studentService.CheckExistsAsync(gradeDTO.StudentId) is false) return NotFound("Student is null!");
             if (await _subjectService.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
@@ -105,9 +115,12 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([PermissionEnum.Delete])]
         public async Task<ActionResult> RemoveAsync(int id)
         {
-            Grade? gradeToRemove = await _gradeService.GetAsync(id);
+            if (id < 1) return BadRequest();
+
+            GradeEntity? gradeToRemove = await _gradeService.GetAsync(id);
 
             if (gradeToRemove is null) return NotFound();
 
