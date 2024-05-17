@@ -7,6 +7,7 @@ export class PersonService extends Service {
     const res = await fetch(this.url, {
       method: "POST",
       body: data,
+      credentials: "include",
     });
     
     return await res.json();
@@ -16,6 +17,7 @@ export class PersonService extends Service {
     const res = await fetch(`${this.url}/${id}`, {
       method: "PUT",
       body: data,
+      credentials: "include",
     });
 
     return await res.json();

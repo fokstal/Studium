@@ -2,13 +2,13 @@ export abstract class Service {
   protected url: string = "";
 
   public async get() {
-    const res = await fetch(this.url);
+    const res = await fetch(this.url, { credentials: "include" });
 
     return await res.json();
   }
 
   public async getById(id: number) {
-    const res = await fetch(`${this.url}/${id}`);
+    const res = await fetch(`${this.url}/${id}`, { credentials: "include" });
 
     return await res.json();
   }
@@ -19,6 +19,7 @@ export abstract class Service {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(data),
     });
 
@@ -31,6 +32,7 @@ export abstract class Service {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(data),
     });
 
@@ -40,6 +42,7 @@ export abstract class Service {
   public async delete(id: number) {
     const res = await fetch(`${this.url}/${id}`, {
       method: "DELETE",
+      credentials: "include",
     });
 
     return res;
