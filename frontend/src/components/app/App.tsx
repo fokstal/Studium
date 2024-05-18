@@ -1,7 +1,7 @@
 import { PageLayout } from "../../layouts";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./default.css";
-import { CreateEditStudent, Error404Page, Home, Student, Students } from "../../pages";
+import { CreateEditStudent, Error404Page, Home, Profile, Student, Students } from "../../pages";
 import { Journal } from "../../pages/journal";
 
 export function App() {
@@ -14,7 +14,7 @@ export function App() {
           <Route path="students" element={<Students/>}/>
           <Route path="students/new" element={<CreateEditStudent/>}/>
           <Route path="students/:id" element={<Student/>}/>
-          <Route path="profile" element={<>Профиль</>}/>
+          <Route path="profile" element={<Profile/>}/>
         </Route>
         <Route path="*" element={<Error404Page/>}/>
       </Routes>
