@@ -34,8 +34,13 @@ namespace api.Extensions
                             }
                         };
                     });
+        }
 
+        public static void AddAppAuthorization(this IServiceCollection services, IConfiguration configuration)
+        {
             services.AddScoped<PermissionService>();
+            services.AddScoped<RoleService>();
+
             services.AddScoped<UserRepository>();
 
             services.AddAuthorization();

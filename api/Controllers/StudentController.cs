@@ -3,13 +3,16 @@ using api.Models;
 using api.Model.DTO;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
-using api.Helpers.Enums;
 using api.Extensions;
+
+using static api.Helpers.Enums.RoleEnum;
+using static api.Helpers.Enums.PermissionEnum;
 
 namespace api.Controllers
 {
     [Route("student")]
     [ApiController]
+    [RequireRoles([Admin, Secretar, Curator, Student])]
     public class StudentController(AppDbContext db) : ControllerBase
     {
         private readonly StudentRepository _studentService = new(db);
@@ -19,7 +22,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
+        [RequirePermissions([Read])]
         public async Task<ActionResult<IEnumerable<StudentEntity>>> GetListAsync() => Ok(await _studentService.GetListAsync());
 
         [HttpGet("{id:int}")]
@@ -27,7 +30,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
+        [RequirePermissions([Read])]
         public async Task<ActionResult<StudentEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
@@ -44,7 +47,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Create])]
+        [RequirePermissions([Create])]
         public async Task<ActionResult<StudentDTO>> CreateAsync([FromBody] StudentDTO studentDTO)
         {
             if (await _studentService.GetAsync(studentDTO.PersonId, studentDTO.GroupId) is not null)
@@ -85,7 +88,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Update])]
+        [RequirePermissions([Update])]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] StudentDTO studentDTO)
         {
             if (id < 1) return BadRequest();
@@ -128,7 +131,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Delete])]
+        [RequirePermissions([Delete])]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();

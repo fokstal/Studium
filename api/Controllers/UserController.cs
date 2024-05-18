@@ -4,6 +4,10 @@ using api.Model.DTO;
 using api.Services;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
+using api.Extensions;
+
+using static api.Helpers.Enums.RoleEnum;
+using static api.Helpers.Enums.PermissionEnum;
 
 namespace api.Controllers
 {
@@ -14,10 +18,15 @@ namespace api.Controllers
         private readonly IConfiguration _configuration = configuration;
         private readonly UserRepository _userService = new(db);
 
+        [HttpGet]
+        public async Task<ActionResult> GetListAsync() => Ok(await _userService.GetListAsync());
+
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequireRoles([Admin, Secretar])]
+        [RequirePermissions([Create])]
         public async Task<ActionResult<RegisterUserDTO>> RegisterAsync([FromBody] RegisterUserDTO userDTO)
         {
             if (await _userService.GetAsync(userDTO.Login) is not null)

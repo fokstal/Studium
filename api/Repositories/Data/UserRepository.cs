@@ -19,7 +19,7 @@ namespace api.Repositories.Data
         {
             RoleEntity role =
                 await _db.Role
-                    .SingleOrDefaultAsync(roleDb => roleDb.Id == Convert.ToInt32(RoleEnum.User))
+                    .SingleOrDefaultAsync(roleDb => roleDb.Id == Convert.ToInt32(RoleEnum.Student))
                     ?? throw new InvalidOperationException();
 
             user.RoleList.Add(role);
@@ -49,6 +49,23 @@ namespace api.Repositories.Data
                 .SelectMany(role => role)
                 .SelectMany(role => role.PermissionList)
                 .Select(permission => (PermissionEnum)permission.Id)
+                .ToHashSet();
+        }
+
+        public HashSet<RoleEnum> GetRoleList(int id)
+        {
+            List<RoleEntity>[] roleList =
+                _db.User
+                    .AsNoTracking()
+                    .Include(user => user.RoleList)
+                    .ThenInclude(role => role.PermissionList)
+                    .Where(user => user.Id == id)
+                    .Select(user => user.RoleList)
+                    .ToArray();
+
+            return roleList
+                .SelectMany(role => role)
+                .Select(role => (RoleEnum) role.Id)
                 .ToHashSet();
         }
     }

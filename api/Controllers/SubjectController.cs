@@ -3,13 +3,16 @@ using api.Models;
 using api.Model.DTO;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
-using api.Helpers.Enums;
 using api.Extensions;
+
+using static api.Helpers.Enums.RoleEnum;
+using static api.Helpers.Enums.PermissionEnum;
 
 namespace api.Controllers
 {
     [Route("subject")]
     [ApiController]
+    [RequireRoles([Admin, Secretar, Curator, Teacher, Student])]
     public class SubjectController(AppDbContext db) : ControllerBase
     {
         private readonly SubjectRepository _subjectService = new(db);
@@ -18,7 +21,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
+        [RequirePermissions([Read])]
         public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync() => Ok(await _subjectService.GetListAsync());
 
         [HttpGet("{id:int}")]
@@ -26,7 +29,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
+        [RequirePermissions([Read])]
         public async Task<ActionResult<SubjectEntity>> GetByIdAsync(int id)
         {
             if (id < 1) return BadRequest();
@@ -42,7 +45,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Create])]
+        [RequirePermissions([Create])]
         public async Task<ActionResult<SubjectDTO>> CreateAsync([FromBody] SubjectDTO subjectDTO)
         {
             if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
@@ -79,7 +82,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Update])]
+        [RequirePermissions([Update])]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] SubjectDTO subjectDTO)
         {
             if (id < 1) return BadRequest();
@@ -118,7 +121,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Delete])]
+        [RequirePermissions([Delete])]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();

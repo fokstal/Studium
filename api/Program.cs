@@ -24,7 +24,8 @@ services.AddCors(options => options.AddPolicy(corsName, policy =>
     .AllowCredentials();
 }));
 
-services.AddAppAuthentication(builder.Configuration);
+services.AddAppAuthentication(configuration);
+services.AddAppAuthorization(configuration);
 
 services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -6,12 +6,15 @@ using api.Repositories.Data;
 using api.Helpers.Constants;
 using Microsoft.AspNetCore.Mvc;
 using api.Extensions;
-using api.Helpers.Enums;
+
+using static api.Helpers.Enums.RoleEnum;
+using static api.Helpers.Enums.PermissionEnum;
 
 namespace api.Controllers
 {
     [Route("passport")]
     [ApiController]
+    [RequireRoles([Admin, Secretar, Student])]
     public class PassportController(AppDbContext db) : ControllerBase
     {
         private readonly PassportRepository _passportService = new(db);
@@ -20,7 +23,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
+        [RequirePermissions([Read])]
         public async Task<ActionResult<IEnumerable<PassportEntity>>> GetListAsync() => Ok(await _passportService.GetListAsync());
 
         [HttpGet("{id:int}")]
@@ -28,7 +31,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
+        [RequirePermissions([Read])]
         public async Task<ActionResult<PassportEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
@@ -45,7 +48,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Create])]
+        [RequirePermissions([Create])]
         public async Task<ActionResult<PassportDTO>> CreateAsync([FromForm] PassportDTO passportDTO)
         {
             if (passportDTO.Scan is null) return BadRequest();
@@ -69,7 +72,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Update])]
+        [RequirePermissions([Update])]
         public async Task<IActionResult> UpdateAsync(int id, [FromForm] PassportDTO passportDTO)
         {
             if (id < 1) return BadRequest();
@@ -96,7 +99,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Delete])]
+        [RequirePermissions([Delete])]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
