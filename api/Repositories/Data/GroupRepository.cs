@@ -38,7 +38,7 @@ namespace api.Repositories.Data
         {
             groupToUpdate.Name = groupDTO.Name;
             groupToUpdate.Description = groupDTO.Name;
-            groupToUpdate.Curator = groupDTO.Curator;
+            groupToUpdate.CuratorId = groupDTO.CuratorId;
             groupToUpdate.AuditoryName = groupDTO.AuditoryName;
 
             await _db.SaveChangesAsync();

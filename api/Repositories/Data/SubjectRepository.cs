@@ -21,7 +21,7 @@ namespace api.Repositories.Data
             return subject;
         }
 
-        public async Task<SubjectEntity?> GetAsync(string name, string teacherName)
+        public async Task<SubjectEntity?> GetAsync(string name, int? teacherId)
         {
             SubjectEntity? subject =
             await _db.Subject
@@ -30,7 +30,7 @@ namespace api.Repositories.Data
                 (
                     subjectDb =>
                         subjectDb.Name.ToLower() == name.ToLower() &&
-                        subjectDb.TeacherName.ToLower() == teacherName.ToLower()
+                        subjectDb.TeacherId == teacherId
                 );
 
             return subject;
@@ -40,7 +40,7 @@ namespace api.Repositories.Data
         {
             subjectToUpdate.Name = subjectDTO.Name;
             subjectToUpdate.Descripton = subjectDTO.Descripton;
-            subjectToUpdate.TeacherName = subjectDTO.TeacherName;
+            subjectToUpdate.TeacherId = subjectDTO.TeacherId;
             subjectToUpdate.GroupId = subjectDTO.GroupId;
 
             await _db.SaveChangesAsync();

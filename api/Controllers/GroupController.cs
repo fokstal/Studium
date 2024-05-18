@@ -55,7 +55,7 @@ namespace api.Controllers
             {
                 Name = groupDTO.Name,
                 Description = groupDTO.Description,
-                Curator = groupDTO.Curator,
+                CuratorId = groupDTO.CuratorId,
                 AuditoryName = groupDTO.AuditoryName,
             });
 

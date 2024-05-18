@@ -45,7 +45,7 @@ namespace api.Controllers
         [RequirePermissions([PermissionEnum.Create])]
         public async Task<ActionResult<SubjectDTO>> CreateAsync([FromBody] SubjectDTO subjectDTO)
         {
-            if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherName) is not null)
+            if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
             {
                 ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
@@ -67,7 +67,7 @@ namespace api.Controllers
             {
                 Name = subjectDTO.Name,
                 Descripton = subjectDTO.Descripton,
-                TeacherName = subjectDTO.TeacherName,
+                TeacherId = subjectDTO.TeacherId,
                 GroupId = groupId,
             });
 
@@ -84,7 +84,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherName) is not null)
+            if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
             {
                 ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
