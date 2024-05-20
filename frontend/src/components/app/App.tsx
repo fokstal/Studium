@@ -19,8 +19,8 @@ export function App() {
       <Routes>
         <Route index element={<Home />} />
         <Route path="/" element={<PageLayout />}>
-          <Route path="journal" element={<Journal />} />
           <Route path="students" element={<Students />} />
+          <Route path="journal" element={<Journal />} />
           <Route path="students/new" element={<CreateEditStudent />} />
           <Route path="students/:id" element={<Student />} />
           <Route path="profile" element={<Profile />} />
