@@ -27,7 +27,7 @@ namespace api.Extensions
 
             RoleService roleService = context.HttpContext.RequestServices.GetRequiredService<RoleService>();
 
-            HashSet<RoleEnum> roleList = roleService.GetRoleList(userId);
+            HashSet<RoleEnum> roleList = roleService.GetRoleListAsync(userId).Result;
 
             if (!roleList.Intersect(roleListRequirement).Any())
             {

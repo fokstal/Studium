@@ -34,16 +34,16 @@ namespace api.Repositories.Data
             throw new NotImplementedException();
         }
 
-        public HashSet<PermissionEnum> GetPermissionList(int id)
+        public async Task<HashSet<PermissionEnum>> GetPermissionListAsync(int id)
         {
-            List<RoleEntity>[] roleList =
+            List<RoleEntity>[] roleList = await
                 _db.User
                     .AsNoTracking()
                     .Include(user => user.RoleList)
                     .ThenInclude(role => role.PermissionList)
                     .Where(user => user.Id == id)
                     .Select(user => user.RoleList)
-                    .ToArray();
+                    .ToArrayAsync();
 
             return roleList
                 .SelectMany(role => role)
@@ -52,16 +52,16 @@ namespace api.Repositories.Data
                 .ToHashSet();
         }
 
-        public HashSet<RoleEnum> GetRoleList(int id)
+        public async Task<HashSet<RoleEnum>> GetRoleListAsync(int id)
         {
-            List<RoleEntity>[] roleList =
+            List<RoleEntity>[] roleList = await
                 _db.User
                     .AsNoTracking()
                     .Include(user => user.RoleList)
                     .ThenInclude(role => role.PermissionList)
                     .Where(user => user.Id == id)
                     .Select(user => user.RoleList)
-                    .ToArray();
+                    .ToArrayAsync();
 
             return roleList
                 .SelectMany(role => role)

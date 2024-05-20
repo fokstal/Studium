@@ -5,9 +5,9 @@ namespace api.Services
 {
     public class RoleService(UserRepository userRepository)
     {
-        public HashSet<RoleEnum> GetRoleList(int userId)
+        public async Task<HashSet<RoleEnum>> GetRoleListAsync(int userId)
         {
-            return userRepository.GetRoleList(userId);
+            return await userRepository.GetRoleListAsync(userId);
         }
     }
 }

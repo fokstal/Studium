@@ -27,7 +27,7 @@ namespace api.Extensions
 
             PermissionService permissionService = context.HttpContext.RequestServices.GetRequiredService<PermissionService>();
 
-            HashSet<PermissionEnum> permissionList = permissionService.GetPermissionList(userId);
+            HashSet<PermissionEnum> permissionList = permissionService.GetPermissionListAsync(userId).Result;
 
             if (!permissionList.Intersect(permissionListRequirement).Any())
             {
