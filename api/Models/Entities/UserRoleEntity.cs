@@ -1,6 +1,6 @@
 namespace api.Models
 {
-    public class UserRole
+    public class UserRoleEntity
     {
         public int UserId { get; set;}
         public int RoleId { get; set;}

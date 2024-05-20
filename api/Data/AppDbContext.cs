@@ -1,4 +1,4 @@
-using api.Configurations;
+using api.Data.Configurations;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,7 +18,6 @@ namespace api.Data
 
         public DbSet<UserEntity> User { get; set; }
         public DbSet<RoleEntity> Role { get; set;}
-        public DbSet<UserRole> UserRole { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options, IOptions<AuthorizationOptions> authOptions) : base(options)
         {

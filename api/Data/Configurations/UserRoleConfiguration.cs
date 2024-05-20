@@ -3,15 +3,15 @@ using api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace api.Configurations
+namespace api.Data.Configurations
 {
-    public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
+    public class UserRoleConfiguration : IEntityTypeConfiguration<UserRoleEntity>
     {
-        public void Configure(EntityTypeBuilder<UserRole> builder)
+        public void Configure(EntityTypeBuilder<UserRoleEntity> builder)
         {
             builder.HasKey(userRole => new { userRole.UserId, userRole.RoleId });
 
-            IEnumerable<UserRole> userRoleList = Enum.GetValues<RoleEnum>().Select(roleEnum => new UserRole
+            IEnumerable<UserRoleEntity> userRoleList = Enum.GetValues<RoleEnum>().Select(roleEnum => new UserRoleEntity
             {
                 UserId = Convert.ToInt32(roleEnum),
                 RoleId = Convert.ToInt32(roleEnum),
