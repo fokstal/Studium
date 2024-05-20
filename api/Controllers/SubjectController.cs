@@ -15,14 +15,14 @@ namespace api.Controllers
     [RequireRoles([Admin, Secretar, Curator, Teacher, Student])]
     public class SubjectController(AppDbContext db) : ControllerBase
     {
-        private readonly SubjectRepository _subjectService = new(db);
-        private readonly GroupRepository _groupService = new(db);
+        private readonly SubjectRepository _subjectRepository = new(db);
+        private readonly GroupRepository _groupRepository = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([Read])]
-        public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync() => Ok(await _subjectService.GetListAsync());
+        public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync() => Ok(await _subjectRepository.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -34,7 +34,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            SubjectEntity? subject = await _subjectService.GetAsync(id);
+            SubjectEntity? subject = await _subjectRepository.GetAsync(id);
 
             if (subject is null) return NotFound();
 
@@ -48,7 +48,7 @@ namespace api.Controllers
         [RequirePermissions([Create])]
         public async Task<ActionResult<SubjectDTO>> CreateAsync([FromBody] SubjectDTO subjectDTO)
         {
-            if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
+            if (await _subjectRepository.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
             {
                 ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
@@ -59,14 +59,14 @@ namespace api.Controllers
 
             if (subjectDTO.GroupId is not null)
             {
-                GroupEntity? group = await _groupService.GetAsync(subjectDTO.GroupId);
+                GroupEntity? group = await _groupRepository.GetAsync(subjectDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
                 groupId = group.Id;
             }
 
-            await _subjectService.AddAsync(new()
+            await _subjectRepository.AddAsync(new()
             {
                 Name = subjectDTO.Name,
                 Descripton = subjectDTO.Descripton,
@@ -87,14 +87,14 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
+            if (await _subjectRepository.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
             {
                 ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            SubjectEntity? subjectToUpdate = await _subjectService.GetAsync(id);
+            SubjectEntity? subjectToUpdate = await _subjectRepository.GetAsync(id);
 
             if (subjectToUpdate is null) return NotFound();
 
@@ -102,7 +102,7 @@ namespace api.Controllers
 
             if (subjectDTO.GroupId is not null)
             {
-                GroupEntity? group = await _groupService.GetAsync(subjectDTO.GroupId);
+                GroupEntity? group = await _groupRepository.GetAsync(subjectDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
@@ -111,7 +111,7 @@ namespace api.Controllers
 
             subjectDTO.GroupId = groupId;
 
-            await _subjectService.UpdateAsync(subjectToUpdate, subjectDTO);
+            await _subjectRepository.UpdateAsync(subjectToUpdate, subjectDTO);
 
             return NoContent();
         }
@@ -126,11 +126,11 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            SubjectEntity? subjectToRemove = await _subjectService.GetAsync(id);
+            SubjectEntity? subjectToRemove = await _subjectRepository.GetAsync(id);
 
             if (subjectToRemove is null) return NotFound();
 
-            await _subjectService.RemoveAsync(subjectToRemove);
+            await _subjectRepository.RemoveAsync(subjectToRemove);
 
             return NoContent();
         }

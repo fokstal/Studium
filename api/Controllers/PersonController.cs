@@ -17,13 +17,13 @@ namespace api.Controllers
     [RequireRoles([Admin, Secretar, Curator, Student])]
     public class PersonController(AppDbContext db) : ControllerBase
     {
-        private readonly PersonRepository _personService = new(db);
+        private readonly PersonRepository _personRepository = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([Read])]
-        public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListAsync() => Ok(await _personService.GetListAsync());
+        public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListAsync() => Ok(await _personRepository.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -35,7 +35,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            PersonEntity? person = await _personService.GetAsync(id);
+            PersonEntity? person = await _personRepository.GetAsync(id);
 
             if (person is null) return NotFound();
 
@@ -51,7 +51,7 @@ namespace api.Controllers
         [RequirePermissions([Create])]
         public async Task<ActionResult<PersonEntity>> CreateAsync([FromForm] PersonDTO personDTO)
         {
-            if (await _personService.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
+            if (await _personRepository.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
             {
                 ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 
@@ -68,7 +68,7 @@ namespace api.Controllers
                 AvatarFileName = await PictureRepository.UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
             };
 
-            await _personService.AddAsync(personToAdd);
+            await _personRepository.AddAsync(personToAdd);
 
             return Created("PersonEntity", personToAdd);
         }
@@ -84,11 +84,11 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            PersonEntity? personToUpdate = await _personService.GetAsync(id);
+            PersonEntity? personToUpdate = await _personRepository.GetAsync(id);
 
             if (personToUpdate is null) return NotFound();
 
-            if (await _personService.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
+            if (await _personRepository.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
             {
                 ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 
@@ -97,7 +97,7 @@ namespace api.Controllers
 
             PictureRepository.RemovePicture(PictureFolders.Person, personToUpdate.AvatarFileName);
 
-            await _personService.UpdateAsync(personToUpdate, personDTO);
+            await _personRepository.UpdateAsync(personToUpdate, personDTO);
 
             return NoContent();
         }
@@ -112,7 +112,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            PersonEntity? personToRemove = await _personService.GetAsync(id);
+            PersonEntity? personToRemove = await _personRepository.GetAsync(id);
 
             if (personToRemove is null) return NotFound();
 
@@ -123,7 +123,7 @@ namespace api.Controllers
 
             PictureRepository.RemovePicture(PictureFolders.Person, personToRemove.AvatarFileName);
 
-            await _personService.RemoveAsync(personToRemove);
+            await _personRepository.RemoveAsync(personToRemove);
 
             return NoContent();
         }
