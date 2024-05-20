@@ -4,6 +4,7 @@ import "./default.css";
 import {
   CreateEditGroup,
   CreateEditStudent,
+  CreateEditSubject,
   Error404Page,
   Home,
   Profile,
@@ -24,6 +25,7 @@ export function App() {
           <Route path="students/:id" element={<Student />} />
           <Route path="profile" element={<Profile />} />
           <Route path="group/new" element={<CreateEditGroup />} />
+          <Route path="subject/new" element={<CreateEditSubject />} />
         </Route>
         <Route path="*" element={<Error404Page />} />
       </Routes>
