@@ -76,6 +76,8 @@ namespace api.Controllers
 
             await _studentRepository.AddAsync(new()
             {
+                AddedDate = studentDTO.AddedDate,
+                RemovedDate = studentDTO.RemovedDate,
                 PersonId = person.Id,
                 GroupId = groupId,
             });

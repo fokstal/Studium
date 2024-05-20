@@ -16,6 +16,8 @@ namespace api.Repositories.Data
 
         public async override Task UpdateAsync(StudentEntity studentToUpdate, StudentDTO studentDTO)
         {
+            studentToUpdate.AddedDate = studentDTO.AddedDate;
+            studentToUpdate.RemovedDate = studentDTO.RemovedDate;
             studentToUpdate.PersonId = studentDTO.PersonId;
             studentToUpdate.GroupId = studentDTO.GroupId;
 
