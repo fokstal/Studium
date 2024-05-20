@@ -1,5 +1,5 @@
-import { Flex } from "@chakra-ui/react";
-import { Select } from "../ui-kit";
+import { Flex, useDisclosure } from "@chakra-ui/react";
+import { Button, Select } from "../ui-kit";
 import { useEffect, useState } from "react";
 import { Group, Person, Student, Subject } from "../../types";
 import {
@@ -8,6 +8,7 @@ import {
   StudentService,
   SubjectService,
 } from "../../services";
+import { GradeModal } from "../modal";
 
 const groupService = new GroupService();
 const personService = new PersonService();
@@ -26,6 +27,7 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
     subjects?: Subject[];
     students?: Student[];
   }>();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { group, person, subject } = filters;
 
@@ -90,6 +92,8 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
         value={subject}
         setValue={setSubject}
       />
+      <Button onClick={onOpen}>Добавить оценку</Button>
+      <GradeModal onClose={onClose} isOpen={isOpen} />
     </Flex>
   );
 }
