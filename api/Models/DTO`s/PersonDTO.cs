@@ -4,8 +4,6 @@ namespace api.Model.DTO
 {
     public class PersonDTO
     {
-        public int Id { get; set; }
-
         [Required]
         [Length(3, 15)]
         public string FirstName { get; set; } = null!;

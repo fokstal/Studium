@@ -4,8 +4,6 @@ namespace api.Model.DTO
 {
     public class SubjectDTO
     {
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(65)]
         public string Name { get; set; } = null!;
