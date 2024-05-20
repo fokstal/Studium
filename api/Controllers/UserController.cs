@@ -27,7 +27,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequireRoles([Admin, Secretar])]
-        [RequirePermissions([Create])]
+        [RequirePermissions([RegisterUser])]
         public async Task<ActionResult<RegisterUserDTO>> RegisterAsync([FromBody] RegisterUserDTO userDTO)
         {
             if (await _userRepository.GetAsync(userDTO.Login) is not null)

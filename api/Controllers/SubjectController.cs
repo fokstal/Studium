@@ -21,7 +21,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Read])]
+        [RequirePermissions([ViewSubject])]
         public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync() => Ok(await _subjectRepository.GetListAsync());
 
         [HttpGet("{id:int}")]
@@ -29,7 +29,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Read])]
+        [RequirePermissions([ViewSubject])]
         public async Task<ActionResult<SubjectEntity>> GetByIdAsync(int id)
         {
             if (id < 1) return BadRequest();
@@ -45,7 +45,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Create])]
+        [RequirePermissions([EditSubject])]
         public async Task<ActionResult<SubjectDTO>> CreateAsync([FromBody] SubjectDTO subjectDTO)
         {
             if (await _subjectRepository.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
@@ -72,7 +72,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Update])]
+        [RequirePermissions([EditSubject])]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] SubjectDTO subjectDTO)
         {
             if (id < 1) return BadRequest();
@@ -111,7 +111,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Delete])]
+        [RequirePermissions([EditSubject])]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();

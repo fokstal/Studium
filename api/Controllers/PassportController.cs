@@ -23,7 +23,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Read])]
+        [RequirePermissions([ViewPassport])]
         public async Task<ActionResult<IEnumerable<PassportEntity>>> GetListAsync() => Ok(await _passportRepository.GetListAsync());
 
         [HttpGet("{id:int}")]
@@ -31,7 +31,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Read])]
+        [RequirePermissions([ViewPassport])]
         public async Task<ActionResult<PassportEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
@@ -48,7 +48,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Create])]
+        [RequirePermissions([EditPassport])]
         public async Task<ActionResult<PassportDTO>> CreateAsync([FromForm] PassportDTO passportDTO)
         {
             if (passportDTO.Scan is null) return BadRequest();
@@ -68,7 +68,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Update])]
+        [RequirePermissions([EditPassport])]
         public async Task<IActionResult> UpdateAsync(int id, [FromForm] PassportDTO passportDTO)
         {
             if (id < 1) return BadRequest();
@@ -95,7 +95,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Delete])]
+        [RequirePermissions([EditPassport])]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();

@@ -22,7 +22,7 @@ namespace api.Controllers
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Read])]
+        [RequirePermissions([])]
         public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListAsync() => Ok(await _gradeRepository.GetListAsync());
 
         [HttpGet("list-by-student/{id:int}")]
@@ -30,7 +30,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Read])]
+        [RequirePermissions([ViewGrade])]
         public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentIdAsync(int id)
         {
             if (id < 1) return BadRequest();
@@ -45,7 +45,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Read])]
+        [RequirePermissions([ViewGrade])]
         public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListBySubjectIdAsync(int id)
         {
             if (id < 1) return BadRequest();
@@ -60,7 +60,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Read])]
+        [RequirePermissions([ViewGrade])]
         public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentAndSubjectIdAsync(int studentId, int subjectId)
         {
             if (studentId < 1 || subjectId < 1) return BadRequest();
@@ -75,7 +75,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Create])]
+        [RequirePermissions([EditGrade])]
         public async Task<ActionResult<GradeDTO>> AddAsync([FromBody] GradeDTO gradeDTO)
         {
             if (await _studentRepository.CheckExistsAsync(gradeDTO.StudentId) is false) return NotFound("Student is null!");
@@ -90,7 +90,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Update])]
+        [RequirePermissions([EditGrade])]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] GradeDTO gradeDTO)
         {
             if (id < 1) return BadRequest();
@@ -112,7 +112,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([Delete])]
+        [RequirePermissions([EditGrade])]
         public async Task<ActionResult> RemoveAsync(int id)
         {
             if (id < 1) return BadRequest();
