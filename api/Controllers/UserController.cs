@@ -5,6 +5,7 @@ using api.Services;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
 using api.Extensions;
+using api.Helpers.Constants;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
@@ -62,7 +63,7 @@ namespace api.Controllers
 
             if (StringHasher.Verify(userDTO.Password, user.PasswordHash) is false) return BadRequest();
 
-            HttpContext.Response.Cookies.Append("Cookie", new JwtProvider(_configuration).GenerateToken(user));
+            HttpContext.Response.Cookies.Append(CookieNames.USER_TOKEN, new JwtProvider(_configuration).GenerateToken(user));
 
             return Ok();
         }

@@ -3,6 +3,7 @@ using api.Services;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using api.Helpers.Constants;
 
 namespace api.Extensions
 {
@@ -28,7 +29,7 @@ namespace api.Extensions
                         {
                             OnMessageReceived = context =>
                             {
-                                context.Token = context.Request.Cookies["Cookie"];
+                                context.Token = context.Request.Cookies[CookieNames.USER_TOKEN];
 
                                 return Task.CompletedTask;
                             }

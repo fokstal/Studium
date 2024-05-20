@@ -13,7 +13,7 @@ namespace api.Extensions
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            string? token = context.HttpContext.Request.Cookies["Cookie"];
+            string? token = context.HttpContext.Request.Cookies[CookieNames.USER_TOKEN];
             JwtSecurityTokenHandler handler = new();
 
             JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
