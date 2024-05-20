@@ -24,10 +24,19 @@ namespace api.Data.Configurations
                 {
                     Id = Convert.ToInt32(roleEnum),
                     Login = roleEnum.ToString().ToLower(),
-                    PasswordHash = StringHasher.Generate(roleEnum.ToString().ToLower()),
+                    PasswordHash = StringHasher.Generate(GenerateCorrectPasswordByLine(roleEnum.ToString().ToLower())),
                 });
 
             builder.HasData(userList);
+        }
+
+        private static string GenerateCorrectPasswordByLine(string line)
+        {
+            if (line.Length > 9) return line;
+
+            line += line;
+
+            return GenerateCorrectPasswordByLine(line);
         }
     }
 }
