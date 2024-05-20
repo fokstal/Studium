@@ -18,7 +18,7 @@ namespace api.Extensions
 
             JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
 
-            Claim userIdClaim = jwtToken.Claims.First(claim => claim.Type == CustomClaims.UserId);
+            Claim userIdClaim = jwtToken.Claims.First(claim => claim.Type == CustomClaims.USER_ID);
 
             if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out int userId))
             {
