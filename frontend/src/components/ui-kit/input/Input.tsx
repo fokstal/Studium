@@ -9,6 +9,7 @@ export const Input = styled.input<ComponentProps<"input">>`
   outline: none;
   font-size: 1rem;
   background: ${colors.white};
+  width: 100%;
 
   &:focus {
     border-color: ${colors.green}
