@@ -1,8 +1,46 @@
 import { Box, Flex, Text, Textarea, VStack } from "@chakra-ui/react";
 import { Button, Input, colors } from "../../components/ui-kit";
 import { BaseLayout } from "../../layouts";
+import { GroupService } from "../../services";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const groupService = new GroupService();
 
 export function CreateEditGroup() {
+  const [data, setData] = useState<{
+    name?: string;
+    curator?: string;
+    auditoryName?: string;
+    description?: string;
+  }>();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const navigator = useNavigate();
+
+  const handleSubmit = () => {
+    if (
+      !data?.name ||
+      !data?.curator ||
+      !data?.description ||
+      !data?.description
+    ) {
+      return setErrorMessage("Заполните данные полностью");
+    }
+    groupService.post(data).then((res) => {
+      if (res.status !== 201) {
+        setErrorMessage(
+          "Данные введены не коректно, пожалуйста проверьте формат данных"
+        );
+      } else {
+        navigator("/students");
+      }
+    });
+  };
+
+  useEffect(() => {
+    setErrorMessage(null);
+  }, [data]);
+
   return (
     <BaseLayout bg={colors.darkGrey}>
       <VStack
@@ -21,6 +59,7 @@ export function CreateEditGroup() {
             borderRadius="5px"
             bg={colors.white}
             p="20px"
+            borderColor={errorMessage ? colors.red : "none"}
           >
             <Text fontSize="24px" fontWeight="bold">
               Основная информация
@@ -32,28 +71,54 @@ export function CreateEditGroup() {
                 <Text>Аудитория:</Text>
               </VStack>
               <VStack gap="10px" align="start" w="100%">
-                <Input placeholder="2120 best ever" />
-                <Input placeholder="Платонова Тамара Юрьевна" />
-                <Input placeholder="16" />
+                <Input
+                  placeholder="2120"
+                  value={data?.name}
+                  onChange={(e) => setData({ ...data, name: e.target.value })}
+                />
+                <Input
+                  placeholder="Платонова Тамара Юрьевна"
+                  value={data?.curator}
+                  onChange={(e) =>
+                    setData({ ...data, curator: e.target.value })
+                  }
+                />
+                <Input
+                  placeholder="16"
+                  value={data?.auditoryName}
+                  onChange={(e) =>
+                    setData({ ...data, auditoryName: e.target.value })
+                  }
+                />
               </VStack>
             </Flex>
           </VStack>
-          <VStack
-            align="stretch"
-            bg={colors.white}
-            p="20px"
-            gap="20px"
-            borderRadius="5px"
-          >
-            <Text fontSize="24px" fontWeight="bold">
-              Описание
+          <VStack align="stretch" w="100%">
+            <VStack
+              align="stretch"
+              bg={colors.white}
+              p="20px"
+              gap="20px"
+              borderRadius="5px"
+              borderColor={errorMessage ? colors.red : "none"}
+            >
+              <Text fontSize="24px" fontWeight="bold">
+                Описание
+              </Text>
+              <Textarea
+                borderColor={colors.darkGrey}
+                _focusVisible={{ borderColor: colors.darkGreen }}
+                value={data?.description}
+                onChange={(e) =>
+                  setData({ ...data, description: e.target.value })
+                }
+              />
+            </VStack>
+            <Text color={colors.red} fontSize="24px">
+              {errorMessage}
             </Text>
-            <Textarea
-              borderColor={colors.darkGrey}
-              _focusVisible={{ borderColor: colors.darkGreen }}
-            />
           </VStack>
-          <Box alignSelf="end">
+          <Box alignSelf="end" onClick={handleSubmit}>
             <Button>Создать группу</Button>
           </Box>
         </VStack>
