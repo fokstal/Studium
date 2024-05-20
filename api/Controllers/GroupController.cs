@@ -54,13 +54,7 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            await _groupRepository.AddAsync(new()
-            {
-                Name = groupDTO.Name,
-                Description = groupDTO.Description,
-                CuratorId = groupDTO.CuratorId,
-                AuditoryName = groupDTO.AuditoryName,
-            });
+            await _groupRepository.AddAsync(_groupRepository.Create(groupDTO));
 
             return Created("GroupEntity", groupDTO);
         }

@@ -21,6 +21,8 @@ namespace api.Repositories.Data
 
         public virtual async Task<TValue?> GetAsync(int id) => await _db.Set<TValue>().FirstOrDefaultAsync(valueDb => valueDb.Id == id);
 
+        public abstract TValue Create(TValueDTO valueDTO);
+
         public virtual async Task AddAsync(TValue valueToAdd)
         {
             await _db.Set<TValue>().AddAsync(valueToAdd);

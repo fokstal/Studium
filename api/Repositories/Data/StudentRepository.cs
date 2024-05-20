@@ -13,6 +13,17 @@ namespace api.Repositories.Data
 
             return student;
         }
+        
+        public override StudentEntity Create(StudentDTO studentDTO)
+        {
+            return new()
+            {
+                AddedDate = studentDTO.AddedDate,
+                RemovedDate = studentDTO.RemovedDate,
+                PersonId = studentDTO.PersonId,
+                GroupId = studentDTO.GroupId,
+            };
+        }
 
         public async override Task UpdateAsync(StudentEntity studentToUpdate, StudentDTO studentDTO)
         {

@@ -37,15 +37,7 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            string passwordHash = StringHasher.Generate(userDTO.Password);
-
-            await _userRepository.AddAsync(new()
-            {
-                Login = userDTO.Login,
-                Email = userDTO.Email,
-                PasswordHash = passwordHash,
-                DateCreated = DateTime.Now,
-            });
+            await _userRepository.AddAsync(_userRepository.Create(userDTO));
 
             return Created("User", userDTO);
         }

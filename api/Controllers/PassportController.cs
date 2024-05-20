@@ -57,11 +57,7 @@ namespace api.Controllers
 
             if (person is null) return NotFound("Person is null!");
 
-            await _passportRepository.AddAsync(new()
-            {
-                ScanFileName = await PictureRepository.UploadPassportScanAsync(passportDTO.Scan),
-                PersonId = person.Id,
-            });
+            await _passportRepository.AddAsync(_passportRepository.Create(passportDTO));
 
             return Created("PassportEntity", passportDTO);
         }

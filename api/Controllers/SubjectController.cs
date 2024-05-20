@@ -55,24 +55,14 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            int? groupId = null;
-
             if (subjectDTO.GroupId is not null)
             {
                 GroupEntity? group = await _groupRepository.GetAsync(subjectDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
-
-                groupId = group.Id;
             }
 
-            await _subjectRepository.AddAsync(new()
-            {
-                Name = subjectDTO.Name,
-                Descripton = subjectDTO.Descripton,
-                TeacherId = subjectDTO.TeacherId,
-                GroupId = groupId,
-            });
+            await _subjectRepository.AddAsync(_subjectRepository.Create(subjectDTO));
 
             return Created("SubjectEntity", subjectDTO);
         }

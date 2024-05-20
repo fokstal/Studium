@@ -81,13 +81,7 @@ namespace api.Controllers
             if (await _studentRepository.CheckExistsAsync(gradeDTO.StudentId) is false) return NotFound("Student is null!");
             if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
 
-            await _gradeRepository.AddAsync(new()
-            {
-                Value = gradeDTO.Value,
-                StudentId = gradeDTO.StudentId,
-                SubjectId = gradeDTO.SubjectId,
-                SetDate = DateTime.Now,
-            });
+            await _gradeRepository.AddAsync(_gradeRepository.Create(gradeDTO));
 
             return Created("GradeEntity", gradeDTO);
         }

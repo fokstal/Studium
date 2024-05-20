@@ -3,6 +3,7 @@ using api.Models;
 using api.Model.DTO;
 using api.Helpers.Enums;
 using Microsoft.EntityFrameworkCore;
+using api.Services;
 
 namespace api.Repositories.Data
 {
@@ -27,6 +28,17 @@ namespace api.Repositories.Data
             await _db.User.AddAsync(user);
 
             await _db.SaveChangesAsync();
+        }
+
+        public override UserEntity Create(RegisterUserDTO userDTO)
+        {
+            return new()
+            {
+                Login = userDTO.Login,
+                Email = userDTO.Email,
+                PasswordHash = StringHasher.Generate(userDTO.Password),
+                DateCreated = DateTime.Now,
+            };
         }
 
         public override Task UpdateAsync(UserEntity valueToUpdate, RegisterUserDTO valueDTO)

@@ -36,6 +36,17 @@ namespace api.Repositories.Data
             return subject;
         }
 
+        public override SubjectEntity Create(SubjectDTO subjectDTO)
+        {
+            return new()
+            {
+                Name = subjectDTO.Name,
+                Descripton = subjectDTO.Descripton,
+                TeacherId = subjectDTO.TeacherId,
+                GroupId = subjectDTO.GroupId,
+            };
+        }
+
         public async override Task UpdateAsync(SubjectEntity subjectToUpdate, SubjectDTO subjectDTO)
         {
             subjectToUpdate.Name = subjectDTO.Name;

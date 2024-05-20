@@ -34,6 +34,17 @@ namespace api.Repositories.Data
             return group;
         }
 
+        public override GroupEntity Create(GroupDTO groupDTO)
+        {
+            return new()
+            {
+                Name = groupDTO.Name,
+                Description = groupDTO.Description,
+                CuratorId = groupDTO.CuratorId,
+                AuditoryName = groupDTO.AuditoryName,
+            };
+        }
+
         public override async Task UpdateAsync(GroupEntity groupToUpdate, GroupDTO groupDTO)
         {
             groupToUpdate.Name = groupDTO.Name;

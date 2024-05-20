@@ -61,26 +61,14 @@ namespace api.Controllers
 
             if (person is null) return NotFound("Person is null!");
 
-            int? groupId = null;
-
             if (studentDTO.GroupId is not null)
             {
                 GroupEntity? group = await _groupRepository.GetAsync(studentDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
-
-                groupId = group.Id;
             }
 
-            studentDTO.GroupId = groupId;
-
-            await _studentRepository.AddAsync(new()
-            {
-                AddedDate = studentDTO.AddedDate,
-                RemovedDate = studentDTO.RemovedDate,
-                PersonId = person.Id,
-                GroupId = groupId,
-            });
+            await _studentRepository.AddAsync(_studentRepository.Create(studentDTO));
 
             return Created("StudentEntity", studentDTO);
         }

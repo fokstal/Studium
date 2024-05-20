@@ -58,15 +58,7 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            PersonEntity personToAdd = new()
-            {
-                FirstName = personDTO.FirstName,
-                MiddleName = personDTO.MiddleName,
-                LastName = personDTO.LastName,
-                BirthDate = personDTO.BirthDate,
-                Sex = personDTO.Sex,
-                AvatarFileName = await PictureRepository.UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
-            };
+            PersonEntity personToAdd = _personRepository.Create(personDTO);
 
             await _personRepository.AddAsync(personToAdd);
 

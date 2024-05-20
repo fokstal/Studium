@@ -28,6 +28,17 @@ namespace api.Repositories.Data
             return gradeList;
         }
 
+        public override GradeEntity Create(GradeDTO gradeDTO)
+        {
+            return new()
+            {
+                Value = gradeDTO.Value,
+                StudentId = gradeDTO.StudentId,
+                SubjectId = gradeDTO.SubjectId,
+                SetDate = DateTime.Now,
+            };
+        }
+
         public override async Task UpdateAsync(GradeEntity gradeToUpdate, GradeDTO gradeDTO)
         {
             gradeToUpdate.Value = gradeDTO.Value;
