@@ -6,6 +6,7 @@ import {
   CreateEditStudent,
   CreateEditSubject,
   Error404Page,
+  Groups,
   Home,
   Profile,
   Student,
@@ -24,6 +25,7 @@ export function App() {
           <Route path="students/new" element={<CreateEditStudent />} />
           <Route path="students/:id" element={<Student />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="group" element={<Groups />} />
           <Route path="group/new" element={<CreateEditGroup />} />
           <Route path="subject/new" element={<CreateEditSubject />} />
         </Route>
