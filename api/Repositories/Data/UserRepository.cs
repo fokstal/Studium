@@ -30,13 +30,6 @@ namespace api.Repositories.Data
 
         public override async Task AddAsync(UserEntity user)
         {
-            RoleEntity role =
-                await _db.Role
-                    .SingleOrDefaultAsync(roleDb => roleDb.Id == Convert.ToInt32(RoleEnum.Student))
-                    ?? throw new InvalidOperationException();
-
-            user.RoleList.Add(role);
-
             await _db.User.AddAsync(user);
 
             await _db.SaveChangesAsync();
@@ -50,6 +43,7 @@ namespace api.Repositories.Data
                 Email = userDTO.Email,
                 PasswordHash = StringHasher.Generate(userDTO.Password),
                 DateCreated = DateTime.Now,
+                RoleList = userDTO.RoleList
             };
         }
 

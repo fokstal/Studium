@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using api.Models;
 
 namespace api.Model.DTO
 {
@@ -12,5 +13,8 @@ namespace api.Model.DTO
         [Required]
         [Length(10, 15)]
         public string Password { get; set; } = null!;
+
+        [Required]
+        public List<RoleEntity> RoleList { get; set; } = [];
     }
 }
