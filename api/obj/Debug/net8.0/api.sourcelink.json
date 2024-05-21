@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"documents":{"/home/fokstal/Репозитории/Диплом/Studium/*":"https://raw.githubusercontent.com/Fokstal/Studium/aef7d126667e8309c5e1952bc5f00600b2ef45b9/*"}}
+=======
+{"documents":{"/home/fokstal/Репозитории/Диплом/Studium/*":"https://raw.githubusercontent.com/Fokstal/Studium/31934585870e601837b6659e40e482daadd3d819/*"}}
+>>>>>>> db69232 (fix: update path to client in CORS (Tue  21.05.24 3:52 PM))
