@@ -7,6 +7,7 @@ using api.Extensions;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
+using api.Services;
 
 namespace api.Controllers
 {
@@ -16,6 +17,8 @@ namespace api.Controllers
     public class GroupEntityController(AppDbContext db) : ControllerBase
     {
         private readonly GroupRepository _groupRepository = new(db);
+        private readonly UserRepository _userRepository = new(db);
+
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -54,6 +57,11 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
+            UserEntity? user = await _userRepository.GetAsync(groupDTO.CuratorId);
+
+            if (user is null) return NotFound("Curator is null");
+            if (!UserService.CheckRoleContains(user, Curator)) return BadRequest("User is not a Curator!");
+
             await _groupRepository.AddAsync(_groupRepository.Create(groupDTO));
 
             return Created("GroupEntity", groupDTO);
@@ -79,6 +87,11 @@ namespace api.Controllers
             GroupEntity? groupToUpdate = await _groupRepository.GetAsync(id);
 
             if (groupToUpdate is null) return NotFound();
+
+            UserEntity? user = await _userRepository.GetAsync(groupDTO.CuratorId);
+
+            if (user is null) return NotFound("Curator is null");
+            if (!UserService.CheckRoleContains(user, Curator)) return BadRequest("User is not a Curator!");
 
             await _groupRepository.UpdateAsync(groupToUpdate, groupDTO);
 
