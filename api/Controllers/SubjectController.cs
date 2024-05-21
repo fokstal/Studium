@@ -45,7 +45,7 @@ namespace api.Controllers
                 .RequireUserAccess
                 (
                     HttpContext,
-                    [Convert.ToInt32(subject.TeacherId)],
+                    [subject.TeacherId],
                     Teacher
                 );
 
@@ -56,7 +56,7 @@ namespace api.Controllers
                 .RequireUserAccess
                 (
                     HttpContext,
-                    [Convert.ToInt32(_groupRepository.GetAsync(subject).Result!.CuratorId)],
+                    [_groupRepository.GetAsync(subject).Result!.CuratorId],
                     Curator
                 );
 
@@ -99,6 +99,11 @@ namespace api.Controllers
                 if (group is null) return NotFound("Group is null!");
             }
 
+            UserEntity? user = await _userRepository.GetAsync(subjectDTO.TeacherId);
+
+            if (user is null) return NotFound("Teacher is null");
+            if (!UserService.CheckRoleContains(user, Teacher)) return BadRequest("User is not a Teacher!");
+
             await _subjectRepository.AddAsync(_subjectRepository.Create(subjectDTO));
 
             return Created("SubjectEntity", subjectDTO);
@@ -137,6 +142,11 @@ namespace api.Controllers
             }
 
             subjectDTO.GroupId = groupId;
+
+            UserEntity? user = await _userRepository.GetAsync(subjectDTO.TeacherId);
+
+            if (user is null) return NotFound("Teacher is null");
+            if (!UserService.CheckRoleContains(user, Teacher)) return BadRequest("User is not a Teacher!");
 
             await _subjectRepository.UpdateAsync(subjectToUpdate, subjectDTO);
 

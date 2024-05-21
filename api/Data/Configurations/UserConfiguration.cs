@@ -22,7 +22,7 @@ namespace api.Data.Configurations
 
             IEnumerable<UserEntity> userList = Enum.GetValues<RoleEnum>().Select(roleEnum => new UserEntity
                 {
-                    Id = Convert.ToInt32(roleEnum),
+                    Id = StringHasher.GenerateGuid(Convert.ToInt32(roleEnum).ToString()),
                     Login = roleEnum.ToString().ToLower(),
                     PasswordHash = StringHasher.Generate(GenerateCorrectPasswordByLine(roleEnum.ToString().ToLower())),
                 });

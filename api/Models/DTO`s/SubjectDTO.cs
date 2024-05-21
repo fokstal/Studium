@@ -12,7 +12,7 @@ namespace api.Model.DTO
         [MaxLength(150)]
         public string Descripton { get; set; } = null!;
 
-        public int? TeacherId { get; set; }
+        public Guid TeacherId { get; set; }
         public int? GroupId { get; set; }
     }
 }

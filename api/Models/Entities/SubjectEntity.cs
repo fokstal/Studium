@@ -4,7 +4,7 @@ namespace api.Models
     {
         public string Name { get; set; } = null!;
         public string Descripton { get; set; } = null!;
-        public int? TeacherId { get; set; }
+        public Guid TeacherId { get; set; }
 
         public int? GroupId { get; set; }
         public List<GradeEntity> GradeList { get; set; } = [];

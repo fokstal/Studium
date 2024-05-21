@@ -8,7 +8,7 @@ namespace api.Services
 {
     public class HttpContextService(HttpContext httpContext)
     {
-        public int GetUserIdFromCookie()
+        public Guid GetUserIdFromCookie()
         {
             string? token = httpContext.Request.Cookies[CookieNames.USER_TOKEN];
             JwtSecurityTokenHandler handler = new();
@@ -17,7 +17,7 @@ namespace api.Services
 
             Claim userIdClaim = jwtToken.Claims.First(claim => claim.Type == CustomClaims.USER_ID);
 
-            if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out int userId))
+            if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
             {
                 throw new Exception("User is not authorize!");
             }
@@ -27,7 +27,7 @@ namespace api.Services
 
         public async Task<UserEntity> GetUserFromCookie(UserRepository userRepository)
         {
-            int userIdFromCookie = new HttpContextService(httpContext).GetUserIdFromCookie();
+            Guid userIdFromCookie = new HttpContextService(httpContext).GetUserIdFromCookie();
 
             return await userRepository.GetAsync(Convert.ToInt32(userIdFromCookie)) ?? throw new ArgumentNullException("User is null!");
         }

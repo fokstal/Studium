@@ -20,7 +20,7 @@ namespace api.Extensions
 
             Claim userIdClaim = jwtToken.Claims.First(claim => claim.Type == CustomClaims.USER_ID);
 
-            if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out int userId))
+            if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
             {
                 return;
             }

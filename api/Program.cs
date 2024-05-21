@@ -18,7 +18,7 @@ services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionStrin
 services.AddCors(options => options.AddPolicy(corsName, policy =>
 {
     policy
-    .WithOrigins("http//localhost:3000")
+    .WithOrigins("http://localhost:3000")
     .WithHeaders("Content-Type")
     .WithMethods("PUT", "DELETE")
     .AllowCredentials();

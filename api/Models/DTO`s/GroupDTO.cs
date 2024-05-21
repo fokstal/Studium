@@ -12,7 +12,7 @@ namespace api.Model.DTO
         [MaxLength(70)]
         public string Description { get; set; } = null!;
 
-        public int? CuratorId { get; set; }
+        public Guid CuratorId { get; set; }
 
         [Required]
         [MaxLength(5)]
