@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace api.Extensions
 {
-    public class RequirePermissionsAttribute(PermissionEnum[] permissionListRequirement) : AuthorizeAttribute, IAuthorizationFilter
+    public class RequireRolesAttribute(RoleEnum[] roleListRequirement) : AuthorizeAttribute, IAuthorizationFilter
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
@@ -25,11 +25,11 @@ namespace api.Extensions
                 return;
             }
 
-            PermissionService permissionService = context.HttpContext.RequestServices.GetRequiredService<PermissionService>();
+            RoleService roleService = context.HttpContext.RequestServices.GetRequiredService<RoleService>();
 
-            HashSet<PermissionEnum> permissionList = permissionService.GetPermissionListAsync(userId).Result;
+            HashSet<RoleEnum> roleList = roleService.GetRoleListAsync(userId).Result;
 
-            if (!permissionList.Intersect(permissionListRequirement).Any())
+            if (!roleList.Intersect(roleListRequirement).Any())
             {
                 context.Result = new ForbidResult();
             }

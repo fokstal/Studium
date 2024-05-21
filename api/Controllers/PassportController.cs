@@ -6,34 +6,37 @@ using api.Repositories.Data;
 using api.Helpers.Constants;
 using Microsoft.AspNetCore.Mvc;
 using api.Extensions;
-using api.Helpers.Enums;
+
+using static api.Helpers.Enums.RoleEnum;
+using static api.Helpers.Enums.PermissionEnum;
 
 namespace api.Controllers
 {
     [Route("passport")]
     [ApiController]
+    [RequireRoles([Admin, Secretar, Student])]
     public class PassportController(AppDbContext db) : ControllerBase
     {
-        private readonly PassportRepository _passportService = new(db);
-        private readonly PersonRepository _personService = new(db);
+        private readonly PassportRepository _passportRepository = new(db);
+        private readonly PersonRepository _personRepository = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
-        public async Task<ActionResult<IEnumerable<PassportEntity>>> GetListAsync() => Ok(await _passportService.GetListAsync());
+        [RequirePermissions([ViewPassport])]
+        public async Task<ActionResult<IEnumerable<PassportEntity>>> GetListAsync() => Ok(await _passportRepository.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
+        [RequirePermissions([ViewPassport])]
         public async Task<ActionResult<PassportEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            PassportEntity? passport = await _passportService.GetAsync(id);
+            PassportEntity? passport = await _passportRepository.GetAsync(id);
 
             if (passport is null) return NotFound();
 
@@ -45,20 +48,16 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Create])]
+        [RequirePermissions([EditPassport])]
         public async Task<ActionResult<PassportDTO>> CreateAsync([FromForm] PassportDTO passportDTO)
         {
             if (passportDTO.Scan is null) return BadRequest();
 
-            PersonEntity? person = await _personService.GetAsync(passportDTO.PersonId);
+            PersonEntity? person = await _personRepository.GetAsync(passportDTO.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
-            await _passportService.AddAsync(new()
-            {
-                ScanFileName = await PictureRepository.UploadPassportScanAsync(passportDTO.Scan),
-                PersonId = person.Id,
-            });
+            await _passportRepository.AddAsync(_passportRepository.Create(passportDTO));
 
             return Created("PassportEntity", passportDTO);
         }
@@ -69,24 +68,24 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Update])]
+        [RequirePermissions([EditPassport])]
         public async Task<IActionResult> UpdateAsync(int id, [FromForm] PassportDTO passportDTO)
         {
             if (id < 1) return BadRequest();
 
             if (passportDTO.Scan is null) return BadRequest();
 
-            PassportEntity? passportToUpdate = await _passportService.GetAsync(id);
+            PassportEntity? passportToUpdate = await _passportRepository.GetAsync(id);
 
             if (passportToUpdate is null) return NotFound();
 
-            PersonEntity? person = await _personService.GetAsync(passportToUpdate.PersonId);
+            PersonEntity? person = await _personRepository.GetAsync(passportToUpdate.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
             PictureRepository.RemovePicture(PictureFolders.Passport, passportToUpdate.ScanFileName);
 
-            await _passportService.UpdateAsync(passportToUpdate, passportDTO);
+            await _passportRepository.UpdateAsync(passportToUpdate, passportDTO);
 
             return NoContent();
         }
@@ -96,18 +95,18 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Delete])]
+        [RequirePermissions([EditPassport])]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            PassportEntity? passportToRemove = await _passportService.GetAsync(id);
+            PassportEntity? passportToRemove = await _passportRepository.GetAsync(id);
 
             if (passportToRemove is null) return NotFound();
 
             PictureRepository.RemovePicture(PictureFolders.Passport, passportToRemove.ScanFileName);
 
-            await _passportService.RemoveAsync(passportToRemove);
+            await _passportRepository.RemoveAsync(passportToRemove);
 
             return NoContent();
         }

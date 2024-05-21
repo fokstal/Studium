@@ -34,11 +34,32 @@ namespace api.Repositories.Data
             return group;
         }
 
+        public async Task<GroupEntity?> GetAsync(SubjectEntity subject)
+        {
+            GroupEntity? group = await _db.Group
+                .Include(groupDb => groupDb.StudentList)
+                .Include(groupdDb => groupdDb.SubjectList)
+                .FirstOrDefaultAsync(groupdId => groupdId.SubjectList.Contains(subject));
+
+            return group;
+        }
+
+        public override GroupEntity Create(GroupDTO groupDTO)
+        {
+            return new()
+            {
+                Name = groupDTO.Name,
+                Description = groupDTO.Description,
+                CuratorId = groupDTO.CuratorId,
+                AuditoryName = groupDTO.AuditoryName,
+            };
+        }
+
         public override async Task UpdateAsync(GroupEntity groupToUpdate, GroupDTO groupDTO)
         {
             groupToUpdate.Name = groupDTO.Name;
             groupToUpdate.Description = groupDTO.Name;
-            groupToUpdate.Curator = groupDTO.Curator;
+            groupToUpdate.CuratorId = groupDTO.CuratorId;
             groupToUpdate.AuditoryName = groupDTO.AuditoryName;
 
             await _db.SaveChangesAsync();

@@ -4,8 +4,6 @@ namespace api.Model.DTO
 {
     public class SubjectDTO
     {
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(65)]
         public string Name { get; set; } = null!;
@@ -14,9 +12,7 @@ namespace api.Model.DTO
         [MaxLength(150)]
         public string Descripton { get; set; } = null!;
 
-        [Required]
-        [MaxLength(60)]
-        public string TeacherName { get; set; } = null!;
+        public int? TeacherId { get; set; }
         public int? GroupId { get; set; }
     }
 }

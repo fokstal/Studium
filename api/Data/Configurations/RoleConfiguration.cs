@@ -3,7 +3,7 @@ using api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace api.Configurations
+namespace api.Data.Configurations
 {
     public class RoleConfiguration : IEntityTypeConfiguration<RoleEntity>
     {

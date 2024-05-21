@@ -3,6 +3,7 @@ using api.Models;
 using api.Model.DTO;
 using api.Helpers.Enums;
 using Microsoft.EntityFrameworkCore;
+using api.Services;
 
 namespace api.Repositories.Data
 {
@@ -19,7 +20,7 @@ namespace api.Repositories.Data
         {
             RoleEntity role =
                 await _db.Role
-                    .SingleOrDefaultAsync(roleDb => roleDb.Id == Convert.ToInt32(RoleEnum.User))
+                    .SingleOrDefaultAsync(roleDb => roleDb.Id == Convert.ToInt32(RoleEnum.Student))
                     ?? throw new InvalidOperationException();
 
             user.RoleList.Add(role);
@@ -29,26 +30,54 @@ namespace api.Repositories.Data
             await _db.SaveChangesAsync();
         }
 
+        public override UserEntity Create(RegisterUserDTO userDTO)
+        {
+            return new()
+            {
+                Login = userDTO.Login,
+                Email = userDTO.Email,
+                PasswordHash = StringHasher.Generate(userDTO.Password),
+                DateCreated = DateTime.Now,
+            };
+        }
+
         public override Task UpdateAsync(UserEntity valueToUpdate, RegisterUserDTO valueDTO)
         {
             throw new NotImplementedException();
         }
 
-        public HashSet<PermissionEnum> GetPermissionList(int id)
+        public async Task<HashSet<PermissionEnum>> GetPermissionListAsync(int id)
         {
-            List<RoleEntity>[] roleList =
+            List<RoleEntity>[] roleList = await
                 _db.User
                     .AsNoTracking()
                     .Include(user => user.RoleList)
                     .ThenInclude(role => role.PermissionList)
                     .Where(user => user.Id == id)
                     .Select(user => user.RoleList)
-                    .ToArray();
+                    .ToArrayAsync();
 
             return roleList
                 .SelectMany(role => role)
                 .SelectMany(role => role.PermissionList)
                 .Select(permission => (PermissionEnum)permission.Id)
+                .ToHashSet();
+        }
+
+        public async Task<HashSet<RoleEnum>> GetRoleListAsync(int id)
+        {
+            List<RoleEntity>[] roleList = await
+                _db.User
+                    .AsNoTracking()
+                    .Include(user => user.RoleList)
+                    .ThenInclude(role => role.PermissionList)
+                    .Where(user => user.Id == id)
+                    .Select(user => user.RoleList)
+                    .ToArrayAsync();
+
+            return roleList
+                .SelectMany(role => role)
+                .Select(role => (RoleEnum) role.Id)
                 .ToHashSet();
         }
     }

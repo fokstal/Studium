@@ -3,37 +3,77 @@ using api.Models;
 using api.Model.DTO;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
-using api.Helpers.Enums;
 using api.Extensions;
+
+using static api.Helpers.Enums.RoleEnum;
+using static api.Helpers.Enums.PermissionEnum;
+using api.Services;
 
 namespace api.Controllers
 {
     [Route("subject")]
     [ApiController]
+    [RequireRoles([Admin, Secretar, Curator, Teacher, Student])]
     public class SubjectController(AppDbContext db) : ControllerBase
     {
-        private readonly SubjectRepository _subjectService = new(db);
-        private readonly GroupRepository _groupService = new(db);
+        private readonly SubjectRepository _subjectRepository = new(db);
+        private readonly GroupRepository _groupRepository = new(db);
+        private readonly UserRepository _userRepository = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
-        public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync() => Ok(await _subjectService.GetListAsync());
+        [RequirePermissions([ViewSubject])]
+        public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync() => Ok(await _subjectRepository.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
+        [RequirePermissions([ViewSubject])]
         public async Task<ActionResult<SubjectEntity>> GetByIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            SubjectEntity? subject = await _subjectService.GetAsync(id);
+            SubjectEntity? subject = await _subjectRepository.GetAsync(id);
 
             if (subject is null) return NotFound();
+
+            ActionResult actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [Convert.ToInt32(subject.TeacherId)],
+                    Teacher
+                );
+
+            if (actionResultUserAccess.GetType() != new OkResult().GetType())
+            {
+                actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [Convert.ToInt32(_groupRepository.GetAsync(subject).Result!.CuratorId)],
+                    Curator
+                );
+
+                if (actionResultUserAccess.GetType() != new OkResult().GetType())
+                {
+                    actionResultUserAccess = await
+                    new PermissionService(_userRepository)
+                    .RequireUserAccess
+                    (
+                        HttpContext,
+                        _groupRepository.GetAsync(subject).Result!.StudentList.Select(student => student.Id).ToArray(),
+                        Student
+                    );
+
+                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
+                }
+            }
 
             return Ok(subject);
         }
@@ -42,34 +82,24 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Create])]
+        [RequirePermissions([EditSubject])]
         public async Task<ActionResult<SubjectDTO>> CreateAsync([FromBody] SubjectDTO subjectDTO)
         {
-            if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherName) is not null)
+            if (await _subjectRepository.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
             {
                 ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            int? groupId = null;
-
             if (subjectDTO.GroupId is not null)
             {
-                GroupEntity? group = await _groupService.GetAsync(subjectDTO.GroupId);
+                GroupEntity? group = await _groupRepository.GetAsync(subjectDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
-
-                groupId = group.Id;
             }
 
-            await _subjectService.AddAsync(new()
-            {
-                Name = subjectDTO.Name,
-                Descripton = subjectDTO.Descripton,
-                TeacherName = subjectDTO.TeacherName,
-                GroupId = groupId,
-            });
+            await _subjectRepository.AddAsync(_subjectRepository.Create(subjectDTO));
 
             return Created("SubjectEntity", subjectDTO);
         }
@@ -79,19 +109,19 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Update])]
+        [RequirePermissions([EditSubject])]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] SubjectDTO subjectDTO)
         {
             if (id < 1) return BadRequest();
 
-            if (await _subjectService.GetAsync(subjectDTO.Name, subjectDTO.TeacherName) is not null)
+            if (await _subjectRepository.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
             {
                 ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            SubjectEntity? subjectToUpdate = await _subjectService.GetAsync(id);
+            SubjectEntity? subjectToUpdate = await _subjectRepository.GetAsync(id);
 
             if (subjectToUpdate is null) return NotFound();
 
@@ -99,7 +129,7 @@ namespace api.Controllers
 
             if (subjectDTO.GroupId is not null)
             {
-                GroupEntity? group = await _groupService.GetAsync(subjectDTO.GroupId);
+                GroupEntity? group = await _groupRepository.GetAsync(subjectDTO.GroupId);
 
                 if (group is null) return NotFound("Group is null!");
 
@@ -108,7 +138,7 @@ namespace api.Controllers
 
             subjectDTO.GroupId = groupId;
 
-            await _subjectService.UpdateAsync(subjectToUpdate, subjectDTO);
+            await _subjectRepository.UpdateAsync(subjectToUpdate, subjectDTO);
 
             return NoContent();
         }
@@ -118,16 +148,16 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Delete])]
+        [RequirePermissions([EditSubject])]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            SubjectEntity? subjectToRemove = await _subjectService.GetAsync(id);
+            SubjectEntity? subjectToRemove = await _subjectRepository.GetAsync(id);
 
             if (subjectToRemove is null) return NotFound();
 
-            await _subjectService.RemoveAsync(subjectToRemove);
+            await _subjectRepository.RemoveAsync(subjectToRemove);
 
             return NoContent();
         }

@@ -5,34 +5,37 @@ using api.Model.DTO;
 using api.Repositories;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
-using api.Helpers.Enums;
 using api.Extensions;
+
+using static api.Helpers.Enums.RoleEnum;
+using static api.Helpers.Enums.PermissionEnum;
 
 namespace api.Controllers
 {
     [Route("person")]
     [ApiController]
+    [RequireRoles([Admin, Secretar, Curator, Student])]
     public class PersonController(AppDbContext db) : ControllerBase
     {
-        private readonly PersonRepository _personService = new(db);
+        private readonly PersonRepository _personRepository = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
-        public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListAsync() => Ok(await _personService.GetListAsync());
+        [RequirePermissions([ViewPerson])]
+        public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListAsync() => Ok(await _personRepository.GetListAsync());
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Read])]
+        [RequirePermissions([ViewPerson])]
         public async Task<ActionResult<PersonEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            PersonEntity? person = await _personService.GetAsync(id);
+            PersonEntity? person = await _personRepository.GetAsync(id);
 
             if (person is null) return NotFound();
 
@@ -45,27 +48,19 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Create])]
+        [RequirePermissions([EditPerson])]
         public async Task<ActionResult<PersonEntity>> CreateAsync([FromForm] PersonDTO personDTO)
         {
-            if (await _personService.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
+            if (await _personRepository.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
             {
                 ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            PersonEntity personToAdd = new()
-            {
-                FirstName = personDTO.FirstName,
-                MiddleName = personDTO.MiddleName,
-                LastName = personDTO.LastName,
-                BirthDate = personDTO.BirthDate,
-                Sex = personDTO.Sex,
-                AvatarFileName = await PictureRepository.UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex),
-            };
+            PersonEntity personToAdd = _personRepository.Create(personDTO);
 
-            await _personService.AddAsync(personToAdd);
+            await _personRepository.AddAsync(personToAdd);
 
             return Created("PersonEntity", personToAdd);
         }
@@ -76,16 +71,16 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Update])]
+        [RequirePermissions([EditPerson])]
         public async Task<IActionResult> UpdateAsync(int id, [FromForm] PersonDTO personDTO)
         {
             if (id < 1) return BadRequest();
 
-            PersonEntity? personToUpdate = await _personService.GetAsync(id);
+            PersonEntity? personToUpdate = await _personRepository.GetAsync(id);
 
             if (personToUpdate is null) return NotFound();
 
-            if (await _personService.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
+            if (await _personRepository.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
             {
                 ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 
@@ -94,7 +89,7 @@ namespace api.Controllers
 
             PictureRepository.RemovePicture(PictureFolders.Person, personToUpdate.AvatarFileName);
 
-            await _personService.UpdateAsync(personToUpdate, personDTO);
+            await _personRepository.UpdateAsync(personToUpdate, personDTO);
 
             return NoContent();
         }
@@ -104,12 +99,12 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([PermissionEnum.Delete])]
+        [RequirePermissions([EditPerson])]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             if (id < 1) return BadRequest();
 
-            PersonEntity? personToRemove = await _personService.GetAsync(id);
+            PersonEntity? personToRemove = await _personRepository.GetAsync(id);
 
             if (personToRemove is null) return NotFound();
 
@@ -120,7 +115,7 @@ namespace api.Controllers
 
             PictureRepository.RemovePicture(PictureFolders.Person, personToRemove.AvatarFileName);
 
-            await _personService.RemoveAsync(personToRemove);
+            await _personRepository.RemoveAsync(personToRemove);
 
             return NoContent();
         }

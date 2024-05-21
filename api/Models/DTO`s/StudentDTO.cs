@@ -4,7 +4,11 @@ namespace api.Model.DTO
 {
     public class StudentDTO
     {
-        public int Id { get; set; }
+        [Required]
+        public DateTime AddedDate { get; set;}
+        
+        [Required]
+        public DateTime RemovedDate { get; set; }
 
         [Required]
         public int PersonId { get; set; }

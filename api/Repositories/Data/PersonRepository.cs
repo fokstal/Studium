@@ -25,7 +25,7 @@ namespace api.Repositories.Data
 
         public async Task<PersonEntity?> GetAsync(string firstName, string middleName, string lastName)
         {
-            PersonEntity? person = 
+            PersonEntity? person =
             await _db.Person
                 .Include(personDb => personDb.Passport)
                 .Include(personDb => personDb.Student)
@@ -38,6 +38,19 @@ namespace api.Repositories.Data
                 );
 
             return person;
+        }
+
+        public override PersonEntity Create(PersonDTO personDTO)
+        {
+            return new()
+            {
+                FirstName = personDTO.FirstName,
+                MiddleName = personDTO.MiddleName,
+                LastName = personDTO.LastName,
+                BirthDate = personDTO.BirthDate,
+                Sex = personDTO.Sex,
+                AvatarFileName = UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex).Result,
+            };
         }
 
         public async override Task UpdateAsync(PersonEntity personToUpdate, PersonDTO personDTO)
