@@ -7,6 +7,18 @@ namespace api.Repositories.Data
 {
     public class StudentRepository(AppDbContext db) : DataRepositoryBase<StudentEntity, StudentDTO>(db)
     {
+        public override Task<StudentEntity?> GetAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<StudentEntity?> GetAsync(Guid id)
+        {
+            StudentEntity? student = await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id);
+
+            return student;
+        }
+
         public async Task<StudentEntity?> GetAsync(int personId, int? groupId)
         {
             StudentEntity? student = await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.PersonId == personId && studentDb.GroupId == groupId);
@@ -18,6 +30,7 @@ namespace api.Repositories.Data
         {
             return new()
             {
+                Id = studentDTO.Id,
                 AddedDate = studentDTO.AddedDate,
                 RemovedDate = studentDTO.RemovedDate,
                 PersonId = studentDTO.PersonId,
@@ -27,6 +40,7 @@ namespace api.Repositories.Data
 
         public async override Task UpdateAsync(StudentEntity studentToUpdate, StudentDTO studentDTO)
         {
+            studentToUpdate.Id = studentDTO.Id;
             studentToUpdate.AddedDate = studentDTO.AddedDate;
             studentToUpdate.RemovedDate = studentDTO.RemovedDate;
             studentToUpdate.PersonId = studentDTO.PersonId;

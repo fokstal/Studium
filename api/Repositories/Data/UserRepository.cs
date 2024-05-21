@@ -39,6 +39,7 @@ namespace api.Repositories.Data
         {
             return new()
             {
+                Id = userDTO.Id,
                 Login = userDTO.Login,
                 FirstName = userDTO.FirstName,
                 MiddleName = userDTO.MiddleName,
@@ -87,6 +88,11 @@ namespace api.Repositories.Data
                 .SelectMany(role => role)
                 .Select(role => (RoleEnum) role.Id)
                 .ToHashSet();
+        }
+
+        public RoleEntity GetRoleEntityByEnum(RoleEnum roleEnum)
+        {
+            return _db.Role.SingleOrDefault(roleDb => roleDb.Name == roleEnum.ToString()) ?? throw new Exception("RoleDb and RoleEnum is not Equal!");
         }
     }
 }

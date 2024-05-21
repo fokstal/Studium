@@ -5,6 +5,8 @@ namespace api.Model.DTO
 {
     public class RegisterUserDTO
     {
+        public Guid Id { get; set;}
+
         [Required]
         [Length(3, 10)]
         public string Login { get; set; } = null!;
