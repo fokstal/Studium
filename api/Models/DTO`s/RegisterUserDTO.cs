@@ -8,7 +8,9 @@ namespace api.Model.DTO
         [Required]
         [Length(3, 10)]
         public string Login { get; set; } = null!;
-        public string? Email { get; set; }
+        public string FirstName { get; set; } = null!;
+        public string MiddleName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
 
         [Required]
         [Length(10, 15)]

@@ -24,6 +24,9 @@ namespace api.Data.Configurations
                 {
                     Id = StringHasher.GenerateGuid(Convert.ToInt32(roleEnum).ToString()),
                     Login = roleEnum.ToString().ToLower(),
+                    FirstName = $"{roleEnum}Base",
+                    MiddleName = "",
+                    LastName = "",
                     PasswordHash = StringHasher.Generate(GenerateCorrectPasswordByLine(roleEnum.ToString().ToLower())),
                 });
 

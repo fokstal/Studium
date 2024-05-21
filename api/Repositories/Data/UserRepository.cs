@@ -40,7 +40,9 @@ namespace api.Repositories.Data
             return new()
             {
                 Login = userDTO.Login,
-                Email = userDTO.Email,
+                FirstName = userDTO.FirstName,
+                MiddleName = userDTO.MiddleName,
+                LastName = userDTO.LastName,
                 PasswordHash = StringHasher.Generate(userDTO.Password),
                 DateCreated = DateTime.Now,
                 RoleList = userDTO.RoleList
