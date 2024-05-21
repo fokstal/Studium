@@ -7,6 +7,7 @@ using api.Extensions;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
+using api.Services;
 
 namespace api.Controllers
 {
@@ -17,6 +18,7 @@ namespace api.Controllers
     {
         private readonly SubjectRepository _subjectRepository = new(db);
         private readonly GroupRepository _groupRepository = new(db);
+        private readonly UserRepository _userRepository = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -37,6 +39,41 @@ namespace api.Controllers
             SubjectEntity? subject = await _subjectRepository.GetAsync(id);
 
             if (subject is null) return NotFound();
+
+            ActionResult actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [Convert.ToInt32(subject.TeacherId)],
+                    Teacher
+                );
+
+            if (actionResultUserAccess.GetType() != new OkResult().GetType())
+            {
+                actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [Convert.ToInt32(_groupRepository.GetAsync(subject).Result!.CuratorId)],
+                    Curator
+                );
+
+                if (actionResultUserAccess.GetType() != new OkResult().GetType())
+                {
+                    actionResultUserAccess = await
+                    new PermissionService(_userRepository)
+                    .RequireUserAccess
+                    (
+                        HttpContext,
+                        _groupRepository.GetAsync(subject).Result!.StudentList.Select(student => student.Id).ToArray(),
+                        Student
+                    );
+
+                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
+                }
+            }
 
             return Ok(subject);
         }

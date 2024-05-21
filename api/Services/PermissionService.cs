@@ -1,5 +1,7 @@
 using api.Helpers.Enums;
+using api.Models;
 using api.Repositories.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace api.Services
 {
@@ -8,6 +10,24 @@ namespace api.Services
         public async Task<HashSet<PermissionEnum>> GetPermissionListAsync(int userId)
         {
             return await userRepository.GetPermissionListAsync(userId);
+        }
+
+        public async Task<ActionResult> RequireUserAccess(HttpContext httpContext, int[] requiredIdList, RoleEnum requireRole)
+        {
+            int userIdFromCookie = new HttpContextService(httpContext).GetUserIdFromCookie();
+
+            RoleService roleService = httpContext.RequestServices.GetRequiredService<RoleService>();
+
+            HashSet<RoleEnum> roleList = roleService.GetRoleListAsync(userIdFromCookie).Result;
+
+            if (roleList.Intersect([RoleEnum.Admin, RoleEnum.Secretar]).Any()) return new OkResult();
+            if (!roleList.Contains(requireRole)) return new ForbidResult();
+
+            UserEntity user = await userRepository.GetAsync(Convert.ToInt32(userIdFromCookie)) ?? throw new ArgumentNullException("User is null!");
+            
+            if (!requiredIdList.Contains(user.Id)) return new ForbidResult();
+
+            return new OkResult();
         }
     }
 }
