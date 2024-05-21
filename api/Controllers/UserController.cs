@@ -53,7 +53,7 @@ namespace api.Controllers
 
             if (user is null) return NotFound();
 
-            if (StringHasher.Verify(userDTO.Password, user.PasswordHash) is false) return BadRequest();
+            if (StringHasher.Verify(userDTO.Password, user.PasswordHash) is false) return BadRequest("Password is not valid!");
 
             HttpContext.Response.Cookies.Append(CookieNames.USER_TOKEN, new JwtProvider(_configuration).GenerateToken(user));
 
