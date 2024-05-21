@@ -1,5 +1,6 @@
 using api.Helpers.Enums;
 using api.Models;
+using api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,7 +14,7 @@ namespace api.Data.Configurations
 
             IEnumerable<UserRoleEntity> userRoleList = Enum.GetValues<RoleEnum>().Select(roleEnum => new UserRoleEntity
             {
-                UserId = Convert.ToInt32(roleEnum),
+                UserId = StringHasher.GenerateGuid(Convert.ToInt32(roleEnum).ToString()),
                 RoleId = Convert.ToInt32(roleEnum),
             });
 

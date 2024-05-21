@@ -1,6 +1,7 @@
 # api
 
 /api/bin
+/api/obj
 /api/AppData/Database.db
 
 Studium.sln
