@@ -172,8 +172,3 @@ namespace api.Controllers
         }
     }
 }
-
-
-
-// !!!!!!!!!!!!!!!!!!!!
-// Пофиксить BadRequest при входе за Юзера
