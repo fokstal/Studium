@@ -7,14 +7,14 @@ namespace api.Services
 {
     public class PermissionService(UserRepository userRepository)
     {
-        public async Task<HashSet<PermissionEnum>> GetPermissionListAsync(int userId)
+        public async Task<HashSet<PermissionEnum>> GetPermissionListAsync(Guid userId)
         {
             return await userRepository.GetPermissionListAsync(userId);
         }
 
-        public async Task<ActionResult> RequireUserAccess(HttpContext httpContext, int[] requiredIdList, RoleEnum requireRole)
+        public async Task<ActionResult> RequireUserAccess(HttpContext httpContext, Guid[] requiredIdList, RoleEnum requireRole)
         {
-            int userIdFromCookie = new HttpContextService(httpContext).GetUserIdFromCookie();
+            Guid userIdFromCookie = new HttpContextService(httpContext).GetUserIdFromCookie();
 
             RoleService roleService = httpContext.RequestServices.GetRequiredService<RoleService>();
 
@@ -25,7 +25,7 @@ namespace api.Services
 
             UserEntity user = await userRepository.GetAsync(Convert.ToInt32(userIdFromCookie)) ?? throw new ArgumentNullException("User is null!");
             
-            if (!requiredIdList.Contains(user.Id)) return new ForbidResult();
+            if (!requiredIdList.ToList().Contains(user.Id)) return new ForbidResult();
 
             return new OkResult();
         }

@@ -9,6 +9,18 @@ namespace api.Repositories.Data
 {
     public class UserRepository(AppDbContext db) : DataRepositoryBase<UserEntity, RegisterUserDTO>(db)
     {
+        public override Task<UserEntity?> GetAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<UserEntity?> GetAsync(Guid id)
+        {
+            UserEntity? user = await _db.User.FirstOrDefaultAsync(userDb => userDb.Id == id);
+
+            return user;
+        }
+
         public async Task<UserEntity?> GetAsync(string login)
         {
             UserEntity? user = await _db.User.FirstOrDefaultAsync(userDb => userDb.Login.ToLower() == login.ToLower());
@@ -46,7 +58,7 @@ namespace api.Repositories.Data
             throw new NotImplementedException();
         }
 
-        public async Task<HashSet<PermissionEnum>> GetPermissionListAsync(int id)
+        public async Task<HashSet<PermissionEnum>> GetPermissionListAsync(Guid id)
         {
             List<RoleEntity>[] roleList = await
                 _db.User
@@ -64,7 +76,7 @@ namespace api.Repositories.Data
                 .ToHashSet();
         }
 
-        public async Task<HashSet<RoleEnum>> GetRoleListAsync(int id)
+        public async Task<HashSet<RoleEnum>> GetRoleListAsync(Guid id)
         {
             List<RoleEntity>[] roleList = await
                 _db.User

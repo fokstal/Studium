@@ -21,7 +21,7 @@ namespace api.Repositories.Data
             return subject;
         }
 
-        public async Task<SubjectEntity?> GetAsync(string name, int? teacherId)
+        public async Task<SubjectEntity?> GetAsync(string name, Guid? teacherId)
         {
             SubjectEntity? subject =
             await _db.Subject
