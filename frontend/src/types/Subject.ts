@@ -3,5 +3,5 @@ export type Subject = {
   name: string;
   description: string;
   teacherName: string;
-  groupId: number;
+  groupId: number | string;
 }

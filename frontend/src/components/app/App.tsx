@@ -11,6 +11,7 @@ import {
   Profile,
   Student,
   Students,
+  Subjects,
 } from "../../pages";
 import { Journal } from "../../pages/journal";
 
@@ -27,6 +28,7 @@ export function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="group" element={<Groups />} />
           <Route path="group/new" element={<CreateEditGroup />} />
+          <Route path="subject" element={<Subjects />} />
           <Route path="subject/new" element={<CreateEditSubject />} />
         </Route>
         <Route path="*" element={<Error404Page />} />

@@ -4,4 +4,4 @@ export * from "./error";
 export * from "./student";
 export * from "./profile";
 export * from "./groups";
-export * from "./create-edit-subject";
+export * from "./subjects";
