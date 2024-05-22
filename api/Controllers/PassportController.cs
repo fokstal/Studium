@@ -9,6 +9,7 @@ using api.Extensions;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
+using api.Services;
 
 namespace api.Controllers
 {
@@ -19,11 +20,12 @@ namespace api.Controllers
     {
         private readonly PassportRepository _passportRepository = new(db);
         private readonly PersonRepository _personRepository = new(db);
+        private readonly UserRepository _userRepository = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([ViewPassport])]
+        [RequirePermissions([ViewPassportList])]
         public async Task<ActionResult<IEnumerable<PassportEntity>>> GetListAsync() => Ok(await _passportRepository.GetListAsync());
 
         [HttpGet("{id:int}")]
@@ -39,6 +41,22 @@ namespace api.Controllers
             PassportEntity? passport = await _passportRepository.GetAsync(id);
 
             if (passport is null) return NotFound();
+
+            PersonEntity? person = await _personRepository.GetAsync(passport.PersonId);
+
+            if (person!.Student is not null)
+            {
+                ActionResult actionResultUserAccess = await
+                    new PermissionService(_userRepository)
+                    .RequireUserAccess
+                    (
+                        HttpContext,
+                        [person.Student.Id],
+                        Student
+                    );
+
+                if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
+            }
 
             return Ok(passport);
         }

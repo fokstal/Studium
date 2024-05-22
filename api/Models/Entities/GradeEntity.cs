@@ -4,7 +4,7 @@ namespace api.Models
     {
         public int Value { get; set; }
         public DateTime SetDate { get; set; }
-        public int StudentId { get; set; }
+        public Guid StudentId { get; set; }
         public int SubjectId { get; set; }
     }
 }

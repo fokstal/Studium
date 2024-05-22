@@ -1,47 +1,50 @@
 import { Box, Flex, Text, Textarea, VStack } from "@chakra-ui/react";
-import { Button, Input, colors } from "../../components/ui-kit";
+import { Button, Input, Select, colors } from "../../components/ui-kit";
 import { BaseLayout } from "../../layouts";
-import { GroupService } from "../../services";
+import { UserService } from "../../services";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LanguageContext, Translator } from "../../store";
+import { User } from "../../types";
+import { createGroup } from "../../lib";
 
-const groupService = new GroupService();
+const userService = new UserService();
 
-export function CreateEditGroup() {
+export function CreateGroup() {
   const [data, setData] = useState<{
     name?: string;
-    curator?: string;
+    curator?: User;
     auditoryName?: string;
     description?: string;
-  }>();
+  }>({});
+  const [curators, setCurators] = useState<User[]>();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigator = useNavigate();
   const { lang } = useContext(LanguageContext);
 
-  const handleSubmit = () => {
-    if (
-      !data?.name ||
-      !data?.curator ||
-      !data?.description ||
-      !data?.description
-    ) {
-      return setErrorMessage("Заполните данные полностью");
-    }
-    groupService.post(data).then((res) => {
-      if (res.status !== 201) {
-        setErrorMessage(
-          "Данные введены не коректно, пожалуйста проверьте формат данных"
-        );
-      } else {
-        navigator("/students");
-      }
-    });
+  const handleSubmit = async () => {
+    const res = await createGroup(data);
+    if (res === "Created") return navigator("/group");
+    setErrorMessage(res);
+  };
+
+  const handleCuratorChange = (value: User) => {
+    setData({ ...data, curator: value });
   };
 
   useEffect(() => {
     setErrorMessage(null);
   }, [data]);
+
+  useEffect(() => {
+    userService
+      .get()
+      .then((data) =>
+        setCurators(
+          data.filter((user: User) => user.roleList[0].name === "Curator")
+        )
+      );
+  }, []);
 
   return (
     <BaseLayout bg={colors.darkGrey}>
@@ -78,12 +81,12 @@ export function CreateEditGroup() {
                   value={data?.name}
                   onChange={(e) => setData({ ...data, name: e.target.value })}
                 />
-                <Input
+                <Select
                   placeholder="Платонова Тамара Юрьевна"
+                  options={curators || []}
                   value={data?.curator}
-                  onChange={(e) =>
-                    setData({ ...data, curator: e.target.value })
-                  }
+                  setValue={handleCuratorChange}
+                  name="firstName"
                 />
                 <Input
                   placeholder="16"
@@ -105,7 +108,7 @@ export function CreateEditGroup() {
               borderColor={errorMessage ? colors.red : "none"}
             >
               <Text fontSize="24px" fontWeight="bold">
-              {Translator[lang.name]["descripition"]}
+                {Translator[lang.name]["descripition"]}
               </Text>
               <Textarea
                 borderColor={colors.darkGrey}

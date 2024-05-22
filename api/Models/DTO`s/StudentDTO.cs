@@ -4,6 +4,8 @@ namespace api.Model.DTO
 {
     public class StudentDTO
     {
+        public Guid Id { get; set;}
+
         [Required]
         public DateTime AddedDate { get; set;}
         

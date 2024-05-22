@@ -9,7 +9,7 @@ namespace api.Model.DTO
         public int Value { get; set; }
 
         [Required]
-        public int StudentId { get; set; }
+        public Guid StudentId { get; set; }
 
         [Required]
         public int SubjectId { get; set; }

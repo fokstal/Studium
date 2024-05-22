@@ -23,7 +23,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([ViewSubject])]
+        [RequirePermissions([ViewSubjectList])]
         public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync() => Ok(await _subjectRepository.GetListAsync());
 
         [HttpGet("{id:int}")]
@@ -102,7 +102,7 @@ namespace api.Controllers
             UserEntity? user = await _userRepository.GetAsync(subjectDTO.TeacherId);
 
             if (user is null) return NotFound("Teacher is null");
-            if (!UserService.CheckRoleContains(user, Teacher)) return BadRequest("User is not a Teacher!");
+            if (!UserService.CheckRoleContains(_userRepository, user, Teacher)) return BadRequest("User is not a Teacher!");
 
             await _subjectRepository.AddAsync(_subjectRepository.Create(subjectDTO));
 
@@ -146,7 +146,7 @@ namespace api.Controllers
             UserEntity? user = await _userRepository.GetAsync(subjectDTO.TeacherId);
 
             if (user is null) return NotFound("Teacher is null");
-            if (!UserService.CheckRoleContains(user, Teacher)) return BadRequest("User is not a Teacher!");
+            if (!UserService.CheckRoleContains(_userRepository, user, Teacher)) return BadRequest("User is not a Teacher!");
 
             await _subjectRepository.UpdateAsync(subjectToUpdate, subjectDTO);
 

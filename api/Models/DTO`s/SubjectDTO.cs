@@ -10,7 +10,7 @@ namespace api.Model.DTO
 
         [Required]
         [MaxLength(150)]
-        public string Descripton { get; set; } = null!;
+        public string Description { get; set; } = null!;
 
         public Guid TeacherId { get; set; }
         public int? GroupId { get; set; }

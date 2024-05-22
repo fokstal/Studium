@@ -41,7 +41,7 @@ namespace api.Repositories.Data
             return new()
             {
                 Name = subjectDTO.Name,
-                Descripton = subjectDTO.Descripton,
+                Description = subjectDTO.Description,
                 TeacherId = subjectDTO.TeacherId,
                 GroupId = subjectDTO.GroupId,
             };
@@ -50,7 +50,7 @@ namespace api.Repositories.Data
         public async override Task UpdateAsync(SubjectEntity subjectToUpdate, SubjectDTO subjectDTO)
         {
             subjectToUpdate.Name = subjectDTO.Name;
-            subjectToUpdate.Descripton = subjectDTO.Descripton;
+            subjectToUpdate.Description = subjectDTO.Description;
             subjectToUpdate.TeacherId = subjectDTO.TeacherId;
             subjectToUpdate.GroupId = subjectDTO.GroupId;
 

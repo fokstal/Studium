@@ -9,6 +9,7 @@ using api.Extensions;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
+using api.Services;
 
 namespace api.Controllers
 {
@@ -18,11 +19,13 @@ namespace api.Controllers
     public class PersonController(AppDbContext db) : ControllerBase
     {
         private readonly PersonRepository _personRepository = new(db);
+        private readonly GroupRepository _groupRepository = new(db);
+        private readonly UserRepository _userRepository = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([ViewPerson])]
+        [RequirePermissions([ViewPersonList])]
         public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListAsync() => Ok(await _personRepository.GetListAsync());
 
         [HttpGet("{id:int}")]
@@ -38,6 +41,45 @@ namespace api.Controllers
             PersonEntity? person = await _personRepository.GetAsync(id);
 
             if (person is null) return NotFound();
+
+            if (person.Student is not null)
+            {
+                ActionResult actionResultUserAccess = await
+                    new PermissionService(_userRepository)
+                    .RequireUserAccess
+                    (
+                        HttpContext,
+                        [person.Student.Id],
+                        Student
+                    );
+
+                if (actionResultUserAccess.GetType() != new OkResult().GetType())
+                {
+                    actionResultUserAccess = await
+                    new PermissionService(_userRepository)
+                    .RequireUserAccess
+                    (
+                        HttpContext,
+                        [_groupRepository.GetAsync(person.Student.GroupId).Result!.CuratorId],
+                        Curator
+                    );
+
+                    if (actionResultUserAccess.GetType() != new OkResult().GetType())
+                    {
+                        actionResultUserAccess = await
+                        new PermissionService(_userRepository)
+                        .RequireUserAccess
+                        (
+                            HttpContext,
+                            _groupRepository.GetAsync(person.Student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
+                            Teacher
+                        );
+
+                        if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
+                    }
+                }
+            }
+
 
             return Ok(person);
         }

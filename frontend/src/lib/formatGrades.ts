@@ -1,5 +1,5 @@
-import { PersonService, StudentService, SubjectService } from "../../services";
-import { Grade, Group, Person, Student, Subject } from "../../types";
+import { PersonService, StudentService, SubjectService } from "../services";
+import { Grade, Group, Person, Student, Subject } from "../types";
 
 const studentService = new StudentService();
 const subjectService = new SubjectService();
