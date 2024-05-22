@@ -2,15 +2,17 @@ import { Box, Flex, Text } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
 import { colors } from "../../components/ui-kit";
 import { GroupService, SubjectService } from "../../services";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Subject } from "../../types";
 import { SubjectTable } from "../../components/subjects";
+import { LanguageContext, Translator } from "../../store";
 
 const subjectService = new SubjectService();
 const groupService = new GroupService();
 
 export function Subjects() {
   const [subjects, setSubjects] = useState<Subject[]>();
+  const { lang } = useContext(LanguageContext);
 
   const updateSubjects = async () => {
     const subjects = await subjectService.get();
@@ -19,7 +21,7 @@ export function Subjects() {
       groupId: (await groupService.getById(+s.groupId)).name,
     }));
     setSubjects(formatedSubjects);
-  }
+  };
 
   useEffect(() => {
     updateSubjects();
@@ -35,7 +37,7 @@ export function Subjects() {
         gap="10px"
       >
         <Text color={colors.black} fontSize="32px" as="h1" fontWeight="bold">
-          Список предметов
+          {Translator[lang.name]["subject_list"]}
         </Text>
         <Flex
           borderRadius="5px"

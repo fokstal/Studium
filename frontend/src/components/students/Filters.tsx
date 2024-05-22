@@ -1,8 +1,11 @@
 import { Box, Flex, Input, InputGroup, Text, VStack } from "@chakra-ui/react";
 import { Button, Checkbox, Select, colors, groups } from "../ui-kit";
 import { AiOutlineClose } from "react-icons/ai";
+import { useContext } from "react";
+import { LanguageContext, Translator } from "../../store";
 
 export function Filters() {
+  const { lang } = useContext(LanguageContext);
   return (
     <Box
       bg={colors.darkGrey}
@@ -13,11 +16,15 @@ export function Filters() {
     >
       <Flex direction="column" gap="20px" w="max-content">
         <VStack align="stretch">
-          <Text fontWeight="bold">Учебная группа</Text>
+          <Text fontWeight="bold">
+            {Translator[lang.name]["student_group"]}
+          </Text>
           {/* <Select placeholder="Выберите группу" options={groups} /> */}
         </VStack>
         <VStack align="stretch">
-          <Text fontWeight="bold">Дата зачисления</Text>
+          <Text fontWeight="bold">
+            {Translator[lang.name]["date_start_stude"]}
+          </Text>
           <InputGroup maxW="200px">
             <Input
               borderColor={colors.lightGrey}
@@ -25,7 +32,7 @@ export function Filters() {
               _focusVisible={{ boxShadow: "none" }}
               bg={colors.white}
               borderRadius="5px 0 0 5px"
-              placeholder="От"
+              placeholder={Translator[lang.name]["from"]}
             />
             <Input
               borderColor={colors.lightGrey}
@@ -33,7 +40,7 @@ export function Filters() {
               _focusVisible={{ boxShadow: "none" }}
               bg={colors.white}
               borderRadius="0 5px 5px 0"
-              placeholder="До"
+              placeholder={Translator[lang.name]["to"]}
             />
           </InputGroup>
         </VStack>
@@ -41,20 +48,22 @@ export function Filters() {
           <Flex gap="10px" align="center">
             <Checkbox name="graduated" id="graduated" />
             <Text as="label" htmlFor="graduated">
-              Выпуск этого года
+              {Translator[lang.name]["this_year_finish"]}
             </Text>
           </Flex>
           <Flex gap="10px" align="center">
             <Checkbox name="enrollment" id="enrollment" />
             <Text as="label" htmlFor="enrollment">
-              Зачисленные в этом году
+              {Translator[lang.name]["this_year_start"]}
             </Text>
           </Flex>
         </VStack>
         <VStack align="stretch">
-          <Button>Поиск</Button>
+          <Button>{Translator[lang.name]["search"]}</Button>
           <Flex gap="10px" align="center" cursor="pointer">
-            <Text fontWeight="bold">Очистить фильтры</Text>
+            <Text fontWeight="bold">
+              {Translator[lang.name]["clear_filters"]}
+            </Text>
             <AiOutlineClose size="20px" />
           </Flex>
         </VStack>

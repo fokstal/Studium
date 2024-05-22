@@ -1,10 +1,13 @@
 import { Box, Flex, Image, Text, VStack } from "@chakra-ui/react";
 import { colors } from "../../components/ui-kit";
 import { AuthForm } from "../../components/forms";
+import { useContext } from "react";
+import { LanguageContext, Translator } from "../../store";
 
 const imagesUrl = process.env.PUBLIC_URL + "/images";
 
 export function Home() {
+  const {lang} = useContext(LanguageContext);
   return (
     <Flex
       w="100%"
@@ -31,7 +34,7 @@ export function Home() {
           fontWeight="bold"
           maxW="560px"
         >
-          удобный электронный журнал и база данных учащихся
+          {Translator[lang.name]["studium_description"]}
         </Text>
       </VStack>
       <Box w="320px">

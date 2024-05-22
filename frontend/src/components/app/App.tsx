@@ -14,25 +14,31 @@ import {
   Subjects,
 } from "../../pages";
 import { Journal } from "../../pages/journal";
+import { useState } from "react";
+import { LanguageContext } from "../../store";
 
 export function App() {
+  const [lang, setLang] = useState<{name: "RU" | "BE" | "EN"}>({name: "RU"});
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="/" element={<PageLayout />}>
-          <Route path="students" element={<Students />} />
-          <Route path="journal" element={<Journal />} />
-          <Route path="students/new" element={<CreateEditStudent />} />
-          <Route path="students/:id" element={<Student />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="group" element={<Groups />} />
-          <Route path="group/new" element={<CreateEditGroup />} />
-          <Route path="subject" element={<Subjects />} />
-          <Route path="subject/new" element={<CreateEditSubject />} />
-        </Route>
-        <Route path="*" element={<Error404Page />} />
-      </Routes>
-    </BrowserRouter>
+    <LanguageContext.Provider value={{ lang: lang || {name: "RU"}, setLang: setLang }}>
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path="/" element={<PageLayout />}>
+            <Route path="students" element={<Students />} />
+            <Route path="journal" element={<Journal />} />
+            <Route path="students/new" element={<CreateEditStudent />} />
+            <Route path="students/:id" element={<Student />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="group" element={<Groups />} />
+            <Route path="group/new" element={<CreateEditGroup />} />
+            <Route path="subject" element={<Subjects />} />
+            <Route path="subject/new" element={<CreateEditSubject />} />
+          </Route>
+          <Route path="*" element={<Error404Page />} />
+        </Routes>
+      </BrowserRouter>
+    </LanguageContext.Provider>
   );
 }

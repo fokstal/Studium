@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
 import { colors } from "../../components/ui-kit";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AiOutlineFilter } from "react-icons/ai";
 import { FaSearch } from "react-icons/fa";
 import { Student, StudentsTableData } from "../../types";
@@ -18,6 +18,7 @@ import {
   SelectedStudent,
   StudentsTable,
 } from "../../components/students";
+import { LanguageContext, Translator } from "../../store";
 
 const studentService = new StudentService();
 const groupService = new GroupService();
@@ -31,6 +32,7 @@ export function Students() {
   const [selectedStudent, setSelectedStudent] = useState<
     (StudentsTableData & Student) | null
   >(null);
+  const { lang } = useContext(LanguageContext);
 
   const handleOpenToggleColumns = () => {
     if (selectedStudent) setSelectedStudent(null);
@@ -78,10 +80,10 @@ export function Students() {
         gap="10px"
       >
         <Text color={colors.black} fontSize="32px" as="h1" fontWeight="bold">
-          Список учащихся
+          {Translator[lang.name]["student_list"]}
         </Text>
         <Text color={colors.grey} fontSize="20px" as="b">
-          Нажмите на учащегося в таблице для подробной информации
+          {Translator[lang.name]["click_student"]}
         </Text>
         <Flex
           borderRadius="5px"
@@ -99,7 +101,7 @@ export function Students() {
               onClick={handleOpenToggleColumns}
             >
               <Text userSelect="none" fontSize="16px">
-                Фильтры
+                {Translator[lang.name]["filters"]}
               </Text>
               <AiOutlineFilter size="16px" />
             </Flex>
@@ -108,7 +110,7 @@ export function Students() {
                 <FaSearch />
               </InputLeftElement>
               <ChakraInput
-                placeholder="Поиск"
+                placeholder={Translator[lang.name]["search"]}
                 borderColor={colors.lightGrey}
                 _hover={{ borderColor: colors.green }}
                 value={search}

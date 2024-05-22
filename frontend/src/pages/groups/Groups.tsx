@@ -3,13 +3,15 @@ import { BaseLayout } from "../../layouts";
 import { colors } from "../../components/ui-kit";
 import { GroupService } from "../../services";
 import { GroupTable } from "../../components/groups";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Group } from "../../types";
+import { LanguageContext, Translator } from "../../store";
 
 const groupService = new GroupService();
 
 export function Groups() {
   const [groups, setGroups] = useState<Group[]>();
+  const { lang } = useContext(LanguageContext);
 
   useEffect(() => {
     groupService.get().then((groups) => setGroups(groups));
@@ -25,7 +27,7 @@ export function Groups() {
         gap="10px"
       >
         <Text color={colors.black} fontSize="32px" as="h1" fontWeight="bold">
-          Список групп
+          {Translator[lang.name]["group_list"]}
         </Text>
         <Flex
           borderRadius="5px"

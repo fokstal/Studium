@@ -1,6 +1,8 @@
 import { Box, Flex, Text, VStack } from "@chakra-ui/react";
 import { Button, Select, colors } from "../ui-kit";
 import { AiOutlineFrown, AiOutlineMeh, AiOutlineSmile } from "react-icons/ai";
+import { useContext } from "react";
+import { LanguageContext, Translator } from "../../store";
 
 type AverageGradeProps = {
   id: number;
@@ -9,6 +11,7 @@ type AverageGradeProps = {
 export function AverageGrade({ id }: AverageGradeProps) {
   const averageGrade = 4.3;
   const { green, red, white, grey } = colors;
+  const { lang } = useContext(LanguageContext);
   return (
     <Flex
       align="center"
@@ -19,19 +22,19 @@ export function AverageGrade({ id }: AverageGradeProps) {
     >
       <VStack gap="20px" align="stretch">
         <Text fontSize="24px" fontWeight="bold">
-          Расчёт среднего балла
+          {Translator[lang.name]["average_mark_calculation"]}
         </Text>
         <Flex gap="20px" align="center">
-          <Text>Расчитать средний балл для:</Text>
+          <Text>{Translator[lang.name]["calculate_average_mark_for"]}:</Text>
           <Select
             value={null}
-            placeholder="Выберите предмет"
+            placeholder={Translator[lang.name]["select_subject"]}
             setValue={() => {}}
             options={[]}
           />
         </Flex>
         <Box>
-          <Button>Расчитать</Button>
+          <Button>{Translator[lang.name]["calculate"]}</Button>
         </Box>
       </VStack>
       <VStack gap="5px" align="end">
@@ -54,10 +57,10 @@ export function AverageGrade({ id }: AverageGradeProps) {
         </Flex>
         <Text color={grey}>
           {averageGrade >= 9
-            ? "Вы - отличник! Так держать!"
+            ? Translator[lang.name]["average_mark_good"]
             : averageGrade > 5
-              ? "Вы - хорошист! Отлично!"
-              : "Вы - серьезный тип! Старайтесь лучше!"}
+              ? Translator[lang.name]["average_mark_normal"]
+              : Translator[lang.name]["average_mark_bad"]}
         </Text>
       </VStack>
     </Flex>

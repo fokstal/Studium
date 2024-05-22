@@ -1,8 +1,9 @@
 import { Box, Flex, Text, VStack } from "@chakra-ui/react";
 import { Chart } from "primereact/chart";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GradeService } from "../../services";
 import { Button, Select, colors } from "../ui-kit";
+import { LanguageContext, Translator } from "../../store";
 
 const gradeService = new GradeService();
 
@@ -14,10 +15,14 @@ export function Diagrams({ id }: DiagramsProps) {
   const [chartDataGrades, setChartDataGrades] = useState({});
   const [chartDataCredits, setChartDataCredits] = useState({});
   const { red, green, darkGreen, darkRed, white, darkGrey } = colors;
+  const { lang } = useContext(LanguageContext);
 
   useEffect(() => {
     const data = {
-      labels: ["Отметки ниже 3", "Отметки выше 3"],
+      labels: [
+        Translator[lang.name]["marks_lower_3"],
+        Translator[lang.name]["marks_highter_3"],
+      ],
       datasets: [
         {
           data: [10, 2],
@@ -46,26 +51,39 @@ export function Diagrams({ id }: DiagramsProps) {
   return (
     <VStack p="20px" gap="20px" align="stretch" bg={white} w="100%">
       <Text fontSize="24px" fontWeight="bold">
-        Диаграммы
+        {Translator[lang.name]["diagrams"]}
       </Text>
       <Flex gap="20px">
         <VStack align="center" w="100%" bg={darkGrey} p="20px" gap="20px">
           <Text fontSize="24px" fontWeight="bold">
-            Отметки
+            {Translator[lang.name]["marks"]}
           </Text>
-          <Chart type="doughnut" data={chartDataGrades} options={{ cutout: "60%", borderColor: darkGrey }} />
+          <Chart
+            type="doughnut"
+            data={chartDataGrades}
+            options={{ cutout: "60%", borderColor: darkGrey }}
+          />
         </VStack>
 
         <VStack align="center" w="100%" bg={darkGrey} p="20px" gap="20px">
           <Text fontSize="24px" fontWeight="bold">
-            Зачеты
+            {Translator[lang.name]["credits"]}
           </Text>
-          <Chart type="doughnut" data={chartDataCredits} options={{ cutout: "60%", borderColor: darkGrey }} />
+          <Chart
+            type="doughnut"
+            data={chartDataCredits}
+            options={{ cutout: "60%", borderColor: darkGrey }}
+          />
         </VStack>
       </Flex>
-      <Flex justify="space-between" align="center">  
-        <Select value={null} setValue={() =>{}} placeholder="Выбурите предмет" options={[]}/>
-        <Button>Сформировать диаграммы</Button>
+      <Flex justify="space-between" align="center">
+        <Select
+          value={null}
+          setValue={() => {}}
+          placeholder={Translator[lang.name]["select_subject"]}
+          options={[]}
+        />
+        <Button>{Translator[lang.name]["create_diagrams"]}</Button>
       </Flex>
     </VStack>
   );

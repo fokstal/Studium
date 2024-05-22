@@ -7,29 +7,28 @@ import {
   AiOutlinePieChart,
   AiOutlineProfile,
 } from "react-icons/ai";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { StudentComponent } from "../../components/students";
 import { AverageGrade, Diagrams } from "../../components/profile";
+import { LanguageContext, Translator } from "../../store";
 
 export function Profile() {
   const [currentPart, setCurrentPart] = useState("Информация");
+  const { lang } = useContext(LanguageContext);
 
   const profileLinks = [
-    { name: "Информация", Icon: AiOutlineExclamationCircle },
-    { name: "Успеваемость", Icon: AiOutlinePieChart },
-    { name: "Оформить справку", Icon: AiOutlineProfile },
+    {
+      name: Translator[lang.name]["information"],
+      Icon: AiOutlineExclamationCircle,
+    },
+    { name: Translator[lang.name]["performance"], Icon: AiOutlinePieChart },
   ];
 
   return (
     <BaseLayout bg={colors.darkGrey}>
-      <VStack
-        p="80px 0"
-        minH="calc(100vh - 100px)"
-        align="stretch"
-        gap="50px"
-      >
+      <VStack p="80px 0" minH="calc(100vh - 100px)" align="stretch" gap="50px">
         <Text fontSize="32px" fontWeight="bold">
-          Личный кабинет
+        {Translator[lang.name]["profile"]}
         </Text>
         <Flex gap="90px">
           <VStack fontSize="20px" align="stretch" w="max-content">
@@ -47,12 +46,14 @@ export function Profile() {
             ))}
             <Flex gap="10px" color={colors.red} align="center">
               <AiOutlineExport size="24px" />
-              <Text whiteSpace="pre">Выйти</Text>
+              <Text whiteSpace="pre">{Translator[lang.name]["exit"]}</Text>
             </Flex>
           </VStack>
           <VStack align="stretch" gap="20px" w="100%">
-            {currentPart === "Информация" ? <StudentComponent id={1} /> : null}
-            {currentPart === "Успеваемость" ? (
+            {currentPart === Translator[lang.name]["information"] ? (
+              <StudentComponent id={1} />
+            ) : null}
+            {currentPart === Translator[lang.name]["performance"] ? (
               <>
                 <Diagrams id={1} />
                 <AverageGrade id={1} />

@@ -1,6 +1,6 @@
 import { Flex, useDisclosure } from "@chakra-ui/react";
 import { Button, Select } from "../ui-kit";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Group, Person, Student, Subject } from "../../types";
 import {
   GroupService,
@@ -9,6 +9,7 @@ import {
   SubjectService,
 } from "../../services";
 import { GradeModal } from "../modal";
+import { LanguageContext, Translator } from "../../store";
 
 const groupService = new GroupService();
 const personService = new PersonService();
@@ -28,6 +29,7 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
     students?: Student[];
   }>();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { lang} = useContext(LanguageContext);
 
   const { group, person, subject } = filters;
 
@@ -74,25 +76,25 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
   return (
     <Flex gap="20px" align="center">
       <Select
-        placeholder="Выберите группу"
+        placeholder={Translator[lang.name]["select_group"]}
         options={selectOptions?.groups || []}
         value={group}
         setValue={setGroup}
       />
       <Select
-        placeholder="Выберите учащегося"
+        placeholder={Translator[lang.name]["select_student"]}
         options={personOptions() || []}
         value={person}
         setValue={setPerson}
         name="firstName"
       />
       <Select
-        placeholder="Выберите предмет"
+        placeholder={Translator[lang.name]["select_subject"]}
         options={subjectOptions() || []}
         value={subject}
         setValue={setSubject}
       />
-      <Button onClick={onOpen}>Добавить оценку</Button>
+      <Button onClick={onOpen}>{Translator[lang.name]["add_mark"]}</Button>
       <GradeModal onClose={onClose} isOpen={isOpen} />
     </Flex>
   );

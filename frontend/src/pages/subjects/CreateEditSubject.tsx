@@ -2,9 +2,10 @@ import { Box, Flex, Text, Textarea, VStack } from "@chakra-ui/react";
 import { Button, Input, Select, colors } from "../../components/ui-kit";
 import { BaseLayout } from "../../layouts";
 import { GroupService, SubjectService } from "../../services";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Group } from "../../types";
 import { useNavigate } from "react-router-dom";
+import { LanguageContext, Translator } from "../../store";
 
 const groupService = new GroupService();
 const subjectService = new SubjectService();
@@ -19,6 +20,7 @@ export function CreateEditSubject() {
     group?: Group;
   }>({});
   const navigator = useNavigate();
+  const { lang } = useContext(LanguageContext);
 
   useEffect(() => {
     groupService.get().then((value) => setGroups(value));
@@ -56,7 +58,7 @@ export function CreateEditSubject() {
         p="80px 0px"
       >
         <Text fontSize="32px" fontWeight="bold">
-          Создание предмета
+          {Translator[lang.name]["subject_create"]}
         </Text>
         <VStack
           align="stretch"
@@ -66,13 +68,13 @@ export function CreateEditSubject() {
           p="20px"
         >
           <Text fontSize="24px" fontWeight="bold">
-            Основная информация
+            {Translator[lang.name]["main_information"]}
           </Text>
           <Flex gap="10px" p="20px" bg={colors.darkGrey} borderRadius="5px">
             <VStack gap="22px" align="end" p="7px 0" whiteSpace="nowrap">
-              <Text>Название:</Text>
-              <Text>Преподаватель:</Text>
-              <Text>Группа:</Text>
+              <Text>{Translator[lang.name]["name"]}:</Text>
+              <Text>{Translator[lang.name]["teacher"]}:</Text>
+              <Text>{Translator[lang.name]["group"]}:</Text>
             </VStack>
             <VStack gap="10px" align="start" w="100%">
               <Input
@@ -105,7 +107,7 @@ export function CreateEditSubject() {
             borderRadius="5px"
           >
             <Text fontSize="24px" fontWeight="bold">
-              Описание
+              {Translator[lang.name]["descripition"]}
             </Text>
             <Textarea
               value={data.description}
@@ -121,7 +123,7 @@ export function CreateEditSubject() {
           </Text>
         </VStack>
         <Box alignSelf="end" onClick={handleSubmit}>
-          <Button>Создать предмет</Button>
+          <Button>{Translator[lang.name]["create"]}</Button>
         </Box>
       </VStack>
     </BaseLayout>

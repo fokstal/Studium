@@ -2,8 +2,9 @@ import { Box, Flex, Text, Textarea, VStack } from "@chakra-ui/react";
 import { Button, Input, colors } from "../../components/ui-kit";
 import { BaseLayout } from "../../layouts";
 import { GroupService } from "../../services";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { LanguageContext, Translator } from "../../store";
 
 const groupService = new GroupService();
 
@@ -16,6 +17,7 @@ export function CreateEditGroup() {
   }>();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigator = useNavigate();
+  const { lang } = useContext(LanguageContext);
 
   const handleSubmit = () => {
     if (
@@ -50,7 +52,7 @@ export function CreateEditGroup() {
         p="80px 0px"
       >
         <Text fontSize="32px" fontWeight="bold">
-          Создание группы
+          {Translator[lang.name]["group_create"]}
         </Text>
         <VStack align="stretch" gap="20px">
           <VStack
@@ -62,13 +64,13 @@ export function CreateEditGroup() {
             borderColor={errorMessage ? colors.red : "none"}
           >
             <Text fontSize="24px" fontWeight="bold">
-              Основная информация
+              {Translator[lang.name]["main_information"]}
             </Text>
             <Flex gap="10px" p="20px" bg={colors.darkGrey} borderRadius="5px">
               <VStack gap="22px" align="end" p="7px 0" whiteSpace="nowrap">
-                <Text>Номер группы:</Text>
-                <Text>Куратор:</Text>
-                <Text>Аудитория:</Text>
+                <Text>{Translator[lang.name]["group_number"]}:</Text>
+                <Text>{Translator[lang.name]["curator"]}:</Text>
+                <Text>{Translator[lang.name]["auditory"]}:</Text>
               </VStack>
               <VStack gap="10px" align="start" w="100%">
                 <Input
@@ -103,7 +105,7 @@ export function CreateEditGroup() {
               borderColor={errorMessage ? colors.red : "none"}
             >
               <Text fontSize="24px" fontWeight="bold">
-                Описание
+              {Translator[lang.name]["descripition"]}
               </Text>
               <Textarea
                 borderColor={colors.darkGrey}
@@ -119,7 +121,7 @@ export function CreateEditGroup() {
             </Text>
           </VStack>
           <Box alignSelf="end" onClick={handleSubmit}>
-            <Button>Создать группу</Button>
+            <Button>{Translator[lang.name]["create"]}</Button>
           </Box>
         </VStack>
       </VStack>
