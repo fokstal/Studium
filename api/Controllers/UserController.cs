@@ -20,6 +20,10 @@ namespace api.Controllers
         private readonly UserRepository _userRepository = new(db);
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequireRoles([Admin, Secretar])]
+        [RequirePermissions([ViewUserList])]
         public async Task<ActionResult> GetListAsync() => Ok(await _userRepository.GetListAsync());
 
         [HttpPost("register")]

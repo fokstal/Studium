@@ -2,24 +2,30 @@ namespace api.Helpers.Enums
 {
     public enum PermissionEnum
     {
-        ViewGrade = 1,
-        EditGrade = 2,
+        ViewGradeList = 1,
+        ViewGrade = 2,
+        EditGrade = 3,
 
-        ViewGroup = 3,
-        EditGroup = 4,
+        ViewGroup = 4,
+        EditGroup = 5,
 
-        ViewPassport = 5,
-        EditPassport = 6,
+        ViewPassportList = 6,
+        ViewPassport = 7,
+        EditPassport = 8,
 
-        ViewPerson = 7,
-        EditPerson = 8,
+        ViewPersonList = 9,
+        ViewPerson = 10,
+        EditPerson = 11,
 
-        ViewStudent = 9,
-        EditStudent = 10,
+        ViewStudentList = 12,
+        ViewStudent = 13,
+        EditStudent = 14,
 
-        ViewSubject = 11,
-        EditSubject = 12,
+        ViewSubjectList = 15,
+        ViewSubject = 16,
+        EditSubject = 17,
 
-        RegisterUser = 13,
+        ViewUserList = 18,
+        RegisterUser = 19,
     }
 }
