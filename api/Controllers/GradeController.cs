@@ -15,9 +15,9 @@ namespace api.Controllers
     [RequireRoles([Admin, Secretar, Curator, Teacher, Student])]
     public class GradeController(AppDbContext db) : ControllerBase
     {
+        private readonly GradeRepository _gradeRepository = new(db);
         private readonly StudentRepository _studentRepository = new(db);
         private readonly SubjectRepository _subjectRepository = new(db);
-        private readonly GradeRepository _gradeRepository = new(db);
 
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -25,16 +25,14 @@ namespace api.Controllers
         [RequirePermissions([])]
         public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListAsync() => Ok(await _gradeRepository.GetListAsync());
 
-        [HttpGet("list-by-student/{id:int}")]
+        [HttpGet("list-by-student/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGrade])]
-        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentIdAsync(int id)
+        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentIdAsync(Guid id)
         {
-            if (id < 1) return BadRequest();
-
             if (await _studentRepository.CheckExistsAsync(id) is false) return NotFound();
 
             return Ok(await _gradeRepository.GetListByStudentIdAsync(id));
@@ -61,9 +59,9 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGrade])]
-        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentAndSubjectIdAsync(int studentId, int subjectId)
+        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentAndSubjectIdAsync(Guid studentId, int subjectId)
         {
-            if (studentId < 1 || subjectId < 1) return BadRequest();
+            if (subjectId < 1) return BadRequest();
 
             if (await _studentRepository.CheckExistsAsync(studentId) is false) return NotFound("Student is null!");
             if (await _subjectRepository.CheckExistsAsync(subjectId) is false) return NotFound("Subject is null!");

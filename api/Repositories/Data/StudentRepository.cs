@@ -7,6 +7,10 @@ namespace api.Repositories.Data
 {
     public class StudentRepository(AppDbContext db) : DataRepositoryBase<StudentEntity, StudentDTO>(db)
     {
+        public override Task<bool> CheckExistsAsync(int id) => throw new NotImplementedException();
+
+        public async Task<bool> CheckExistsAsync(Guid id) => await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id) is not null;
+
         public override Task<StudentEntity?> GetAsync(int id)
         {
             throw new NotImplementedException();

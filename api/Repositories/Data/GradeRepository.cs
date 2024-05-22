@@ -7,7 +7,7 @@ namespace api.Repositories.Data
 {
     public class GradeRepository(AppDbContext db) : DataRepositoryBase<GradeEntity, GradeDTO>(db)
     {
-        public async Task<IEnumerable<GradeEntity>> GetListByStudentIdAsync(int id)
+        public async Task<IEnumerable<GradeEntity>> GetListByStudentIdAsync(Guid id)
         {
             IEnumerable<GradeEntity> gradeList = await _db.Grade.Where(grade_db => grade_db.StudentId == id).ToArrayAsync();
 
@@ -21,7 +21,7 @@ namespace api.Repositories.Data
             return gradeList;
         }
 
-        public async Task<IEnumerable<GradeEntity>> GetListByStudentAndSubjectIdAsync(int studentId, int subjectId)
+        public async Task<IEnumerable<GradeEntity>> GetListByStudentAndSubjectIdAsync(Guid studentId, int subjectId)
         {
             IEnumerable<GradeEntity> gradeList = await _db.Grade.Where(grade_db => grade_db.StudentId == studentId && grade_db.SubjectId == subjectId).ToListAsync();
 
