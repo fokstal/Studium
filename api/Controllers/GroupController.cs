@@ -57,10 +57,10 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            UserEntity? user = await _userRepository.GetAsync(groupDTO.CuratorId);
+            UserEntity? user = await _userRepository.GetNoTrackingAsync(groupDTO.CuratorId);
 
             if (user is null) return NotFound("Curator is null");
-            if (!UserService.CheckRoleContains(user, Curator)) return BadRequest("User is not a Curator!");
+            if (!UserService.CheckRoleContains(_userRepository, user, Curator)) return BadRequest("User is not a Curator!");
 
             await _groupRepository.AddAsync(_groupRepository.Create(groupDTO));
 
@@ -88,10 +88,10 @@ namespace api.Controllers
 
             if (groupToUpdate is null) return NotFound();
 
-            UserEntity? user = await _userRepository.GetAsync(groupDTO.CuratorId);
+            UserEntity? user = await _userRepository.GetNoTrackingAsync(groupDTO.CuratorId);
 
             if (user is null) return NotFound("Curator is null");
-            if (!UserService.CheckRoleContains(user, Curator)) return BadRequest("User is not a Curator!");
+            if (!UserService.CheckRoleContains(_userRepository, user, Curator)) return BadRequest("User is not a Curator!");
 
             await _groupRepository.UpdateAsync(groupToUpdate, groupDTO);
 

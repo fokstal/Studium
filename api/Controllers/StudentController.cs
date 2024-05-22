@@ -7,7 +7,6 @@ using api.Extensions;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
-using api.Services;
 
 namespace api.Controllers
 {
@@ -79,7 +78,7 @@ namespace api.Controllers
                 MiddleName = person.MiddleName,
                 LastName = person.LastName,
                 Password = login,
-                RoleList = [_userRepository.GetRoleEntityByEnum(Student)]
+                RoleList = [Student]
             }));
 
             studentDTO.Id = userStudentId;
@@ -140,7 +139,7 @@ namespace api.Controllers
                 MiddleName = person.MiddleName,
                 LastName = person.LastName,
                 Password = login,
-                RoleList = [_userRepository.GetRoleEntityByEnum(Student)]
+                RoleList = [Student]
             }));
 
             studentDTO.Id = userStudentId;

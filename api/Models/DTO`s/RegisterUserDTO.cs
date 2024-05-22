@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using api.Models;
+using api.Helpers.Enums;
 
 namespace api.Model.DTO
 {
@@ -29,6 +29,6 @@ namespace api.Model.DTO
         public string Password { get; set; } = null!;
 
         [Required]
-        public List<RoleEntity> RoleList { get; set; } = [];
+        public RoleEnum[] RoleList { get; set; } = [];
     }
 }
