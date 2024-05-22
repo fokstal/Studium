@@ -6,10 +6,12 @@ import { AiOutlineEye } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { LanguageContext, Translator } from "../../store";
+import userhelperlibrary from "userhelperlibrary";
 
 export function Header() {
   const location = useLocation();
   const { lang, setLang } = useContext(LanguageContext);
+
   return (
     <BaseLayout>
       <Flex align="center" justify="space-between" h="100px">
@@ -51,9 +53,9 @@ export function Header() {
           </Text>
         </Flex>
         <Flex gap="20px" align="center">
-          <AiOutlineEye size="24" />
+          <AiOutlineEye size="24" onClick={() => userhelperlibrary()}/>
           <Select
-            options={[{name: "RU"}, {name: "EN"}, {name: "BE"}]}
+            options={[{ name: "RU" }, { name: "EN" }, { name: "BE" }]}
             placeholder="RU"
             value={lang}
             setValue={setLang}
