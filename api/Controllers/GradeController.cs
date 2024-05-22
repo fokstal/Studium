@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
+using api.Services;
 
 namespace api.Controllers
 {
@@ -18,6 +19,8 @@ namespace api.Controllers
         private readonly GradeRepository _gradeRepository = new(db);
         private readonly StudentRepository _studentRepository = new(db);
         private readonly SubjectRepository _subjectRepository = new(db);
+        private readonly GroupRepository _groupRepository = new(db);
+        private readonly UserRepository _userRepository = new(db);
 
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -35,7 +38,44 @@ namespace api.Controllers
         {
             if (await _studentRepository.CheckExistsAsync(id) is false) return NotFound();
 
-            return Ok(await _gradeRepository.GetListByStudentIdAsync(id));
+            IEnumerable<GradeEntity> gradeList = await _gradeRepository.GetListByStudentIdAsync(id);
+
+            ActionResult actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+                    Teacher
+                );
+
+            if (actionResultUserAccess.GetType() != new OkResult().GetType())
+            {
+                actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+                    Curator
+                );
+
+                if (actionResultUserAccess.GetType() != new OkResult().GetType())
+                {
+                    actionResultUserAccess = await
+                    new PermissionService(_userRepository)
+                    .RequireUserAccess
+                    (
+                        HttpContext,
+                        gradeList.Select(grade => grade.StudentId).ToArray(),
+                        Student
+                    );
+
+                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
+                }
+            }
+
+            return Ok(gradeList);
         }
 
         [HttpGet("list-by-subject/{id:int}")]
@@ -50,7 +90,44 @@ namespace api.Controllers
 
             if (await _subjectRepository.CheckExistsAsync(id) is false) return NotFound();
 
-            return Ok(await _gradeRepository.GetListBySubjectIdAsync(id));
+            IEnumerable<GradeEntity> gradeList = await _gradeRepository.GetListBySubjectIdAsync(id);
+
+            ActionResult actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+                    Teacher
+                );
+
+            if (actionResultUserAccess.GetType() != new OkResult().GetType())
+            {
+                actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+                    Curator
+                );
+
+                if (actionResultUserAccess.GetType() != new OkResult().GetType())
+                {
+                    actionResultUserAccess = await
+                    new PermissionService(_userRepository)
+                    .RequireUserAccess
+                    (
+                        HttpContext,
+                        gradeList.Select(grade => grade.StudentId).ToArray(),
+                        Student
+                    );
+
+                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
+                }
+            }
+
+            return Ok(gradeList);
         }
 
         [HttpGet("list-by-student/{studentId:int}/by-subject/{subjectId:int}")]
@@ -66,7 +143,44 @@ namespace api.Controllers
             if (await _studentRepository.CheckExistsAsync(studentId) is false) return NotFound("Student is null!");
             if (await _subjectRepository.CheckExistsAsync(subjectId) is false) return NotFound("Subject is null!");
 
-            return Ok(await _gradeRepository.GetListByStudentAndSubjectIdAsync(studentId, subjectId));
+            IEnumerable<GradeEntity> gradeList = await _gradeRepository.GetListByStudentAndSubjectIdAsync(studentId, subjectId);
+
+            ActionResult actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+                    Teacher
+                );
+
+            if (actionResultUserAccess.GetType() != new OkResult().GetType())
+            {
+                actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+                    Curator
+                );
+
+                if (actionResultUserAccess.GetType() != new OkResult().GetType())
+                {
+                    actionResultUserAccess = await
+                    new PermissionService(_userRepository)
+                    .RequireUserAccess
+                    (
+                        HttpContext,
+                        gradeList.Select(grade => grade.StudentId).ToArray(),
+                        Student
+                    );
+
+                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
+                }
+            }
+
+            return Ok(gradeList);
         }
 
         [HttpPost]

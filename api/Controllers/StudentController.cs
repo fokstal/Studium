@@ -7,6 +7,7 @@ using api.Extensions;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
+using api.Services;
 
 namespace api.Controllers
 {
@@ -37,6 +38,41 @@ namespace api.Controllers
             StudentEntity? student = await _studentRepository.GetAsync(id);
 
             if (student is null) return NotFound();
+
+            ActionResult actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [_groupRepository.GetAsync(student.GroupId).Result!.CuratorId],
+                    Curator
+                );
+
+            if (actionResultUserAccess.GetType() != new OkResult().GetType())
+            {
+                actionResultUserAccess = await
+                new PermissionService(_userRepository)
+                .RequireUserAccess
+                (
+                    HttpContext,
+                    [student.Id],
+                    Student
+                );
+
+                if (actionResultUserAccess.GetType() != new OkResult().GetType())
+                {
+                    actionResultUserAccess = await
+                    new PermissionService(_userRepository)
+                    .RequireUserAccess
+                    (
+                        HttpContext,
+                        _groupRepository.GetAsync(student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
+                        Teacher
+                    );
+
+                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
+                }
+            }
 
             return Ok(student);
         }
