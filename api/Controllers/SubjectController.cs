@@ -103,6 +103,7 @@ namespace api.Controllers
 
             if (user is null) return NotFound("Teacher is null");
             if (!UserService.CheckRoleContains(_userRepository, user, Teacher)) return BadRequest("User is not a Teacher!");
+            if (await _subjectRepository.CheckExistsAsync(user.Id)) return BadRequest("Teacher already have the Subject!");
 
             await _subjectRepository.AddAsync(_subjectRepository.Create(subjectDTO));
 
@@ -147,6 +148,7 @@ namespace api.Controllers
 
             if (user is null) return NotFound("Teacher is null");
             if (!UserService.CheckRoleContains(_userRepository, user, Teacher)) return BadRequest("User is not a Teacher!");
+            if (await _subjectRepository.CheckExistsAsync(user.Id)) return BadRequest("Teacher already have the Subject!");
 
             await _subjectRepository.UpdateAsync(subjectToUpdate, subjectDTO);
 

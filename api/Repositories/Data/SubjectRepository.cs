@@ -7,6 +7,8 @@ namespace api.Repositories.Data
 {
     public class SubjectRepository(AppDbContext db) : DataRepositoryBase<SubjectEntity, SubjectDTO>(db)
     {
+        public async Task<bool> CheckExistsAsync(Guid userId) => await _db.Subject.FirstOrDefaultAsync(valueDb => valueDb.TeacherId == userId) is not null;
+
         public async override Task<IEnumerable<SubjectEntity>> GetListAsync()
         {
             IEnumerable<SubjectEntity> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradeList).ToArrayAsync();
