@@ -1,5 +1,6 @@
 using api.Data.Configurations;
 using api.Models;
+using api.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -10,6 +11,7 @@ namespace api.Data
         private readonly AuthorizationOptions _authOptions;
 
         public DbSet<GradeEntity> Grade { get; set; }
+        public DbSet<GradeTypeEntity> GradeTypeEntity { get; set; }
         public DbSet<GroupEntity> Group { get; set; }
         public DbSet<PassportEntity> Passport { get; set; }
         public DbSet<PersonEntity> Person { get; set; }

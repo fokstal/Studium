@@ -1,6 +1,10 @@
 {
   "Files": [
     {
+      "Id": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/0a67248f-bc83-4d3b-9ff6-8c77e9d68d68.png",
+      "PackagePath": "staticwebassets/pictures/person/0a67248f-bc83-4d3b-9ff6-8c77e9d68d68.png"
+    },
+    {
       "Id": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/6933f4ec-f13a-471f-9038-779f9b7f4a6d.png",
       "PackagePath": "staticwebassets/pictures/person/6933f4ec-f13a-471f-9038-779f9b7f4a6d.png"
     },

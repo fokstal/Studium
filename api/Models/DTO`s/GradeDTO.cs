@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using api.Helpers.Enums;
 
 namespace api.Model.DTO
 {
@@ -13,5 +14,8 @@ namespace api.Model.DTO
 
         [Required]
         public int SubjectId { get; set; }
+
+        [Required]
+        public GradeTypeEnum Type { get; set; }
     }
 }

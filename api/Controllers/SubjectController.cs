@@ -99,7 +99,7 @@ namespace api.Controllers
                 if (group is null) return NotFound("Group is null!");
             }
 
-            UserEntity? user = await _userRepository.GetAsync(subjectDTO.TeacherId);
+            UserEntity? user = await _userRepository.GetNoTrackingAsync(subjectDTO.TeacherId);
 
             if (user is null) return NotFound("Teacher is null");
             if (!UserService.CheckRoleContains(_userRepository, user, Teacher)) return BadRequest("User is not a Teacher!");
@@ -144,7 +144,7 @@ namespace api.Controllers
 
             subjectDTO.GroupId = groupId;
 
-            UserEntity? user = await _userRepository.GetAsync(subjectDTO.TeacherId);
+            UserEntity? user = await _userRepository.GetNoTrackingAsync(subjectDTO.TeacherId);
 
             if (user is null) return NotFound("Teacher is null");
             if (!UserService.CheckRoleContains(_userRepository, user, Teacher)) return BadRequest("User is not a Teacher!");
