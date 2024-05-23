@@ -30,7 +30,6 @@ export function GroupTable({ data }: GroupTableProps) {
       >
         <Column field="name" header="Название" sortable></Column>
         <Column field="description" header="Описание" sortable></Column>
-        <Column field="curator" header="Куратор" sortable></Column>
         <Column field="auditoryName" header="Аудитория" sortable></Column>
         <Column
           body={(rowData) => (

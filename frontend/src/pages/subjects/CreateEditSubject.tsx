@@ -1,22 +1,24 @@
 import { Box, Flex, Text, Textarea, VStack } from "@chakra-ui/react";
 import { Button, Input, Select, colors } from "../../components/ui-kit";
 import { BaseLayout } from "../../layouts";
-import { GroupService, SubjectService } from "../../services";
+import { GroupService, UserService } from "../../services";
 import { useContext, useEffect, useState } from "react";
-import { Group } from "../../types";
+import { Group, User } from "../../types";
 import { useNavigate } from "react-router-dom";
 import { LanguageContext, Translator } from "../../store";
+import { createSubject } from "../../lib";
 
 const groupService = new GroupService();
-const subjectService = new SubjectService();
+const userService = new UserService();
 
 export function CreateEditSubject() {
   const [errorMessage, setErrorMessage] = useState<string | null>();
   const [groups, setGroups] = useState<Group[]>();
+  const [teachers, setTeachers] = useState<User[]>();
   const [data, setData] = useState<{
     name?: string;
     description?: string;
-    teacherName?: string;
+    teacher?: User;
     group?: Group;
   }>({});
   const navigator = useNavigate();
@@ -24,29 +26,31 @@ export function CreateEditSubject() {
 
   useEffect(() => {
     groupService.get().then((value) => setGroups(value));
+    userService
+      .get()
+      .then((data) =>
+        setTeachers(
+          data.filter((user: User) => user.roleList[0].name === "Teacher")
+        )
+      );
   }, []);
 
   useEffect(() => {
     setErrorMessage(null);
   }, [data]);
 
+  const handleTeacherSelect = (value: User) => {
+    setData({ ...data, teacher: value });
+  };
+
   const handleGroupSelect = (value: Group) => {
     setData({ ...data, group: value });
   };
 
-  const handleSubmit = () => {
-    if (!data.description || !data.group || !data.name || !data.teacherName) {
-      return setErrorMessage("Заполните данные полностью");
-    }
-    subjectService.post({ ...data, groupId: data.group.id }).then((res) => {
-      if (res.status !== 201) {
-        setErrorMessage(
-          "Данные введены не коректно, пожалуйста проверьте формат данных"
-        );
-      } else {
-        navigator("/students");
-      }
-    });
+  const handleSubmit = async () => {
+    const res = await createSubject(data);
+    if (res === "Created") return navigator("/subject");
+    setErrorMessage(res);
   };
 
   return (
@@ -82,12 +86,12 @@ export function CreateEditSubject() {
                 value={data.name}
                 onChange={(e) => setData({ ...data, name: e.target.value })}
               />
-              <Input
+              <Select
                 placeholder="Платонова Тамара Юрьевна"
-                value={data.teacherName}
-                onChange={(e) =>
-                  setData({ ...data, teacherName: e.target.value })
-                }
+                value={data.teacher}
+                options={teachers || []}
+                setValue={handleTeacherSelect}
+                name="firstName"
               />
               <Select
                 placeholder="2120"

@@ -16,10 +16,12 @@ export function Subjects() {
 
   const updateSubjects = async () => {
     const subjects = await subjectService.get();
-    const formatedSubjects = await subjects.map(async (s: Subject) => ({
-      ...s,
-      groupId: (await groupService.getById(+s.groupId)).name,
-    }));
+    const formatedSubjects = await Promise.all(
+      subjects.map(async (s: Subject) => ({
+        ...s,
+        groupId: (await groupService.getById(+s.groupId)).name,
+      }))
+    );
     setSubjects(formatedSubjects);
   };
 
