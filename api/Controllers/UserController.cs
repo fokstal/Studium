@@ -41,6 +41,8 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
+            userDTO.Id = Guid.NewGuid();
+
             await _userRepository.AddAsync(_userRepository.Create(userDTO));
 
             return Created("User", userDTO);
