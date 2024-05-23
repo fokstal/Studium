@@ -11,10 +11,7 @@ namespace api.Repositories.Data
 
         public async Task<bool> CheckExistsAsync(Guid id) => await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id) is not null;
 
-        public override Task<StudentEntity?> GetAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        public override Task<StudentEntity?> GetAsync(int id) => throw new NotImplementedException();
 
         public async Task<StudentEntity?> GetAsync(Guid id)
         {
