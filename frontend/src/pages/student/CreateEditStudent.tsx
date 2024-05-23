@@ -1,8 +1,14 @@
-import { Flex, HStack, Text } from "@chakra-ui/react";
+import { Box, Flex, HStack, Text, VStack } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
-import { Button, Input, Select, colors } from "../../components/ui-kit";
+import {
+  Button,
+  ImagePicker,
+  Input,
+  Select,
+  colors,
+} from "../../components/ui-kit";
 import { Group, Person, Student } from "../../types";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, ChangeEvent } from "react";
 import { GroupService } from "../../services";
 import { createStudent, editStudent } from "../../lib";
 
@@ -16,8 +22,14 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
   const [studentData, setStudentData] = useState<(Student & Person) | null>(
     null
   );
+  const [avatar, setAvatar] = useState<any>();
   const [groups, setGroups] = useState<Group[]>();
   const [isPending, startTransaction] = useTransition();
+  const [passport, setPassport] = useState<File>();
+  const [additionalDate, setAdditionalDate] = useState<{
+    addedDate?: string;
+    removeDate?: string;
+  }>({});
 
   useEffect(() => {
     groupService.get().then((groups) => setGroups(groups));
@@ -40,6 +52,13 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
     }));
   };
 
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setPassport(file);
+    }
+  };
+
   const handleSubmit = () => {
     if (!studentData) return;
     startTransaction(() => {
@@ -48,13 +67,15 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
           ...studentData,
           sex: (studentData.sex as unknown as { name: string; code: boolean })
             .code,
+          avatarFileName: avatar,
         });
       } else {
         createStudent({
           ...studentData,
           sex: (studentData.sex as unknown as { name: string; code: boolean })
             .code,
-        });
+          avatarFileName: avatar,
+        }, additionalDate, passport,);
       }
     });
   };
@@ -90,7 +111,9 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
             bg={colors.darkGrey}
             borderRadius="5px"
           >
-            {/* TODO: CREATE IMAGE PICKER COMPONENT */}
+            <Box w="max-content">
+              <ImagePicker setFile={setAvatar} />
+            </Box>
             <Flex
               direction="row"
               p="20px"
@@ -100,7 +123,12 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
               w="100%"
               justify="center"
             >
-              <Flex direction="column" gap="12.5px" align="end">
+              <Flex
+                direction="column"
+                gap="12.5px"
+                align="end"
+                whiteSpace="nowrap"
+              >
                 <Text p="6px 0">Имя:</Text>
                 <Text p="6px 0">Отчество:</Text>
                 <Text p="6px 0">Фамилия:</Text>
@@ -108,7 +136,7 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
                 <Text p="6px 0">Пол:</Text>
                 <Text p="6px 0">Учебная группа:</Text>
               </Flex>
-              <Flex direction="column" gap="10px">
+              <Flex direction="column" gap="10px" w="100%">
                 <Input
                   value={studentData?.firstName}
                   onChange={(e) =>
@@ -153,7 +181,7 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
             </Flex>
           </Flex>
         </Flex>
-        <Flex>
+        <Flex gap="20px">
           <Flex
             bg={colors.white}
             direction="column"
@@ -173,9 +201,55 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
             >
               <Flex direction="column" gap="10px">
                 <Text>Паспортные данные:</Text>
-                <Input type="file" />
+                <Input type="file" onChange={(e) => handleFileChange(e)}/>
               </Flex>
             </HStack>
+          </Flex>
+          <Flex
+            bg={colors.white}
+            direction="column"
+            gap="20px"
+            p="20px"
+            borderRadius="5px"
+            w="calc(50% - 10px)"
+          >
+            <Text fontSize="24px" fontWeight="bold">
+              Данные о зачислении
+            </Text>
+            <VStack
+              p="20px"
+              bg={colors.darkGrey}
+              borderRadius="5px"
+              justify="space-between"
+              align="start"
+            >
+              <Flex gap="10px" whiteSpace="nowrap" align="center">
+                <Text>Дата зачисления:</Text>
+                <Input
+                  type="date"
+                  value={additionalDate.addedDate}
+                  onChange={(e) =>
+                    setAdditionalDate({
+                      ...additionalDate,
+                      addedDate: e.target.value,
+                    })
+                  }
+                />
+              </Flex>
+              <Flex gap="10px" whiteSpace="nowrap">
+                <Text>Дата окончания:</Text>
+                <Input
+                  type="date"
+                  value={additionalDate.removeDate}
+                  onChange={(e) =>
+                    setAdditionalDate({
+                      ...additionalDate,
+                      removeDate: e.target.value,
+                    })
+                  }
+                />
+              </Flex>
+            </VStack>
           </Flex>
         </Flex>
         <Button onClick={handleSubmit} disabled={isPending}>

@@ -7,4 +7,6 @@ export type Student = {
   personId?: number;
   group: Group;
   groupId?: number;
+  addedDate?: string;
+  removedDate?: string;
 }

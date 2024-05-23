@@ -7,7 +7,7 @@ export abstract class Service {
     return await res.json();
   }
 
-  public async getById(id: number) {
+  public async getById(id: number | string) {
     const res = await fetch(`${this.url}/${id}`, { credentials: "include" });
 
     return await res.json();

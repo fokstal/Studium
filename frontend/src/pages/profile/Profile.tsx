@@ -5,7 +5,6 @@ import {
   AiOutlineExclamationCircle,
   AiOutlineExport,
   AiOutlinePieChart,
-  AiOutlineProfile,
 } from "react-icons/ai";
 import { useContext, useState } from "react";
 import { StudentComponent } from "../../components/students";
@@ -51,7 +50,7 @@ export function Profile() {
           </VStack>
           <VStack align="stretch" gap="20px" w="100%">
             {currentPart === Translator[lang.name]["information"] ? (
-              <StudentComponent id={1} />
+              <StudentComponent id="292bea68-3b33-40af-8833-4b29c9d536a9" />
             ) : null}
             {currentPart === Translator[lang.name]["performance"] ? (
               <>

@@ -1,5 +1,5 @@
 import { Flex, Input } from "@chakra-ui/react";
-import { ChangeEvent, RefObject, useRef } from "react";
+import { ChangeEvent, useRef } from "react";
 import { colors } from "../variables";
 import { AiOutlineCamera } from "react-icons/ai";
 
@@ -37,6 +37,7 @@ export function ImagePicker({ setFile }: ImagePickerProps) {
         type="file"
         visibility="hidden"
         w="0"
+        display="none"
         onChange={(e) => handleFileChange(e)}
         ref={fileInputRef}
       />

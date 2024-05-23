@@ -6,7 +6,7 @@ export function Student() {
   const { id } = useParams();
   return (
     <StudentPageLayout>
-      <StudentComponent id={+(id || 0)} />
+      <StudentComponent id={id || ""} />
     </StudentPageLayout>
   );
 }
