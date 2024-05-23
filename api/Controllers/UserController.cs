@@ -18,6 +18,7 @@ namespace api.Controllers
     {
         private readonly IConfiguration _configuration = configuration;
         private readonly UserRepository _userRepository = new(db);
+        private readonly StudentRepository _studentRepository = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -41,7 +42,7 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            userDTO.Id = Guid.NewGuid();
+            // userDTO.Id = Guid.NewGuid();
 
             await _userRepository.AddAsync(_userRepository.Create(userDTO));
 
@@ -64,6 +65,29 @@ namespace api.Controllers
             HttpContext.Response.Cookies.Append(CookieNames.USER_TOKEN, new JwtProvider(_configuration).GenerateToken(user));
 
             return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([RegisterUser])]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            UserEntity? userToRemove = await _userRepository.GetNoTrackingAsync(id);
+
+            if (userToRemove is null) return NotFound();
+
+            if (UserService.CheckRoleContains(_userRepository, userToRemove, Student))
+            {
+                StudentEntity studentToRemove = await _studentRepository.GetAsync(userToRemove.Id) ?? throw new Exception("Student on User is null!");
+
+                await _studentRepository.RemoveAsync(studentToRemove);
+            }
+
+            await _userRepository.RemoveAsync(userToRemove);
+
+            return NoContent();
         }
     }
 }
