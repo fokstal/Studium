@@ -26,7 +26,7 @@ const SelectWrapper = styled.div`
   }
 `;
 
-const Option = styled.li`
+const Option = styled.div`
   background: ${colors.white};
   transition: 0.2s;
   padding: 6px 10px;

@@ -22,7 +22,7 @@ export class GradeService extends Service {
   }
 
   private async baseGetMethod(additionalUrl: string) {
-    const res = await fetch(`${this.url}/${additionalUrl}`);
+    const res = await fetch(`${this.url}/${additionalUrl}`, {credentials: "include"});
 
     return await res.json();
   }

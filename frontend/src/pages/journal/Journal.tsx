@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { Grade, Group, Person, Subject } from "../../types";
 import { JournalFilters, JournalTable } from "../../components/journal";
 import { GradeService } from "../../services";
-import { formatGrades } from "../../lib";
+import { formatColumns, formatGrades } from "../../lib";
 import { LanguageContext, Translator } from "../../store";
 
 const gradeService = new GradeService();
@@ -16,13 +16,18 @@ export function Journal() {
     person?: Person;
     subject?: Subject;
   }>();
-  const [grades, setGrades] = useState<Grade[]>();
   const [data, setData] = useState<any[]>();
+  const [columns, setColumns] = useState<{ field: string; name: string }[]>([]);
   const { lang } = useContext(LanguageContext);
 
   useEffect(() => {
-    gradeService.get().then((grades) => setGrades(grades));
-    formatGrades(filters!, grades).then((data) => setData(data));
+    const fetchData = async () => {
+      const grades = await gradeService.get();
+      const data = await formatGrades(filters!, grades);
+      setData(data);
+      setColumns(formatColumns(data));
+    };
+    fetchData();
   }, [filters]);
 
   return (
@@ -40,16 +45,7 @@ export function Journal() {
           </Text>
           <JournalFilters filters={filters || {}} setFilters={setFilters} />
         </Flex>
-        <JournalTable
-          data={data || []}
-          columns={[
-            { name: "Name", field: "name" },
-            { field: "9.4_0", name: "9.4" },
-            { field: "9.4_1", name: "9.4" },
-            { field: "9.4_2", name: "9.4" },
-            { field: "9.4_3", name: "9.4" },
-          ]}
-        />
+        <JournalTable data={data || []} columns={columns || []} />
       </Flex>
     </BaseLayout>
   );

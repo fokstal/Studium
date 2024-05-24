@@ -90,6 +90,5 @@ export async function formatGrades(filters: Filter, grades?: Grade[]) {
       gradeFormat(persons.find((p: Person) => s.personId === p.id))
     );
   }
-  console.log(formattedGrades);
   return formattedGrades;
 }
