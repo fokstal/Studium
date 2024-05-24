@@ -9,6 +9,8 @@ using api.Helpers.Constants;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace api.Controllers
 {
@@ -26,6 +28,27 @@ namespace api.Controllers
         [RequireRoles([Admin, Secretar])]
         [RequirePermissions([ViewUserList])]
         public async Task<ActionResult> GetListAsync() => Ok(await _userRepository.GetListAsync());
+
+        [HttpGet("session")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<UserEntity>> GetSessionAsync()
+        {
+            string? token = HttpContext.Request.Cookies[CookieNames.USER_TOKEN];
+
+            if (token is null) return Unauthorized();
+
+            JwtSecurityTokenHandler handler = new();
+
+            JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
+
+            Claim userIdClaim = jwtToken.Claims.First(claim => claim.Type == CustomClaims.USER_ID);
+
+            if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out Guid userId)) return Unauthorized();
+
+            return Ok(await _userRepository.GetAsync(userId));
+        }
 
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
