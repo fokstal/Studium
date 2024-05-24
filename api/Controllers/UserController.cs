@@ -26,7 +26,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequireRoles([Admin, Secretar])]
-        [RequirePermissions([ViewUserList])]
+        [RequirePermissions([ViewUser])]
         public async Task<ActionResult<IEnumerable<UserEntity>>> GetListAsync() => Ok(await _userRepository.GetListAsync());
 
         [HttpGet("session")]
@@ -94,7 +94,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([RegisterUser])]
+        [RequirePermissions([EditUser])]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             UserEntity? userToRemove = await _userRepository.GetNoTrackingAsync(id);

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "eVl/euWb7O0uhCIWljcwon2BozKCQO5m6SH25ypYSV4=",
+  "Hash": "KAfuXh6GUGS5fxbit9HdIiiUKeB4M/QplXtn0QyGOsg=",
   "Source": "api",
   "BasePath": "_content/api",
   "Mode": "Default",
@@ -53,6 +53,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/pictures/person/6933f4ec-f13a-471f-9038-779f9b7f4a6d.png"
+    },
+    {
+      "Identity": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/9e211da7-1b25-410d-8886-86c5570848d9.png",
+      "SourceId": "api",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/",
+      "BasePath": "_content/api",
+      "RelativePath": "pictures/person/9e211da7-1b25-410d-8886-86c5570848d9.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/pictures/person/9e211da7-1b25-410d-8886-86c5570848d9.png"
     },
     {
       "Identity": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/fa4757fb-c3a7-43a1-b02f-1b324bdebe10.png",

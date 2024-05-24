@@ -25,7 +25,8 @@ namespace api.Helpers.Enums
         ViewSubject = 16,
         EditSubject = 17,
 
-        ViewUserList = 18,
+        ViewUser = 18,
         RegisterUser = 19,
+        EditUser = 20,
     }
 }
