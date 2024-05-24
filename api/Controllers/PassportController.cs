@@ -97,7 +97,7 @@ namespace api.Controllers
 
             if (passportToUpdate is null) return NotFound();
 
-            PersonEntity? person = await _personRepository.GetAsync(passportToUpdate.PersonId);
+            PersonEntity? person = await _personRepository.GetAsync(passportDTO.PersonId);
 
             if (person is null) return NotFound("Person is null!");
 
