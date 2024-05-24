@@ -27,7 +27,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequireRoles([Admin, Secretar])]
         [RequirePermissions([ViewUserList])]
-        public async Task<ActionResult> GetListAsync() => Ok(await _userRepository.GetListAsync());
+        public async Task<ActionResult<IEnumerable<UserEntity>>> GetListAsync() => Ok(await _userRepository.GetListAsync());
 
         [HttpGet("session")]
         [ProducesResponseType(StatusCodes.Status200OK)]
