@@ -6,7 +6,7 @@ export function filterStudents(students: any, filters: {
   endDate: string | null;
   finish: boolean;
   start: boolean;
-}) {
+}, search: string) {
   return students.filter((student: any) => {
     const studentAddedDate = new Date(student.addedDate);
 
@@ -36,6 +36,10 @@ export function filterStudents(students: any, filters: {
       return false;
     }
     if (filters.finish && studentAddedDate.getFullYear() !== new Date(filters.endDate || '').getFullYear()) {
+      return false;
+    }
+
+    if (search && !student.name.toLowerCase().includes(search.toLowerCase())) {
       return false;
     }
 

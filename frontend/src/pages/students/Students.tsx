@@ -41,7 +41,7 @@ export function Students() {
     finish: false,
     start: false,
   });
-  const [search, setSearch] = useState<string>();
+  const [search, setSearch] = useState<string>("");
   const [students, setStudents] = useState<StudentsTableData[]>();
   const [selectedStudent, setSelectedStudent] = useState<
     (StudentsTableData & Student) | null
@@ -75,12 +75,12 @@ export function Students() {
         };
       })
     );
-    setStudents(filterStudents(studentsForTable, filters));
+    setStudents(filterStudents(studentsForTable, filters, search));
   };
 
   useEffect(() => {
     updateStudents();
-  }, [filters]);
+  }, [filters, search]);
 
   return (
     <BaseLayout bg={colors.darkGrey}>
