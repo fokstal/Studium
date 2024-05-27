@@ -11,7 +11,7 @@ import { colors } from "../../components/ui-kit";
 import { useContext, useEffect, useState } from "react";
 import { AiOutlineFilter } from "react-icons/ai";
 import { FaSearch } from "react-icons/fa";
-import { Student, StudentsTableData } from "../../types";
+import { Group, Student, StudentsTableData } from "../../types";
 import { GroupService, PersonService, StudentService } from "../../services";
 import {
   Filters,
@@ -19,6 +19,7 @@ import {
   StudentsTable,
 } from "../../components/students";
 import { LanguageContext, Translator } from "../../store";
+import { filterStudents } from "../../lib";
 
 const studentService = new StudentService();
 const groupService = new GroupService();
@@ -27,6 +28,19 @@ const personService = new PersonService();
 export function Students() {
   const [isOpenToggleFilters, setIsOpenToggleFilters] =
     useState<boolean>(false);
+  const [filters, setFilters] = useState<{
+    group: Group | null;
+    startDate: string;
+    endDate: string;
+    finish: boolean;
+    start: boolean;
+  }>({
+    group: null,
+    startDate: "",
+    endDate: "",
+    finish: false,
+    start: false,
+  });
   const [search, setSearch] = useState<string>();
   const [students, setStudents] = useState<StudentsTableData[]>();
   const [selectedStudent, setSelectedStudent] = useState<
@@ -54,21 +68,19 @@ export function Students() {
         const person = await personService.getById(student.personId || 0);
         const group = await groupService.getById(student.groupId || 0);
         return {
-          id: student.id,
-          personId: student.personId,
+          ...student,
           name: `${person.firstName} ${person.lastName} ${person.middleName}`,
           groupName: group.name,
           averageMark: 6.5,
         };
       })
     );
-
-    setStudents(studentsForTable);
+    setStudents(filterStudents(studentsForTable, filters));
   };
 
   useEffect(() => {
     updateStudents();
-  }, []);
+  }, [filters]);
 
   return (
     <BaseLayout bg={colors.darkGrey}>
@@ -120,7 +132,7 @@ export function Students() {
             </InputGroup>
           </Flex>
           <Flex gap="20px" align="start">
-            {isOpenToggleFilters ? <Filters /> : null}
+            {isOpenToggleFilters ? <Filters filters={filters} setFilters={setFilters}/> : null}
             <Box w="100%">
               <StudentsTable
                 data={students!}
