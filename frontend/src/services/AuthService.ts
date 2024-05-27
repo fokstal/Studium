@@ -18,4 +18,17 @@ export class AuthServise {
 
     return res;
   }
+
+  public async register(data: any) {
+    const res = await fetch(`${this.url}register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+
+    return res;
+  }
 }

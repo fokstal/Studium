@@ -12,7 +12,6 @@ type Filter = {
 };
 
 export async function formatGrades(filters: Filter, grades?: Grade[]) {
-  if (!grades) return [];
 
   const students = await studentService.get();
   const subjects = await subjectService.get();
@@ -34,7 +33,7 @@ export async function formatGrades(filters: Filter, grades?: Grade[]) {
       });
     }
 
-    grades.forEach(({ setDate, value, studentId, subjectId }, index) => {
+    grades?.forEach(({ setDate, value, studentId, subjectId }, index) => {
       const date = new Date(setDate);
       const beutifullDate = `${date.getDate()}.${date.getMonth()}_${index}`;
 
@@ -64,6 +63,7 @@ export async function formatGrades(filters: Filter, grades?: Grade[]) {
     formattedGrades.push(formattedGrade);
   };
 
+  if (!filters) return[];
   if (filters.person && filters.subject) {
     gradeFormat(filters.person, filters.subject);
   } else if (filters.person) {

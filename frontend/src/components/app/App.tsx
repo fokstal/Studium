@@ -16,12 +16,17 @@ import {
 import { Journal } from "../../pages/journal";
 import { useState } from "react";
 import { LanguageContext } from "../../store";
+import { CreateUser, Users } from "../../pages/users";
 
 export function App() {
-  const [lang, setLang] = useState<{name: "RU" | "BE" | "EN"}>({name: "RU"});
+  const [lang, setLang] = useState<{ name: "RU" | "BE" | "EN" }>({
+    name: "RU",
+  });
 
   return (
-    <LanguageContext.Provider value={{ lang: lang || {name: "RU"}, setLang: setLang }}>
+    <LanguageContext.Provider
+      value={{ lang: lang || { name: "RU" }, setLang: setLang }}
+    >
       <BrowserRouter>
         <Routes>
           <Route index element={<Home />} />
@@ -33,9 +38,11 @@ export function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="group" element={<Groups />} />
             <Route path="group/new" element={<CreateGroup />} />
-            <Route path="group/:id" element={<CreateGroup/>} />
+            <Route path="group/:id" element={<CreateGroup />} />
             <Route path="subject" element={<Subjects />} />
             <Route path="subject/new" element={<CreateEditSubject />} />
+            <Route path="users/" element={<Users />} />
+            <Route path="users/new" element={<CreateUser />} />
           </Route>
           <Route path="*" element={<Error404Page />} />
         </Routes>
