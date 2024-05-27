@@ -5,7 +5,7 @@ import {
   VStack,
   cookieStorageManager,
 } from "@chakra-ui/react";
-import { Button, Input, colors } from "../../ui-kit";
+import { Button, Input, PasswordInput, colors } from "../../ui-kit";
 import { useContext, useState, useTransition } from "react";
 import { AuthServise } from "../../../services/AuthService";
 import { useNavigate } from "react-router-dom";
@@ -40,9 +40,9 @@ export function AuthForm() {
             type="text"
             placeholder="Login"
             value={login}
-            onChange={(e) => setLogin(e.target.value)}
+            onChange={(e: any) => setLogin(e.target.value)}
           />
-          <Input
+          <PasswordInput
             type="password"
             placeholder="Password"
             value={password}
