@@ -145,35 +145,16 @@ namespace api.Controllers
         [HttpGet("student-average/{id}")]
         public async Task<ActionResult<double>> GetAverageAsync(Guid id)
         {
-            double summaryGrades = 0;
-
             StudentEntity? student = await _studentRepository.GetAsync(id);
 
             if (student is null) return NotFound("Student is null!");
             if (student.GroupId is null) return NotFound("Group is null!");
 
-            IEnumerable<SubjectEntity> subjectList = await _subjectRepository.GetListByGroupAsync(Convert.ToInt32(student.GroupId));
-
-            foreach (SubjectEntity subject in subjectList)
-            {
-                double summGrades = 0;
-                int countGrades = 0;
-
-                foreach (GradesEntity gradesEntity in subject.GradesList)
-                {
-                    StudentToValueEntity? grade = gradesEntity.StudentToValueList.FirstOrDefault(grade => grade.StudentId == student.Id);
-
-                    if (grade is not null)
-                    {
-                        summGrades += grade.Value;
-                        countGrades++;
-                    }
-                }
-
-                summaryGrades += Math.Round(summGrades / countGrades);
-            }
-
-            return Ok(Math.Round(summaryGrades / subjectList.Count()));
+            return Ok(_gradeRepository.GetAverage
+            (
+                await _subjectRepository.GetListByGroupAsync(Convert.ToInt32(student.GroupId)),
+                student.Id
+            ));
         }
         
         [HttpPost]
