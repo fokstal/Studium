@@ -22,7 +22,11 @@ namespace api.Repositories.Data
 
         public async Task<IEnumerable<GradeStudentDTO>> GetListByStudentIdAsync(Guid id)
         {
-            IEnumerable<GradesEntity> gradesList = await _db.Grades.ToArrayAsync();
+            IEnumerable<GradesEntity> gradesList = await 
+                _db.Grades
+                .Include(gradeDb => gradeDb.Type)
+                .Include(gradeDb => gradeDb.StudentToValueList)
+                .ToArrayAsync();
 
             List<GradeStudentDTO> gradeStudentList = [];
 
