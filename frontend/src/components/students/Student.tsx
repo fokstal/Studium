@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import { Group, Person, Student } from "../../types";
-import { GroupService, PersonService, StudentService } from "../../services";
+import {
+  GroupService,
+  PassportService,
+  PersonService,
+  StudentService,
+} from "../../services";
 import { Avatar, colors, Input } from "../../components/ui-kit";
-import { Box, Flex, HStack, Text, VStack } from "@chakra-ui/react";
-import { getAvatarPath } from "../../lib/";
+import { Box, Flex, HStack, Link, Text, VStack } from "@chakra-ui/react";
+import { getAvatarPath, getPassportPath } from "../../lib/";
 import {
   AiFillCheckCircle,
   AiFillCloseCircle,
@@ -13,6 +18,7 @@ import {
 const studentService = new StudentService();
 const personService = new PersonService();
 const groupService = new GroupService();
+const passportService = new PassportService();
 
 type StudentComponentProps = {
   id: string;
@@ -20,15 +26,16 @@ type StudentComponentProps = {
 
 export function StudentComponent({ id }: StudentComponentProps) {
   const [student, setStudent] = useState<Person & Group & Student>();
+  const [passport, setPassport] = useState<string>();
 
   const getPersonData = async (personId: number): Promise<Person> => {
     return await personService.getById(personId);
   };
-  
+
   const getGroupData = async (groupId: number): Promise<Group> => {
     return await groupService.getById(groupId);
   };
-  
+
   const updateStudent = async () => {
     if (!id) return;
     const studentData = await studentService.getById(id);
@@ -39,9 +46,13 @@ export function StudentComponent({ id }: StudentComponentProps) {
     const student = {
       ...personData,
       ...groupData,
-      ...studentData
+      ...studentData,
     };
     setStudent(student);
+
+    const passports = await passportService.get();
+    const passport = passports.find((p: any) => p.personId === personData.id);
+    setPassport(passport.scanFileName);
   };
 
   useEffect(() => {
@@ -120,7 +131,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
             <Flex direction="column" gap="10px">
               <Text>Паспортные данные</Text>
               <Text>
-                {student?.passport ? (
+                {passport ? (
                   <Flex gap="10px">
                     <AiFillCheckCircle color="blue" size="24px" />
                     <Text>Данные успешно загружены</Text>
@@ -133,47 +144,47 @@ export function StudentComponent({ id }: StudentComponentProps) {
                 )}
               </Text>
             </Flex>
-            <Box>
+            <Link href={passport ? getPassportPath(passport) : "#"} target="blank">
               <AiOutlineEye size="24px" />
-            </Box>
+            </Link>
           </HStack>
         </Flex>
         <Flex
-            bg={colors.white}
-            direction="column"
-            gap="20px"
+          bg={colors.white}
+          direction="column"
+          gap="20px"
+          p="20px"
+          borderRadius="5px"
+          w="calc(50% - 10px)"
+        >
+          <Text fontSize="24px" fontWeight="bold">
+            Данные о зачислении
+          </Text>
+          <VStack
             p="20px"
+            bg={colors.darkGrey}
             borderRadius="5px"
-            w="calc(50% - 10px)"
+            justify="space-between"
+            align="start"
           >
-            <Text fontSize="24px" fontWeight="bold">
-              Данные о зачислении
-            </Text>
-            <VStack
-              p="20px"
-              bg={colors.darkGrey}
-              borderRadius="5px"
-              justify="space-between"
-              align="start"
-            >
-              <Flex gap="10px" whiteSpace="nowrap" align="center">
-                <Text>Дата зачисления:</Text>
-                <Input
-                  type="text"
-                  value={student?.addedDate?.toString().slice(0, 10)}
-                  disabled
-                />
-              </Flex>
-              <Flex gap="10px" whiteSpace="nowrap" align="center">
-                <Text>Дата окончания:</Text>
-                <Input
-                  type="text"
-                  value={student?.removedDate?.toString().slice(0, 10)}
-                  disabled
-                />
-              </Flex>
-            </VStack>
-          </Flex>
+            <Flex gap="10px" whiteSpace="nowrap" align="center">
+              <Text>Дата зачисления:</Text>
+              <Input
+                type="text"
+                value={student?.addedDate?.toString().slice(0, 10)}
+                disabled
+              />
+            </Flex>
+            <Flex gap="10px" whiteSpace="nowrap" align="center">
+              <Text>Дата окончания:</Text>
+              <Input
+                type="text"
+                value={student?.removedDate?.toString().slice(0, 10)}
+                disabled
+              />
+            </Flex>
+          </VStack>
+        </Flex>
       </Flex>
     </>
   );
