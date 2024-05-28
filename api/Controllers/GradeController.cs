@@ -3,11 +3,12 @@ using api.Extensions;
 using api.Models;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
+using api.Services;
+using api.Models.DTO;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
-using api.Services;
-using api.Models.DTO;
+using api.Models.Entities;
 
 namespace api.Controllers
 {
@@ -141,6 +142,40 @@ namespace api.Controllers
             return Ok(gradeList);
         }
 
+        [HttpGet("student-average/{id}")]
+        public async Task<ActionResult<double>> GetAverageAsync(Guid id)
+        {
+            double summaryGrades = 0;
+
+            StudentEntity? student = await _studentRepository.GetAsync(id);
+
+            if (student is null) return NotFound("Student is null!");
+            if (student.GroupId is null) return NotFound("Group is null!");
+
+            IEnumerable<SubjectEntity> subjectList = await _subjectRepository.GetListByGroupAsync(Convert.ToInt32(student.GroupId));
+
+            foreach (SubjectEntity subject in subjectList)
+            {
+                double summGrades = 0;
+                int countGrades = 0;
+
+                foreach (GradesEntity gradesEntity in subject.GradesList)
+                {
+                    StudentToValueEntity? grade = gradesEntity.StudentToValueList.FirstOrDefault(grade => grade.StudentId == student.Id);
+
+                    if (grade is not null)
+                    {
+                        summGrades += grade.Value;
+                        countGrades++;
+                    }
+                }
+
+                summaryGrades += Math.Round(summGrades / countGrades);
+            }
+
+            return Ok(Math.Round(summaryGrades / subjectList.Count()));
+        }
+        
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
