@@ -11,14 +11,21 @@ namespace api.Repositories.Data
 
         public async override Task<IEnumerable<SubjectEntity>> GetListAsync()
         {
-            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradeList).ToArrayAsync();
+            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradesList).ToArrayAsync();
+
+            return subjectList;
+        }
+
+        public async Task<IEnumerable<SubjectEntity>> GetListByGroupAsync(int id)
+        {
+            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Where(subjectDb => subjectDb.GroupId == id).Include(subjectDb => subjectDb.GradesList).ToArrayAsync();
 
             return subjectList;
         }
 
         public async override Task<SubjectEntity?> GetAsync(int id)
         {
-            SubjectEntity? subject = await _db.Subject.Include(subjectDb => subjectDb.GradeList).FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
+            SubjectEntity? subject = await _db.Subject.Include(subjectDb => subjectDb.GradesList).FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
 
             return subject;
         }
@@ -27,7 +34,7 @@ namespace api.Repositories.Data
         {
             SubjectEntity? subject =
             await _db.Subject
-                .Include(subjectDb => subjectDb.GradeList)
+                .Include(subjectDb => subjectDb.GradesList)
                 .FirstOrDefaultAsync
                 (
                     subjectDb =>
