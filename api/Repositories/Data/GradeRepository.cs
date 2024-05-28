@@ -11,7 +11,11 @@ namespace api.Repositories.Data
     {
         public async override Task<IEnumerable<GradesEntity>> GetListAsync()
         {
-            IEnumerable<GradesEntity> gradeList = await _db.Grades.Include(gradeDb => gradeDb.Type).ToArrayAsync();
+            IEnumerable<GradesEntity> gradeList = await 
+                _db.Grades
+                .Include(gradeDb => gradeDb.Type)
+                .Include(gradeDb => gradeDb.StudentToValueList)
+                .ToArrayAsync();
 
             return gradeList;
         }
@@ -48,14 +52,23 @@ namespace api.Repositories.Data
 
         public async Task<IEnumerable<GradesEntity>> GetListBySubjectIdAsync(int id)
         {
-            IEnumerable<GradesEntity> gradesList = await _db.Grades.Where(gradesDb => gradesDb.SubjectId == id).ToArrayAsync();
+            IEnumerable<GradesEntity> gradesList = await 
+                _db.Grades
+                .Where(gradesDb => gradesDb.SubjectId == id)
+                .Include(gradeDb => gradeDb.Type)
+                .Include(gradeDb => gradeDb.StudentToValueList)
+                .ToArrayAsync();
 
             return gradesList;
         }
 
         public async Task<IEnumerable<GradeStudentDTO>> GetListByStudentAndSubjectIdAsync(Guid studentId, int subjectId)
         {
-            IEnumerable<GradesEntity> gradesList = await _db.Grades.ToArrayAsync();
+            IEnumerable<GradesEntity> gradesList = await 
+                _db.Grades
+                .Include(gradeDb => gradeDb.Type)
+                .Include(gradeDb => gradeDb.StudentToValueList)
+                .ToArrayAsync();
 
             List<GradeStudentDTO> gradeStudentAndSubjectList = [];
 
