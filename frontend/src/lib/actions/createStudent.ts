@@ -4,7 +4,6 @@ import { objectToFormData } from "../objToFormData";
 
 export async function createStudent(
   studentData: Student & Person,
-  additionalDate: { addedDate?: string; removeDate?: string },
   passport?: File,
 ) {
   const studentService = new StudentService();
@@ -29,8 +28,9 @@ export async function createStudent(
   await studentService
     .post({
       personId: person.id,
-      groupId: studentData.group.id,
-      ...additionalDate
+      groupId: studentData?.group?.id,
+      addedDate: studentData.addedDate,
+      removedDate: studentData.removedDate
     })
     .catch((err) => {
       throw new Error(err);

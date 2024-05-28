@@ -85,6 +85,9 @@ export const Translator = {
     selecting_role_help:
       "To select a role, choose a role from the dropdown list, to select multiple roles, choose the role again",
     password: "Password",
+    data_about_start: "Enrollment data",
+    date_start: "Enrollment date",
+    date_finish: "End date",
   },
   BE: {
     student_list: "Спіс навучэнцаў",
@@ -173,6 +176,9 @@ export const Translator = {
     selecting_role_help:
       "Для выбару ролі, выберыце ролю з выпадаючага спісу, для выбару некалькіх роляў, выберыце ролю паўторна",
     password: "Пароль",
+    data_about_start: "Дадзеныя аб зарахаванні",
+    date_start: "Дата зарахавання",
+    date_finish: "Дата заканчэння",
   },
   RU: {
     student_list: "Список учащихся",
@@ -260,5 +266,8 @@ export const Translator = {
     selecting_role_help:
       "Для выбора роли, выберите роль из выпадющего списка, для выбора нескольких ролей, выберите роль повторно",
     password: "Пароль",
+    data_about_start: "Данные о зачислении",
+    date_start: "Дата зачисления",
+    date_finish: "Дата окончания",
   },
 };

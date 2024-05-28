@@ -34,6 +34,7 @@ export function App() {
             <Route path="students" element={<Students />} />
             <Route path="journal" element={<Journal />} />
             <Route path="students/new" element={<CreateEditStudent />} />
+            <Route path="students/edit/:id" element={<CreateEditStudent />} />
             <Route path="students/:id" element={<Student />} />
             <Route path="profile" element={<Profile />} />
             <Route path="group" element={<Groups />} />

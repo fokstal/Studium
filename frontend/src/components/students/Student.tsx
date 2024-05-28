@@ -88,7 +88,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
             <Flex gap="10px" align="center">
               <Text>Дата рождения:</Text>
               <Input
-                value={student?.birthDate.toString().slice(0, 10)}
+                value={student?.birthDate?.toString().slice(0, 10)}
                 disabled
               />
             </Flex>

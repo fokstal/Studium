@@ -8,17 +8,23 @@ import {
   colors,
 } from "../../components/ui-kit";
 import { Group, Person, Student } from "../../types";
-import { useEffect, useState, useTransition, ChangeEvent } from "react";
-import { GroupService } from "../../services";
+import {
+  useEffect,
+  useState,
+  useTransition,
+  ChangeEvent,
+  useContext,
+} from "react";
+import { GroupService, StudentService, PersonService } from "../../services";
 import { createStudent, editStudent } from "../../lib";
-
-type CreateEditStudentProps = {
-  studentToEdit?: Student & Person;
-};
+import { useNavigate, useParams } from "react-router-dom";
+import { LanguageContext, Translator } from "../../store";
 
 const groupService = new GroupService();
+const studentService = new StudentService();
+const personService = new PersonService();
 
-export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
+export function CreateEditStudent() {
   const [studentData, setStudentData] = useState<(Student & Person) | null>(
     null
   );
@@ -26,15 +32,21 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
   const [groups, setGroups] = useState<Group[]>();
   const [isPending, startTransaction] = useTransition();
   const [passport, setPassport] = useState<File>();
-  const [additionalDate, setAdditionalDate] = useState<{
-    addedDate?: string;
-    removeDate?: string;
-  }>({});
+  const navigator = useNavigate();
+  const { lang } = useContext(LanguageContext);
+  const { id } = useParams();
+
+  const setStudentToEdit = async () => {
+    if (!id) return;
+    const student = await studentService.getById(id);
+    const person = await personService.getById(student.personId);
+
+    setStudentData({ ...student, ...person });
+  };
 
   useEffect(() => {
     groupService.get().then((groups) => setGroups(groups));
-    if (!studentToEdit) return;
-    setStudentData(studentToEdit);
+    setStudentToEdit();
   }, []);
 
   const handleSexSelectChange = (value: { name: string; code: boolean }) => {
@@ -62,22 +74,29 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
   const handleSubmit = () => {
     if (!studentData) return;
     startTransaction(() => {
-      if (studentToEdit) {
-        editStudent({
-          ...studentData,
-          sex: (studentData.sex as unknown as { name: string; code: boolean })
-            .code,
-          avatarFileName: avatar,
-        });
+      if (id) {
+        editStudent(
+          {
+            ...studentData,
+            sex: (studentData.sex as unknown as { name: string; code: boolean })
+              .code,
+            avatarFileName: avatar,
+          },
+          passport
+        );
       } else {
-        createStudent({
-          ...studentData,
-          sex: (studentData.sex as unknown as { name: string; code: boolean })
-            .code,
-          avatarFileName: avatar,
-        }, additionalDate, passport,);
+        createStudent(
+          {
+            ...studentData,
+            sex: (studentData.sex as unknown as { name: string; code: boolean })
+              .code,
+            avatarFileName: avatar,
+          },
+          passport
+        );
       }
     });
+    navigator("/students");
   };
 
   return (
@@ -90,9 +109,9 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
         gap="10px"
       >
         <Text color={colors.black} fontSize="32px" as="h1" fontWeight="bold">
-          {studentToEdit
-            ? "Изменение данных о студенте"
-            : "Cоздание нового студента"}
+          {id
+            ? Translator[lang.name]["edit_student"]
+            : Translator[lang.name]["create_new_student"]}
         </Text>
         <Flex
           bg={colors.white}
@@ -102,7 +121,7 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
           borderRadius="5px"
         >
           <Text fontSize="24px" fontWeight="bold">
-            Основная информация
+            {Translator[lang.name]["main_information"]}
           </Text>
           <Flex
             align="center"
@@ -129,12 +148,12 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
                 align="end"
                 whiteSpace="nowrap"
               >
-                <Text p="6px 0">Имя:</Text>
-                <Text p="6px 0">Отчество:</Text>
-                <Text p="6px 0">Фамилия:</Text>
-                <Text p="6px 0">Дата рождения:</Text>
-                <Text p="6px 0">Пол:</Text>
-                <Text p="6px 0">Учебная группа:</Text>
+                <Text p="6px 0">{Translator[lang.name]["first_name"]}:</Text>
+                <Text p="6px 0">{Translator[lang.name]["middle_name"]}:</Text>
+                <Text p="6px 0">{Translator[lang.name]["last_name"]}:</Text>
+                <Text p="6px 0">{Translator[lang.name]["date_birthday"]}:</Text>
+                <Text p="6px 0">{Translator[lang.name]["sex"]}:</Text>
+                <Text p="6px 0">{Translator[lang.name]["student_group"]}:</Text>
               </Flex>
               <Flex direction="column" gap="10px" w="100%">
                 <Input
@@ -167,14 +186,14 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
                   setValue={handleSexSelectChange}
                   placeholder=""
                   options={[
-                    { name: "Мужской", code: 1 },
-                    { name: "Женский", code: 0 },
+                    { name: Translator[lang.name]["man"], code: 1 },
+                    { name: Translator[lang.name]["woman"], code: 0 },
                   ]}
                 />
                 <Select
                   value={studentData?.group}
                   setValue={handleGroupSelectChange}
-                  placeholder="Выберите учебную группу"
+                  placeholder={Translator[lang.name]["select_group"]}
                   options={groups ?? []}
                 />
               </Flex>
@@ -191,7 +210,7 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
             w="calc(50% - 10px)"
           >
             <Text fontSize="24px" fontWeight="bold">
-              Паспортные данные
+              {Translator[lang.name]["passport_information"]}
             </Text>
             <HStack
               p="20px"
@@ -200,8 +219,8 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
               justify="space-between"
             >
               <Flex direction="column" gap="10px">
-                <Text>Паспортные данные:</Text>
-                <Input type="file" onChange={(e) => handleFileChange(e)}/>
+                <Text>{Translator[lang.name]["passport_information"]}:</Text>
+                <Input type="file" onChange={(e) => handleFileChange(e)} />
               </Flex>
             </HStack>
           </Flex>
@@ -214,7 +233,7 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
             w="calc(50% - 10px)"
           >
             <Text fontSize="24px" fontWeight="bold">
-              Данные о зачислении
+              {Translator[lang.name]["data_about_start"]}
             </Text>
             <VStack
               p="20px"
@@ -224,27 +243,27 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
               align="start"
             >
               <Flex gap="10px" whiteSpace="nowrap" align="center">
-                <Text>Дата зачисления:</Text>
+                <Text>{Translator[lang.name]["date_start"]}:</Text>
                 <Input
                   type="date"
-                  value={additionalDate.addedDate}
+                  value={studentData?.addedDate}
                   onChange={(e) =>
-                    setAdditionalDate({
-                      ...additionalDate,
+                    setStudentData({
+                      ...studentData,
                       addedDate: e.target.value,
                     })
                   }
                 />
               </Flex>
               <Flex gap="10px" whiteSpace="nowrap">
-                <Text>Дата окончания:</Text>
+                <Text>{Translator[lang.name]["date_finish"]}:</Text>
                 <Input
                   type="date"
-                  value={additionalDate.removeDate}
+                  value={studentData?.removedDate}
                   onChange={(e) =>
-                    setAdditionalDate({
-                      ...additionalDate,
-                      removeDate: e.target.value,
+                    setStudentData({
+                      ...studentData,
+                      removedDate: e.target.value,
                     })
                   }
                 />
@@ -253,7 +272,7 @@ export function CreateEditStudent({ studentToEdit }: CreateEditStudentProps) {
           </Flex>
         </Flex>
         <Button onClick={handleSubmit} disabled={isPending}>
-          {studentToEdit ? "Изменить" : "Создать"}
+          {id ? Translator[lang.name]["edit"] : Translator[lang.name]["create"]}
         </Button>
       </Flex>
     </BaseLayout>

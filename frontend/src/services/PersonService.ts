@@ -20,6 +20,6 @@ export class PersonService extends Service {
       credentials: "include",
     });
 
-    return await res.json();
+    return res;
   }
 }

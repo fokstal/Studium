@@ -26,7 +26,7 @@ export abstract class Service {
     return res;
   }
 
-  public async put(id: number, data: any) {
+  public async put(id: number | string, data: any) {
     const res = await fetch(`${this.url}/${id}`, {
       method: "PUT",
       headers: {
@@ -39,7 +39,7 @@ export abstract class Service {
     return res;
   }
 
-  public async delete(id: number) {
+  public async delete(id: number | string) {
     const res = await fetch(`${this.url}/${id}`, {
       method: "DELETE",
       credentials: "include",
