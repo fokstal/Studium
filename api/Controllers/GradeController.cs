@@ -103,7 +103,7 @@ namespace api.Controllers
             return Ok(gradeList);
         }
 
-        [HttpGet("list-by-student/{studentId:int}/by-subject/{subjectId:int}")]
+        [HttpGet("list-by-student/{studentId}/by-subject/{subjectId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
