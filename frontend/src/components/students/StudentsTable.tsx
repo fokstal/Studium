@@ -5,7 +5,8 @@ import { Student, StudentsTableData } from "../../types";
 import { Box, Flex, Link } from "@chakra-ui/react";
 import { colors } from "../ui-kit";
 import { FaTrash, FaPlus, FaEdit } from "react-icons/fa";
-import { PersonService, StudentService } from "../../services";
+import { GradeService, PersonService, StudentService } from "../../services";
+import { useEffect, useState } from "react";
 
 type StudentsTableProps = {
   data: StudentsTableData[];
@@ -14,6 +15,7 @@ type StudentsTableProps = {
 };
 
 const studentService = new StudentService();
+const gradeService = new GradeService();
 
 export function StudentsTable({
   data,
@@ -42,8 +44,28 @@ export function StudentsTable({
         selectionMode="single"
       >
         <Column field="name" header="Имя" sortable></Column>
-        <Column field="groupName" header="Возраст" sortable></Column>
-        <Column field="averageMark" header="Средний балл" sortable></Column>
+        <Column field="groupName" header="Группа" sortable></Column>
+        <Column
+          header="Средний балл"
+          sortable
+          body={(rowData) => {
+            const [averageGrade, setAverageGrade] = useState<number | null>(
+              null
+            );
+
+            useEffect(() => {
+              const fetchAverageGrade = async () => {
+                const grade = await gradeService.averageGrade(
+                  rowData.id
+                );
+                setAverageGrade(grade);
+              };
+              fetchAverageGrade();
+            }, [rowData.id]);
+
+            return <>{averageGrade !== null ? averageGrade : "Calculating"}</>;
+          }}
+        ></Column>
         <Column
           body={(rowData) => (
             <Flex gap="10px" align="center">
