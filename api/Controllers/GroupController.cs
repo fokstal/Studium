@@ -94,7 +94,7 @@ namespace api.Controllers
 
             if (user is null) return NotFound("Curator is null");
             if (!UserService.CheckRoleContains(_userRepository, user, Curator)) return BadRequest("User is not a Curator!");
-            if (await _groupRepository.CheckExistsAsync(user.Id)) return BadRequest("Curator already have the Group!");
+            if (await _groupRepository.CheckExistsAsync(user.Id) && user.Id != groupToUpdate.CuratorId) return BadRequest("Curator already have the Group!");
 
             await _groupRepository.UpdateAsync(groupToUpdate, groupDTO);
 
