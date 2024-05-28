@@ -66,7 +66,9 @@ export function CreateEditGroup() {
         p="80px 0px"
       >
         <Text fontSize="32px" fontWeight="bold">
-          {Translator[lang.name]["group_create"]}
+          {id
+            ? Translator[lang.name]["group_create"]
+            : Translator[lang.name]["group_edit"]}
         </Text>
         <VStack align="stretch" gap="20px">
           <VStack
