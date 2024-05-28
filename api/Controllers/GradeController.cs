@@ -166,6 +166,13 @@ namespace api.Controllers
         {
             if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
 
+            if (await _gradeRepository.GetAsync(gradeDTO.SetDate) is not null)
+            {
+                ModelState.AddModelError("Custom Error", "GradesEntity already Exists!");
+
+                return BadRequest(ModelState);
+            }
+
             await _gradeRepository.AddAsync(_gradeRepository.Create(gradeDTO));
 
             return Created("GradeEntity", gradeDTO);
@@ -181,10 +188,18 @@ namespace api.Controllers
             if (id < 1) return BadRequest();
 
             GradesEntity? gradeToUpdate = await _gradeRepository.GetAsync(id);
+            GradesEntity? gradeAnother = await _gradeRepository.GetAsync(gradeDTO.SetDate);
 
             if (gradeToUpdate is null) return NotFound("GradeEntity is null");
 
             if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
+
+            if (gradeAnother is not null && gradeAnother.Id != gradeToUpdate.Id)
+            {
+                ModelState.AddModelError("Custom Error", "GradesEntity already Exists!");
+
+                return BadRequest(ModelState);
+            }
 
             await _gradeRepository.UpdateAsync(gradeToUpdate, gradeDTO);
 

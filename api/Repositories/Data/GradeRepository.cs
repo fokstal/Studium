@@ -100,6 +100,8 @@ namespace api.Repositories.Data
             return gradeStudentAndSubjectList;
         }
 
+        public async Task<GradesEntity?> GetAsync(DateTime setDate) => await _db.Grades.FirstOrDefaultAsync(gradesDb => gradesDb.SetDate == setDate);
+
         public double GetAverage (IEnumerable<SubjectEntity> subjectList, Guid studentId)
         {
             double summaryGrades = 0;
