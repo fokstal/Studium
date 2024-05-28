@@ -105,10 +105,12 @@ namespace api.Controllers
             if (id < 1) return BadRequest();
 
             PersonEntity? personToUpdate = await _personRepository.GetAsync(id);
+            PersonEntity? personAnother = await _personRepository.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName);
 
             if (personToUpdate is null) return NotFound();
 
-            if (await _personRepository.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
+
+            if (personAnother is not null && personAnother.Id != personToUpdate.Id)
             {
                 ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 

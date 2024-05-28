@@ -78,16 +78,17 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            if (await _groupRepository.GetAsync(groupDTO.Name) is not null)
+            GroupEntity? groupToUpdate = await _groupRepository.GetAsync(id);
+            GroupEntity? groupAnother = await _groupRepository.GetAsync(groupDTO.Name);
+
+            if (groupToUpdate is null) return NotFound();
+
+            if (groupAnother is not null && groupAnother.Id != groupToUpdate.Id)
             {
                 ModelState.AddModelError("Custom Error", "GroupEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
-
-            GroupEntity? groupToUpdate = await _groupRepository.GetAsync(id);
-
-            if (groupToUpdate is null) return NotFound();
 
             UserEntity? user = await _userRepository.GetNoTrackingAsync(groupDTO.CuratorId);
 

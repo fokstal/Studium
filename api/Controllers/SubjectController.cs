@@ -106,16 +106,17 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            if (await _subjectRepository.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
+            SubjectEntity? subjectToUpdate = await _subjectRepository.GetAsync(id);
+            SubjectEntity? subjectAnother = await _subjectRepository.GetAsync(subjectDTO.Name, subjectDTO.TeacherId);
+
+            if (subjectToUpdate is null) return NotFound();
+
+            if (subjectAnother is not null && subjectAnother.Id != subjectToUpdate.Id)
             {
                 ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
-
-            SubjectEntity? subjectToUpdate = await _subjectRepository.GetAsync(id);
-
-            if (subjectToUpdate is null) return NotFound();
 
             int? groupId = null;
 
