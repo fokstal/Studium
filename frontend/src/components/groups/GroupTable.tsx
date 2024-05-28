@@ -49,7 +49,7 @@ export function GroupTable({ data }: GroupTableProps) {
                 borderRadius="5px"
                 cursor="pointer"
               >
-                <Link to="/group/new">
+                <Link to={`/group/edit/${rowData.id}`}>
                   <FaEdit color={colors.white} />
                 </Link>
               </Box>

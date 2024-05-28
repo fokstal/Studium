@@ -2,7 +2,7 @@ import { PageLayout } from "../../layouts";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./default.css";
 import {
-  CreateGroup,
+  CreateEditGroup,
   CreateEditStudent,
   CreateEditSubject,
   Error404Page,
@@ -38,8 +38,8 @@ export function App() {
             <Route path="students/:id" element={<Student />} />
             <Route path="profile" element={<Profile />} />
             <Route path="group" element={<Groups />} />
-            <Route path="group/new" element={<CreateGroup />} />
-            <Route path="group/:id" element={<CreateGroup />} />
+            <Route path="group/new" element={<CreateEditGroup />} />
+            <Route path="group/edit/:id" element={<CreateEditGroup />} />
             <Route path="subject" element={<Subjects />} />
             <Route path="subject/new" element={<CreateEditSubject />} />
             <Route path="users/" element={<Users />} />

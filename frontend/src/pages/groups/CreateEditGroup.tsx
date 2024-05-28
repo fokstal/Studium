@@ -1,16 +1,17 @@
 import { Box, Flex, Text, Textarea, VStack } from "@chakra-ui/react";
 import { Button, Input, Select, colors } from "../../components/ui-kit";
 import { BaseLayout } from "../../layouts";
-import { UserService } from "../../services";
+import { GroupService, UserService } from "../../services";
 import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { LanguageContext, Translator } from "../../store";
 import { User } from "../../types";
-import { createGroup } from "../../lib";
+import { createGroup, editGroup } from "../../lib";
 
 const userService = new UserService();
+const groupService = new GroupService();
 
-export function CreateGroup() {
+export function CreateEditGroup() {
   const [data, setData] = useState<{
     name?: string;
     curator?: User;
@@ -21,11 +22,18 @@ export function CreateGroup() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigator = useNavigate();
   const { lang } = useContext(LanguageContext);
+  const { id } = useParams();
 
   const handleSubmit = async () => {
-    const res = await createGroup(data);
-    if (res === "Created") return navigator("/group");
-    setErrorMessage(res);
+    if (id) {
+      const res = await editGroup(+id, data);
+      if (res === "Created") return navigator("/group");
+      setErrorMessage(res);
+    } else {
+      const res = await createGroup(data);
+      if (res === "Created") return navigator("/group");
+      setErrorMessage(res);
+    }
   };
 
   const handleCuratorChange = (value: User) => {
@@ -44,6 +52,9 @@ export function CreateGroup() {
           data.filter((user: User) => user.roleList[0].name === "Curator")
         )
       );
+    if (id) {
+      groupService.getById(id).then((data) => setData(data));
+    }
   }, []);
 
   return (
@@ -124,7 +135,11 @@ export function CreateGroup() {
             </Text>
           </VStack>
           <Box alignSelf="end" onClick={handleSubmit}>
-            <Button>{Translator[lang.name]["create"]}</Button>
+            <Button>
+              {id
+                ? Translator[lang.name]["edit"]
+                : Translator[lang.name]["create"]}
+            </Button>
           </Box>
         </VStack>
       </VStack>
