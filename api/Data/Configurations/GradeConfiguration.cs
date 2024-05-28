@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace api.Data.Configurations
 {
-    public class GradeConfiguration : IEntityTypeConfiguration<GradeEntity>
+    public class GradeConfiguration : IEntityTypeConfiguration<GradesEntity>
     {
-        public void Configure(EntityTypeBuilder<GradeEntity> builder)
+        public void Configure(EntityTypeBuilder<GradesEntity> builder)
         {
             builder.HasKey(gradeDb => gradeDb.Id);
 

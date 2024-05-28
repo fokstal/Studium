@@ -1,14 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using api.Helpers.Enums;
 
-namespace api.Model.DTO
+namespace api.Models.DTO
 {
-    public class GradeDTO
+    public class GradeStudentDTO
     {
-        [Required]
-        [Range(-1, 10)]
-        public int Value { get; set; }
-
         [Required]
         public Guid StudentId { get; set; }
 
@@ -17,5 +13,11 @@ namespace api.Model.DTO
 
         [Required]
         public GradeTypeEnum Type { get; set; }
+        
+        [Required]
+        public DateTime SetDate { get; set; }
+
+        [Range(-1, 10)]
+        public int Value { get; set; }
     }
 }
