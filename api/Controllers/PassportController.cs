@@ -31,7 +31,9 @@ namespace api.Controllers
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewPassport])]
         public async Task<ActionResult<PassportEntity>> GetAsync(int id)
@@ -46,16 +48,16 @@ namespace api.Controllers
 
             if (person!.Student is not null)
             {
-                ActionResult actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        [person.Student.Id],
-                        Student
-                    );
+                bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerAccess
+                (
+                    new()
+                    {
+                        IdList = [person.Student.Id],
+                        Role = Student
+                    }
+                );
 
-                if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
+                if (userAccess is false) return Forbid();
             }
 
             return Ok(passport);

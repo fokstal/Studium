@@ -40,40 +40,26 @@ namespace api.Controllers
 
             if (subject is null) return NotFound();
 
-            ActionResult actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [subject.TeacherId],
-                    Teacher
-                );
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [subject.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(subject).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = _groupRepository.GetAsync(subject).Result!.StudentList.Select(student => student.Id).ToArray(),
+                        Role = Student
+                    },
+                ]);
 
-            if (actionResultUserAccess.GetType() != new OkResult().GetType())
-            {
-                actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_groupRepository.GetAsync(subject).Result!.CuratorId],
-                    Curator
-                );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        _groupRepository.GetAsync(subject).Result!.StudentList.Select(student => student.Id).ToArray(),
-                        Student
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                }
-            }
+            if (userAccess is false) return Forbid();
 
             return Ok(subject);
         }

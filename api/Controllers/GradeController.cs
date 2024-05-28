@@ -40,40 +40,26 @@ namespace api.Controllers
 
             IEnumerable<GradeEntity> gradeList = await _gradeRepository.GetListByStudentIdAsync(id);
 
-            ActionResult actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-                    Teacher
-                );
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
+                        Role = Student
+                    },
+                ]);
 
-            if (actionResultUserAccess.GetType() != new OkResult().GetType())
-            {
-                actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-                    Curator
-                );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        gradeList.Select(grade => grade.StudentId).ToArray(),
-                        Student
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                }
-            }
+            if (userAccess is false) return Forbid();
 
             return Ok(gradeList);
         }
@@ -92,40 +78,26 @@ namespace api.Controllers
 
             IEnumerable<GradeEntity> gradeList = await _gradeRepository.GetListBySubjectIdAsync(id);
 
-            ActionResult actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-                    Teacher
-                );
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
+                        Role = Student
+                    },
+                ]);
 
-            if (actionResultUserAccess.GetType() != new OkResult().GetType())
-            {
-                actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-                    Curator
-                );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        gradeList.Select(grade => grade.StudentId).ToArray(),
-                        Student
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                }
-            }
+            if (userAccess is false) return Forbid();
 
             return Ok(gradeList);
         }
@@ -145,40 +117,26 @@ namespace api.Controllers
 
             IEnumerable<GradeEntity> gradeList = await _gradeRepository.GetListByStudentAndSubjectIdAsync(studentId, subjectId);
 
-            ActionResult actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-                    Teacher
-                );
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
+                        Role = Student
+                    },
+                ]);
 
-            if (actionResultUserAccess.GetType() != new OkResult().GetType())
-            {
-                actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-                    Curator
-                );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        gradeList.Select(grade => grade.StudentId).ToArray(),
-                        Student
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                }
-            }
+            if (userAccess is false) return Forbid();
 
             return Ok(gradeList);
         }

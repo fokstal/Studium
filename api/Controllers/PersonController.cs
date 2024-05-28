@@ -44,40 +44,26 @@ namespace api.Controllers
 
             if (person.Student is not null)
             {
-                ActionResult actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        [person.Student.Id],
-                        Student
-                    );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        [_groupRepository.GetAsync(person.Student.GroupId).Result!.CuratorId],
-                        Curator
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType())
+                bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
                     {
-                        actionResultUserAccess = await
-                        new PermissionService(_userRepository)
-                        .RequireUserAccess
-                        (
-                            HttpContext,
-                            _groupRepository.GetAsync(person.Student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
-                            Teacher
-                        );
+                        IdList = [person.Student.Id],
+                        Role = Student
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(person.Student.GroupId).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = _groupRepository.GetAsync(person.Student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
+                        Role = Teacher
+                    },
+                ]);
 
-                        if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                    }
-                }
+                if (userAccess is false) return Forbid();
             }
 
 

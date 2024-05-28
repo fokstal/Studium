@@ -39,40 +39,26 @@ namespace api.Controllers
 
             if (student is null) return NotFound();
 
-            ActionResult actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_groupRepository.GetAsync(student.GroupId).Result!.CuratorId],
-                    Curator
-                );
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(student.GroupId).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = [student.Id],
+                        Role = Student
+                    },
+                    new()
+                    {
+                        IdList = _groupRepository.GetAsync(student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
+                        Role = Teacher
+                    },
+                ]);
 
-            if (actionResultUserAccess.GetType() != new OkResult().GetType())
-            {
-                actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [student.Id],
-                    Student
-                );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        _groupRepository.GetAsync(student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
-                        Teacher
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                }
-            }
+            if (userAccess is false) return Forbid();
 
             return Ok(student);
         }
