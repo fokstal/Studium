@@ -12,7 +12,7 @@ namespace api.Data.Configurations
 
             builder.HasOne(gradeDb => gradeDb.Type)
             .WithMany()
-            .HasForeignKey(gradeDb => gradeDb.Id)
+            .HasForeignKey(gradeDb => gradeDb.TypeId)
             .OnDelete(DeleteBehavior.Restrict);
         }
     }
