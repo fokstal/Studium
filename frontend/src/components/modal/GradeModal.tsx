@@ -11,9 +11,14 @@ import {
 } from "@chakra-ui/react";
 import { AiOutlineCloseSquare } from "react-icons/ai";
 import { Button, Input, colors } from "../ui-kit";
-import { GradeService, SubjectService, UserService } from "../../services";
+import {
+  GradeService,
+  StudentService,
+  SubjectService,
+  UserService,
+} from "../../services";
 import { useEffect, useState } from "react";
-import { Subject, User } from "../../types";
+import { Student, Subject, User } from "../../types";
 
 type GradeModalProps = {
   isOpen: boolean;
@@ -23,6 +28,7 @@ type GradeModalProps = {
 const userService = new UserService();
 const subjectService = new SubjectService();
 const gradeServcie = new GradeService();
+const studentService = new StudentService();
 
 export function GradeModal({ isOpen, onClose }: GradeModalProps) {
   const [studentsUsers, setStudentsUsers] = useState<User[]>();
@@ -31,8 +37,6 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
     value?: number;
     subjectId?: number;
     studentId?: string;
-    subject?: Subject;
-    student?: User;
     type?: number;
     setDate?: string;
   }>({});
@@ -47,6 +51,19 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
         )
       );
   }, []);
+  const updateStudents = async () => {
+    const students = await studentService.get();
+    const subject = await subjectService.getById(data.subjectId || 0);
+
+    const filteredStudents = students.filter(
+      (s: Student) => s.groupId === subject.groupId
+    );
+    setStudentsUsers(filteredStudents);
+  };
+
+  useEffect(() => {
+    updateStudents();
+  }, [data]);
 
   const handleSubmit = async () => {
     const res = await gradeServcie.post({
@@ -110,7 +127,9 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
               >
                 <option>Выберите учащегося</option>
                 {studentsUsers?.map((student) => (
-                  <option value={student.id}>{student.firstName} {student.lastName}</option>
+                  <option value={student.id}>
+                    {student.firstName} {student.lastName}
+                  </option>
                 ))}
               </Select>
             </VStack>

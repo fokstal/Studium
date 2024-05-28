@@ -18,13 +18,14 @@ export function Header() {
   const { lang, setLang } = useContext(LanguageContext);
 
   useEffect(() => {
-    authService.session().then((res) => {
+    authService.session().then((res: any) => {
       setIsAuth(!!res);
+      localStorage.setItem("role", res?.roleList[0]?.name);
     });
   }, []);
 
   if (!isAuth) {
-    return <Error401Page/>;
+    return <Error401Page />;
   }
 
   return (
@@ -75,9 +76,11 @@ export function Header() {
             value={lang}
             setValue={setLang}
           />
-          <Link to="/profile">
-            <Avatar />
-          </Link>
+          {localStorage.getItem("role") === "student" ? (
+            <Link to="/profile">
+              <Avatar />
+            </Link>
+          ) : null}
         </Flex>
       </Flex>
     </BaseLayout>
