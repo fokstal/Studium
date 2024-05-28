@@ -33,6 +33,8 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
     studentId?: string;
     subject?: Subject;
     student?: User;
+    type?: number;
+    setDate?: string;
   }>({});
 
   useEffect(() => {
@@ -46,11 +48,19 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
       );
   }, []);
 
-
-  const handleSubmit = () => {
-    console.log(data);
-    gradeServcie.post(data);
-    onClose();
+  const handleSubmit = async () => {
+    const res = await gradeServcie.post({
+      subjectId: data.subjectId,
+      type: data.type,
+      setDate: data.setDate || null,
+      studentToValueList: [
+        {
+          studentId: data.studentId,
+          value: data.value,
+        },
+      ],
+    });
+    if (res.status === 201) onClose();
   };
 
   return (
@@ -100,8 +110,21 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
               >
                 <option>Выберите учащегося</option>
                 {studentsUsers?.map((student) => (
-                  <option value={student.id}>{student.firstName}</option>
+                  <option value={student.id}>{student.firstName} {student.lastName}</option>
                 ))}
+              </Select>
+            </VStack>
+            <VStack align="stretch">
+              <Text>Тип отметки:</Text>
+              <Select
+                borderColor={colors.darkGrey}
+                _focusVisible={{ borderColor: colors.darkGrey }}
+                onChange={(e) => setData({ ...data, type: +e.target.value })}
+              >
+                <option>Выберите тип</option>
+                <option value={1}>Практическая работа</option>
+                <option value={2}>Контрольная работа</option>
+                <option value={3}>Лекция</option>
               </Select>
             </VStack>
             <VStack align="stretch">
@@ -110,6 +133,14 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
                 type="text"
                 value={data.value}
                 onChange={(e) => setData({ ...data, value: +e.target.value })}
+              />
+            </VStack>
+            <VStack align="stretch">
+              <Text>Дата:</Text>
+              <Input
+                type="date"
+                value={data.setDate}
+                onChange={(e) => setData({ ...data, setDate: e.target.value })}
               />
             </VStack>
           </VStack>

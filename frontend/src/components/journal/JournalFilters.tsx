@@ -86,7 +86,7 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
         options={personOptions() || []}
         value={person}
         setValue={setPerson}
-        name="firstName"
+        name="lastName"
       />
       <Select
         placeholder={Translator[lang.name]["select_subject"]}

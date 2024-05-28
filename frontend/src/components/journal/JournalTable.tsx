@@ -4,7 +4,7 @@ import { Column } from "primereact/column";
 
 type JournalTableProps = {
   data: any[];
-  columns: { name: string; field: string }[];
+  columns: { header: string; field: string }[];
 };
 
 export function JournalTable({ data, columns }: JournalTableProps) {
@@ -12,11 +12,8 @@ export function JournalTable({ data, columns }: JournalTableProps) {
   return (
     <TableWrapper>
       <DataTable value={data} scrollable paginator={data.length > 7} rows={7}>
-        <Column field="name" header="Имя"></Column>
-        <Column field="24.4_0" header="24.04"></Column>
-        <Column field="24.4_1" header="24.04"></Column>
-        {columns.map(({ name, field }) => (
-          <Column key={field} field={field} header={name}></Column>
+        {columns.map(({ header, field }) => (
+          <Column key={field} field={field} header={header}></Column>
         ))}
       </DataTable>
     </TableWrapper>

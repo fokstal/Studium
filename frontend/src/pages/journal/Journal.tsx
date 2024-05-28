@@ -2,13 +2,10 @@ import { Flex, Text } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
 import { colors } from "../../components/ui-kit";
 import { useContext, useEffect, useState } from "react";
-import { Grade, Group, Person, Subject } from "../../types";
+import { Group, Person, Subject } from "../../types";
 import { JournalFilters, JournalTable } from "../../components/journal";
-import { GradeService } from "../../services";
-import { formatColumns, formatGrades } from "../../lib";
 import { LanguageContext, Translator } from "../../store";
-
-const gradeService = new GradeService();
+import { formatGrades } from "../../lib";
 
 export function Journal() {
   const [filters, setFilters] = useState<{
@@ -17,15 +14,16 @@ export function Journal() {
     subject?: Subject;
   }>();
   const [data, setData] = useState<any[]>();
-  const [columns, setColumns] = useState<{ field: string; name: string }[]>([]);
+  const [columns, setColumns] = useState<{ field: string; header: string }[]>(
+    []
+  );
   const { lang } = useContext(LanguageContext);
 
   useEffect(() => {
     const fetchData = async () => {
-      const grades = await gradeService.get();
-      const data = await formatGrades(filters!, grades);
-      setData(data);
-      setColumns(formatColumns(data));
+      const {columns, tableData} = await formatGrades(filters || {});
+      setColumns(columns);
+      setData(tableData)
     };
     fetchData();
   }, [filters]);
