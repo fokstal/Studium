@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Group, Person, Student } from "../../types";
 import {
   GroupService,
@@ -7,13 +7,14 @@ import {
   StudentService,
 } from "../../services";
 import { Avatar, colors, Input } from "../../components/ui-kit";
-import { Box, Flex, HStack, Link, Text, VStack } from "@chakra-ui/react";
+import { Flex, HStack, Link, Text, VStack } from "@chakra-ui/react";
 import { getAvatarPath, getPassportPath } from "../../lib/";
 import {
   AiFillCheckCircle,
   AiFillCloseCircle,
   AiOutlineEye,
 } from "react-icons/ai";
+import { LanguageContext, Translator } from "../../store";
 
 const studentService = new StudentService();
 const personService = new PersonService();
@@ -27,6 +28,7 @@ type StudentComponentProps = {
 export function StudentComponent({ id }: StudentComponentProps) {
   const [student, setStudent] = useState<Person & Group & Student>();
   const [passport, setPassport] = useState<string>();
+  const { lang } = useContext(LanguageContext);
 
   const getPersonData = async (personId: number): Promise<Person> => {
     return await personService.getById(personId);
@@ -52,7 +54,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
 
     const passports = await passportService.get();
     const passport = passports.find((p: any) => p.personId === personData.id);
-    setPassport(passport.scanFileName);
+    setPassport(passport?.scanFileName ?? null);
   };
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
         borderRadius="5px"
       >
         <Text fontSize="24px" fontWeight="bold">
-          Основная информация
+          {Translator[lang.name]["main_information"]}
         </Text>
         <Flex align="center" gap="20px" justify="center">
           <Avatar
@@ -86,25 +88,25 @@ export function StudentComponent({ id }: StudentComponentProps) {
             bg={colors.darkGrey}
             borderRadius="5px"
             gap="10px"
-            w="max-content"
+            w="100%"
             align="stretch"
           >
             <Flex gap="10px" align="center">
-              <Text>Имя:</Text>
+              <Text>{Translator[lang.name]["name"]}:</Text>
               <Input
                 value={`${student?.firstName} ${student?.middleName} ${student?.lastName}`}
                 disabled
               />
             </Flex>
             <Flex gap="10px" align="center">
-              <Text>Дата рождения:</Text>
+              <Text>{Translator[lang.name]["date_birthday"]}:</Text>
               <Input
                 value={student?.birthDate?.toString().slice(0, 10)}
                 disabled
               />
             </Flex>
             <Flex gap="10px" align="center">
-              <Text>Группа:</Text>
+              <Text>{Translator[lang.name]["student_group"]}:</Text>
               <Input value={student?.name} disabled />
             </Flex>
           </Flex>
@@ -120,7 +122,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
           w="calc(50% - 10px)"
         >
           <Text fontSize="24px" fontWeight="bold">
-            Паспортные данные
+            {Translator[lang.name]["passport_information"]}
           </Text>
           <HStack
             p="20px"
@@ -129,24 +131,26 @@ export function StudentComponent({ id }: StudentComponentProps) {
             justify="space-between"
           >
             <Flex direction="column" gap="10px">
-              <Text>Паспортные данные</Text>
+              <Text> {Translator[lang.name]["passport_information"]}</Text>
               <Text>
                 {passport ? (
                   <Flex gap="10px">
                     <AiFillCheckCircle color="blue" size="24px" />
-                    <Text>Данные успешно загружены</Text>
+                    <Text>{Translator[lang.name]["passport_load"]}</Text>
                   </Flex>
                 ) : (
                   <Flex gap="10px">
                     <AiFillCloseCircle color="red" size="24px" />
-                    <Text>Данные не загружены</Text>
+                    <Text>{Translator[lang.name]["passport_not_load"]}</Text>
                   </Flex>
                 )}
               </Text>
             </Flex>
-            <Link href={passport ? getPassportPath(passport) : "#"} target="blank">
-              <AiOutlineEye size="24px" />
-            </Link>
+            {passport ? (
+              <Link href={getPassportPath(passport)} target="blank">
+                <AiOutlineEye size="24px" />
+              </Link>
+            ) : null}
           </HStack>
         </Flex>
         <Flex
@@ -158,7 +162,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
           w="calc(50% - 10px)"
         >
           <Text fontSize="24px" fontWeight="bold">
-            Данные о зачислении
+            {Translator[lang.name]["data_about_start"]}
           </Text>
           <VStack
             p="20px"
@@ -168,7 +172,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
             align="start"
           >
             <Flex gap="10px" whiteSpace="nowrap" align="center">
-              <Text>Дата зачисления:</Text>
+              <Text>{Translator[lang.name]["date_start"]}:</Text>
               <Input
                 type="text"
                 value={student?.addedDate?.toString().slice(0, 10)}
@@ -176,7 +180,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
               />
             </Flex>
             <Flex gap="10px" whiteSpace="nowrap" align="center">
-              <Text>Дата окончания:</Text>
+              <Text>{Translator[lang.name]["date_finish"]}:</Text>
               <Input
                 type="text"
                 value={student?.removedDate?.toString().slice(0, 10)}

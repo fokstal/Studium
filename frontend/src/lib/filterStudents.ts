@@ -9,6 +9,7 @@ export function filterStudents(students: any, filters: {
 }, search: string) {
   return students.filter((student: any) => {
     const studentAddedDate = new Date(student.addedDate);
+    const studentRemovedDate = new Date(student.removedDate);
 
     if (filters.group && student.groupId !== filters.group.id) {
       return false;
@@ -35,7 +36,7 @@ export function filterStudents(students: any, filters: {
     if (filters.start && studentAddedDate.getFullYear() !== new Date().getFullYear()) {
       return false;
     }
-    if (filters.finish && studentAddedDate.getFullYear() !== new Date(filters.endDate || '').getFullYear()) {
+    if (filters.finish && studentRemovedDate.getFullYear() !== new Date().getFullYear()) {
       return false;
     }
 

@@ -49,6 +49,7 @@ export function Filters({ filters, setFilters }: FiltersProps) {
     <Box
       bg={colors.darkGrey}
       borderRadius="5px"
+      userSelect="none"
       h="min-content"
       p="20px"
       w="max-content"
@@ -127,9 +128,6 @@ export function Filters({ filters, setFilters }: FiltersProps) {
           </Flex>
         </VStack>
         <VStack align="stretch">
-          <Button onClick={handleSearch}>
-            {Translator[lang.name]["search"]}
-          </Button>
           <Flex
             gap="10px"
             align="center"
