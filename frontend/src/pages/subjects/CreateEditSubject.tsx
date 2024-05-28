@@ -1,15 +1,16 @@
 import { Box, Flex, Text, Textarea, VStack } from "@chakra-ui/react";
 import { Button, Input, Select, colors } from "../../components/ui-kit";
 import { BaseLayout } from "../../layouts";
-import { GroupService, UserService } from "../../services";
+import { GroupService, SubjectService, UserService } from "../../services";
 import { useContext, useEffect, useState } from "react";
 import { Group, User } from "../../types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { LanguageContext, Translator } from "../../store";
-import { createSubject } from "../../lib";
+import { createSubject, editSubject } from "../../lib";
 
 const groupService = new GroupService();
 const userService = new UserService();
+const subjectService = new SubjectService();
 
 export function CreateEditSubject() {
   const [errorMessage, setErrorMessage] = useState<string | null>();
@@ -23,6 +24,7 @@ export function CreateEditSubject() {
   }>({});
   const navigator = useNavigate();
   const { lang } = useContext(LanguageContext);
+  const { id } = useParams();
 
   useEffect(() => {
     groupService.get().then((value) => setGroups(value));
@@ -33,6 +35,9 @@ export function CreateEditSubject() {
           data.filter((user: User) => user.roleList[0].name === "Teacher")
         )
       );
+    if (id) {
+      subjectService.getById(id).then((data) => setData(data));
+    }
   }, []);
 
   useEffect(() => {
@@ -48,9 +53,15 @@ export function CreateEditSubject() {
   };
 
   const handleSubmit = async () => {
-    const res = await createSubject(data);
-    if (res === "Created") return navigator("/subject");
-    setErrorMessage(res);
+    if (id) {
+      const res = await editSubject(+id, data);
+      if (res === "Created") return navigator("/subject");
+      setErrorMessage(res);
+    } else {
+      const res = await createSubject(data);
+      if (res === "Created") return navigator("/subject");
+      setErrorMessage(res);
+    }
   };
 
   return (
@@ -127,7 +138,11 @@ export function CreateEditSubject() {
           </Text>
         </VStack>
         <Box alignSelf="end" onClick={handleSubmit}>
-          <Button>{Translator[lang.name]["create"]}</Button>
+          <Button>
+            {id
+              ? Translator[lang.name]["edit"]
+              : Translator[lang.name]["create"]}
+          </Button>
         </Box>
       </VStack>
     </BaseLayout>
