@@ -31,4 +31,13 @@ export class AuthServise {
 
     return res;
   }
+
+  public async session() {
+    const res = await fetch(`${this.url}session`, {
+      credentials: "include"
+    });
+
+    if (!res.ok) return false;
+    return await res.json();
+  }
 }

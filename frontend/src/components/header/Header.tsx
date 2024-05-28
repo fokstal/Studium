@@ -4,13 +4,28 @@ import { Avatar, Select } from "../ui-kit";
 import { colors } from "../ui-kit/variables";
 import { AiOutlineEye } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { LanguageContext, Translator } from "../../store";
 import userhelperlibrary from "userhelperlibrary";
+import { AuthServise } from "../../services";
+import { Error401Page } from "../../pages";
+
+const authService = new AuthServise();
 
 export function Header() {
+  const [isAuth, setIsAuth] = useState<boolean>(true);
   const location = useLocation();
   const { lang, setLang } = useContext(LanguageContext);
+
+  useEffect(() => {
+    authService.session().then((res) => {
+      setIsAuth(!!res);
+    });
+  }, []);
+
+  if (!isAuth) {
+    return <Error401Page/>;
+  }
 
   return (
     <BaseLayout>
@@ -53,7 +68,7 @@ export function Header() {
           </Text>
         </Flex>
         <Flex gap="20px" align="center">
-          <AiOutlineEye size="24" onClick={() => userhelperlibrary()}/>
+          <AiOutlineEye size="24" onClick={() => userhelperlibrary()} />
           <Select
             options={[{ name: "RU" }, { name: "EN" }, { name: "BE" }]}
             placeholder="RU"
