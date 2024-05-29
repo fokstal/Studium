@@ -162,6 +162,8 @@ namespace api.Controllers
         {
             if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
 
+            gradeDTO.SetDate = gradeDTO.SetDate.Date;
+
             if (await _gradeRepository.GetAsync(gradeDTO.SetDate) is not null)
             {
                 ModelState.AddModelError("Custom Error", "GradesEntity already Exists!");
