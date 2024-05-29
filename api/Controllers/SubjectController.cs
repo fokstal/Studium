@@ -49,12 +49,12 @@ namespace api.Controllers
                     },
                     new()
                     {
-                        IdList = [_groupRepository.GetAsync(subject).Result!.CuratorId],
+                        IdList = [_groupRepository.GetAsync(subject).Result.CuratorId],
                         Role = Curator
                     },
                     new()
                     {
-                        IdList = _groupRepository.GetAsync(subject).Result!.StudentList.Select(student => student.Id).ToArray(),
+                        IdList = _groupRepository.GetAsync(subject).Result.StudentList.Select(student => student.Id).ToArray(),
                         Role = Student
                     },
                 ]);

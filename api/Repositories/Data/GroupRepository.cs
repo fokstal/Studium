@@ -36,13 +36,14 @@ namespace api.Repositories.Data
             return group;
         }
 
-        public async Task<GroupEntity?> GetAsync(SubjectEntity subject)
+        public async Task<GroupEntity> GetAsync(SubjectEntity subject)
         {
             GroupEntity? group = await _db.Group
                 .Include(groupDb => groupDb.StudentList)
                 .Include(groupdDb => groupdDb.SubjectList)
-                .FirstOrDefaultAsync(groupdId => groupdId.SubjectList.Contains(subject));
-
+                .FirstOrDefaultAsync(groupdId => groupdId.SubjectList.Contains(subject)) 
+                ?? throw new Exception("Subject exists without Group ib Db!");
+                
             return group;
         }
 
