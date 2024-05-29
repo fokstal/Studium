@@ -32,7 +32,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewSubject])]
-        public async Task<ActionResult<SubjectEntity>> GetByIdAsync(int id)
+        public async Task<ActionResult<SubjectEntity>> GetAsync(int id)
         {
             if (id < 1) return BadRequest();
 
