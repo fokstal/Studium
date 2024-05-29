@@ -41,26 +41,26 @@ namespace api.Controllers
 
             IEnumerable<GradeStudentDTO> gradeList = await _gradeRepository.GetListByStudentIdAsync(id);
 
-            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-                ([
-                    new()
-                    {
-                        IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-                        Role = Teacher
-                    },
-                    new()
-                    {
-                        IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-                        Role = Curator
-                    },
-                    new()
-                    {
-                        IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
-                        Role = Student
-                    },
-                ]);
+            // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+            //     ([
+            //         new()
+            //         {
+            //             IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+            //             Role = Teacher
+            //         },
+            //         new()
+            //         {
+            //             IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+            //             Role = Curator
+            //         },
+            //         new()
+            //         {
+            //             IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
+            //             Role = Student
+            //         },
+            //     ]);
 
-            if (userAccess is false) return Forbid();
+            // if (userAccess is false) return Forbid();
 
             return Ok(gradeList);
         }
@@ -79,26 +79,26 @@ namespace api.Controllers
 
             IEnumerable<GradesEntity> gradeList = await _gradeRepository.GetListBySubjectIdAsync(id);
 
-            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-                ([
-                    new()
-                    {
-                        IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-                        Role = Teacher
-                    },
-                    new()
-                    {
-                        IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-                        Role = Curator
-                    },
-                    new()
-                    {
-                        IdList = gradeList.SelectMany(grade => grade.StudentToValueList.Select(sv => sv.StudentId)).ToArray(),
-                        Role = Student
-                    },
-                ]);
+            // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+            //     ([
+            //         new()
+            //         {
+            //             IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+            //             Role = Teacher
+            //         },
+            //         new()
+            //         {
+            //             IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+            //             Role = Curator
+            //         },
+            //         new()
+            //         {
+            //             IdList = gradeList.SelectMany(grade => grade.StudentToValueList.Select(sv => sv.StudentId)).ToArray(),
+            //             Role = Student
+            //         },
+            //     ]);
 
-            if (userAccess is false) return Forbid();
+            // if (userAccess is false) return Forbid();
 
             return Ok(gradeList);
         }
@@ -118,26 +118,26 @@ namespace api.Controllers
 
             IEnumerable<GradeStudentDTO> gradeList = await _gradeRepository.GetListByStudentAndSubjectIdAsync(studentId, subjectId);
 
-            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-                ([
-                    new()
-                    {
-                        IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-                        Role = Teacher
-                    },
-                    new()
-                    {
-                        IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-                        Role = Curator
-                    },
-                    new()
-                    {
-                        IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
-                        Role = Student
-                    },
-                ]);
+            // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+            //     ([
+            //         new()
+            //         {
+            //             IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+            //             Role = Teacher
+            //         },
+            //         new()
+            //         {
+            //             IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+            //             Role = Curator
+            //         },
+            //         new()
+            //         {
+            //             IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
+            //             Role = Student
+            //         },
+            //     ]);
 
-            if (userAccess is false) return Forbid();
+            // if (userAccess is false) return Forbid();
 
             return Ok(gradeList);
         }

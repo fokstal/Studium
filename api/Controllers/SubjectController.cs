@@ -40,26 +40,26 @@ namespace api.Controllers
 
             if (subject is null) return NotFound();
 
-            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-                ([
-                    new()
-                    {
-                        IdList = [subject.TeacherId],
-                        Role = Teacher
-                    },
-                    new()
-                    {
-                        IdList = [_groupRepository.GetAsync(subject).Result.CuratorId],
-                        Role = Curator
-                    },
-                    new()
-                    {
-                        IdList = _groupRepository.GetAsync(subject).Result.StudentList.Select(student => student.Id).ToArray(),
-                        Role = Student
-                    },
-                ]);
+            // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+            //     ([
+            //         new()
+            //         {
+            //             IdList = [subject.TeacherId],
+            //             Role = Teacher
+            //         },
+            //         new()
+            //         {
+            //             IdList = [_groupRepository.GetAsync(subject).Result.CuratorId],
+            //             Role = Curator
+            //         },
+            //         new()
+            //         {
+            //             IdList = _groupRepository.GetAsync(subject).Result.StudentList.Select(student => student.Id).ToArray(),
+            //             Role = Student
+            //         },
+            //     ]);
 
-            if (userAccess is false) return Forbid();
+            // if (userAccess is false) return Forbid();
 
             return Ok(subject);
         }

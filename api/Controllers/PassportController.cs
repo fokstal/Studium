@@ -46,19 +46,19 @@ namespace api.Controllers
 
             PersonEntity? person = await _personRepository.GetAsync(passport.PersonId);
 
-            if (person!.Student is not null)
-            {
-                bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerAccess
-                (
-                    new()
-                    {
-                        IdList = [person.Student.Id],
-                        Role = Student
-                    }
-                );
+            // if (person!.Student is not null)
+            // {
+            //     bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerAccess
+            //     (
+            //         new()
+            //         {
+            //             IdList = [person.Student.Id],
+            //             Role = Student
+            //         }
+            //     );
 
-                if (userAccess is false) return Forbid();
-            }
+            //     if (userAccess is false) return Forbid();
+            // }
 
             return Ok(passport);
         }

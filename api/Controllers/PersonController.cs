@@ -42,29 +42,29 @@ namespace api.Controllers
 
             if (person is null) return NotFound();
 
-            if (person.Student is not null)
-            {
-                bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-                ([
-                    new()
-                    {
-                        IdList = [person.Student.Id],
-                        Role = Student
-                    },
-                    new()
-                    {
-                        IdList = [_groupRepository.GetAsync(person.Student.GroupId).Result!.CuratorId],
-                        Role = Curator
-                    },
-                    new()
-                    {
-                        IdList = _groupRepository.GetAsync(person.Student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
-                        Role = Teacher
-                    },
-                ]);
+            // if (person.Student is not null)
+            // {
+            //     bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+            //     ([
+            //         new()
+            //         {
+            //             IdList = [person.Student.Id],
+            //             Role = Student
+            //         },
+            //         new()
+            //         {
+            //             IdList = [_groupRepository.GetAsync(person.Student.GroupId).Result!.CuratorId],
+            //             Role = Curator
+            //         },
+            //         new()
+            //         {
+            //             IdList = _groupRepository.GetAsync(person.Student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
+            //             Role = Teacher
+            //         },
+            //     ]);
 
-                if (userAccess is false) return Forbid();
-            }
+            //     if (userAccess is false) return Forbid();
+            // }
 
 
             return Ok(person);
