@@ -24,7 +24,7 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([ViewStudent])]
+        [RequirePermissions([ViewStudentList])]
         public async Task<ActionResult<IEnumerable<StudentEntity>>> GetListAsync() => Ok(await _studentRepository.GetListAsync());
 
         [HttpGet("{id}")]
@@ -32,7 +32,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([ViewStudentList])]
+        [RequirePermissions([ViewStudent])]
         public async Task<ActionResult<StudentEntity>> GetAsync(Guid id)
         {
             StudentEntity? student = await _studentRepository.GetAsync(id);
