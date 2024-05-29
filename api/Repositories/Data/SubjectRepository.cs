@@ -80,7 +80,8 @@ namespace api.Repositories.Data
                     }
                 }
 
-                if (countGrades >= 3) summaryGrades += Math.Round(summGrades / countGrades);
+                // if (countGrades >= 3) summaryGrades += Math.Round(summGrades / countGrades);
+                summaryGrades += Math.Round(summGrades / countGrades);
             }
 
             return Math.Round(summaryGrades / subjectList.Count());
