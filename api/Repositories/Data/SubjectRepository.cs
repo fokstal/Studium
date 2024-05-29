@@ -84,7 +84,7 @@ namespace api.Repositories.Data
                 summaryGrades += Math.Round(summGrades / countGrades);
             }
 
-            return Math.Round(summaryGrades / subjectList.Count());
+            return summaryGrades / subjectList.Count();
         }
 
         public override SubjectEntity Create(SubjectDTO subjectDTO)
