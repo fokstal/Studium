@@ -143,6 +143,9 @@ namespace api.Controllers
         }
 
         [HttpGet("student-average/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<double>> GetAverageAsync(Guid id)
         {
             StudentEntity? student = await _studentRepository.GetAsync(id);
