@@ -150,11 +150,7 @@ namespace api.Controllers
             if (student is null) return NotFound("Student is null!");
             if (student.GroupId is null) return NotFound("Group is null!");
 
-            return Ok(_gradeRepository.GetAverage
-            (
-                await _subjectRepository.GetListByGroupAsync(Convert.ToInt32(student.GroupId)),
-                student.Id
-            ));
+            return Ok(await _subjectRepository.GetAverageAsync(student));
         }
         
         [HttpPost]

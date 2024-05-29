@@ -102,32 +102,6 @@ namespace api.Repositories.Data
 
         public async Task<GradesEntity?> GetAsync(DateTime setDate) => await _db.Grades.FirstOrDefaultAsync(gradesDb => gradesDb.SetDate == setDate);
 
-        public double GetAverage (IEnumerable<SubjectEntity> subjectList, Guid studentId)
-        {
-            double summaryGrades = 0;
-
-            foreach (SubjectEntity subject in subjectList)
-            {
-                double summGrades = 0;
-                int countGrades = 0;
-
-                foreach (GradesEntity gradesEntity in subject.GradesList)
-                {
-                    StudentToValueEntity? grade = gradesEntity.StudentToValueList.FirstOrDefault(grade => grade.StudentId == studentId);
-
-                    if (grade is not null)
-                    {
-                        summGrades += grade.Value;
-                        countGrades += 1;
-                    }
-                }
-
-                if (countGrades >= 3) summaryGrades += Math.Round(summGrades / countGrades);
-            }
-
-            return Math.Round(summaryGrades / subjectList.Count());
-        }
-
         public override GradesEntity Create(GradesDTO gradesDTO)
         {
             return new()
