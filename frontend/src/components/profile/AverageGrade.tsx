@@ -1,17 +1,25 @@
 import { Box, Flex, Text, VStack } from "@chakra-ui/react";
 import { Button, Select, colors } from "../ui-kit";
 import { AiOutlineFrown, AiOutlineMeh, AiOutlineSmile } from "react-icons/ai";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { LanguageContext, Translator } from "../../store";
+import { GradeService } from "../../services";
 
 type AverageGradeProps = {
-  id: number;
+  id: string;
 };
 
+const gradeService = new GradeService();
+
 export function AverageGrade({ id }: AverageGradeProps) {
-  const averageGrade = 4.3;
   const { green, red, white, grey } = colors;
   const { lang } = useContext(LanguageContext);
+  const [averageGrade, setAverageGrade] = useState<number>(0);
+
+  useEffect(() => {
+    gradeService.averageGrade(id).then((grade) => setAverageGrade(grade));
+  }, []);
+
   return (
     <Flex
       align="center"
