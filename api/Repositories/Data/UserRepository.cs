@@ -33,7 +33,12 @@ namespace api.Repositories.Data
 
         public async Task<UserEntity?> GetAsync(Guid id)
         {
-            UserEntity? user = await _db.User.FirstOrDefaultAsync(userDb => userDb.Id == id);
+            UserEntity? user = await _db.User.Include(userDb => userDb.RoleList).FirstOrDefaultAsync(userDb => userDb.Id == id);
+
+            if (user is not null)
+            {
+                user.RoleList = user.RoleList.Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name }).ToList();
+            }
 
             return user;
         }
