@@ -155,7 +155,7 @@ namespace api.Controllers
 
             return Ok(await _subjectRepository.GetAverageAsync(student));
         }
-        
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -167,14 +167,22 @@ namespace api.Controllers
 
             gradeDTO.SetDate = gradeDTO.SetDate.Date;
 
-            if (await _gradeRepository.GetAsync(gradeDTO.SetDate) is not null)
-            {
-                ModelState.AddModelError("Custom Error", "GradesEntity already Exists!");
+            GradesEntity? gradesEntity = await _gradeRepository.GetAsync(gradeDTO.SetDate);
 
-                return BadRequest(ModelState);
+            if (gradesEntity is not null)
+            {
+                foreach (StudentToValueEntity studentToValueEntity in gradeDTO.StudentToValueList)
+                {
+                    gradesEntity.StudentToValueList.Add(studentToValueEntity);
+                }
+
+                await db.SaveChangesAsync();
             }
 
-            await _gradeRepository.AddAsync(_gradeRepository.Create(gradeDTO));
+            if (gradesEntity is null)
+            {
+                await _gradeRepository.AddAsync(_gradeRepository.Create(gradeDTO));
+            }
 
             return Created("GradeEntity", gradeDTO);
         }
