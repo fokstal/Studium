@@ -42,6 +42,7 @@ export function Diagrams({ id }: DiagramsProps) {
       setGrades(grades);
     }
 
+    console.log(grades)
     const data = {
       labels: [
         Translator[lang.name]["marks_lower_3"],
@@ -50,14 +51,15 @@ export function Diagrams({ id }: DiagramsProps) {
       datasets: [
         {
           data: [
-            grades.filters((g: any) => g.value < 4 && g.type.id > 1).length,
-            grades.filters((g: any) => g.value >= 4 && g.type.id > 1).length,
+            grades.filter((g: any) => g.value < 4).length,
+            grades.filter((g: any) => g.value >= 4).length,
           ],
           backgroundColor: [darkRed, darkGreen],
           hoverBackgroundColor: [red, green],
         },
       ],
     };
+    console.log(data);
 
     setChartDataGrades(data);
 
@@ -66,9 +68,9 @@ export function Diagrams({ id }: DiagramsProps) {
       datasets: [
         {
           data: [
-            grades.filters((g: any) => g.type.id === 1 && g.value !== -1)
+            grades?.filter((g: any) => g.type === 1 && g.value !== -1)
               .length,
-            grades.filters((g: any) => g.type.id === 1 && g.value === -1)
+            grades?.filter((g: any) => g.type === 1 && g.value === -1)
               .length,
           ],
           backgroundColor: ["#2555FF", "#AC43FF"],

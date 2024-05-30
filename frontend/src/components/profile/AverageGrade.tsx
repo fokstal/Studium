@@ -33,7 +33,7 @@ export function AverageGrade({ id }: AverageGradeProps) {
           {Translator[lang.name]["average_mark_calculation"]}
         </Text>
         <Flex gap="20px" align="center">
-          <Text>{Translator[lang.name]["calculate_average_mark_for"]}:</Text>
+          <Text>{Translator[lang.name]["calculate_average_mark_for"]}</Text>
           <Select
             value={null}
             placeholder={Translator[lang.name]["select_subject"]}
@@ -41,9 +41,6 @@ export function AverageGrade({ id }: AverageGradeProps) {
             options={[]}
           />
         </Flex>
-        <Box>
-          <Button>{Translator[lang.name]["calculate"]}</Button>
-        </Box>
       </VStack>
       <VStack gap="5px" align="end">
         <Flex

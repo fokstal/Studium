@@ -52,13 +52,13 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
       );
   }, []);
   const updateStudents = async () => {
-    const students = await studentService.get();
-    const subject = await subjectService.getById(data.subjectId || 0);
+    // const students = await studentService.get();
+    // const subject = await subjectService.getById(data.subjectId || 0);
 
-    const filteredStudents = students.filter(
-      (s: Student) => s.groupId === subject.groupId
-    );
-    setStudentsUsers(filteredStudents);
+    // const filteredStudents = students.filter(
+    //   (s: Student) => s.groupId === subject.groupId
+    // );
+    // setStudentsUsers(filteredStudents);
   };
 
   useEffect(() => {
