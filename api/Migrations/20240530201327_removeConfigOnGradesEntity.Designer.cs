@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Data;
 
@@ -10,9 +11,11 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240530201327_removeConfigOnGradesEntity")]
+    partial class removeConfigOnGradesEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.5");
@@ -55,7 +58,10 @@ namespace api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("GradesEntityId")
+                    b.Property<int>("GradeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("GradesEntityId")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid>("StudentId")
@@ -836,9 +842,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Models.GradesEntity", null)
                         .WithMany("StudentToValueList")
-                        .HasForeignKey("GradesEntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GradesEntityId");
                 });
 
             modelBuilder.Entity("api.Models.GradesEntity", b =>
