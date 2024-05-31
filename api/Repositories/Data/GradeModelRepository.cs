@@ -11,13 +11,21 @@ namespace api.Repositories.Data
     {
         public async override Task<IEnumerable<GradeModelEntity>> GetListAsync()
         {
-            IEnumerable<GradeModelEntity> gradeList = await
+            IEnumerable<GradeModelEntity> gradeModelList = await
                 _db.GradeModel
-                .Include(gradeDb => gradeDb.Type)
-                .Include(gradeDb => gradeDb.GradeList)
+                .Include(gradeModelDb => gradeModelDb.Type)
+                .Include(gradeModelDb => gradeModelDb.GradeList)
                 .ToArrayAsync();
 
-            return gradeList;
+            foreach (GradeModelEntity gradeModel in gradeModelList)
+            {
+                foreach (GradeEntity grade in gradeModel.GradeList)
+                {
+                    grade.GradeModelEntity = null!;
+                }
+            }
+
+            return gradeModelList;
         }
 
         public async Task<IEnumerable<GradeStudentDTO>> GetListByStudentIdAsync(Guid id)
@@ -106,11 +114,17 @@ namespace api.Repositories.Data
 
         public override GradeModelEntity Create(GradeModelDTO gradesDTO)
         {
+            HashSet<GradeEntity> gradeList = [];
             Guid gradeModelId = Guid.NewGuid();
 
-            foreach (GradeEntity grade in gradesDTO.StudentToValueList)
+            foreach (GradeDTO grade in gradesDTO.StudentToValueList)
             {
-                grade.GradeModelId = gradeModelId;
+                gradeList.Add(new()
+                {
+                    Value = grade.Value,
+                    StudentId = grade.StudentId,
+                    GradeModelId = gradeModelId,
+                });
             }
 
             return new()
@@ -119,13 +133,25 @@ namespace api.Repositories.Data
                 SubjectId = gradesDTO.SubjectId,
                 SetDate = DateTime.Now.Date,
                 Type = GetGradeTypeEntitiesByEnum(gradesDTO.Type),
-                GradeList = gradesDTO.StudentToValueList
+                GradeList = gradeList,
             };
         }
 
-        public async void UpdateGradeList(GradeModelEntity gradesEntity, HashSet<GradeEntity> gradeList)
+        public async void UpdateGradeList(GradeModelEntity gradesEntity, HashSet<GradeDTO> gradeDTOList)
         {
-            foreach (GradeEntity grade in gradeList)
+            HashSet<GradeEntity> gradeEntityList = [];
+
+            foreach (GradeDTO grade in gradeDTOList)
+            {
+                gradeEntityList.Add(new()
+                {
+                    GradeModelId = gradesEntity.Id,
+                    Value = grade.Value,
+                    StudentId = grade.StudentId
+                });
+            }
+
+            foreach (GradeEntity grade in gradeEntityList)
             {
                 gradesEntity.GradeList.Remove(grade);
 
@@ -140,7 +166,6 @@ namespace api.Repositories.Data
             gradesToUpdate.SubjectId = gradesDTO.SubjectId;
             gradesToUpdate.SetDate = DateTime.Now;
             gradesToUpdate.Type = GetGradeTypeEntitiesByEnum(gradesDTO.Type);
-            gradesToUpdate.GradeList = gradesDTO.StudentToValueList;
 
             await _db.SaveChangesAsync();
         }

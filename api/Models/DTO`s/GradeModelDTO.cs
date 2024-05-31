@@ -16,6 +16,6 @@ namespace api.Models.DTO
         public DateTime SetDate { get; set; }
 
         [Required]
-        public HashSet<GradeEntity> StudentToValueList { get; set; } = [];
+        public HashSet<GradeDTO> StudentToValueList { get; set; } = [];
     }
 }
