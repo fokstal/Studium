@@ -110,7 +110,24 @@ namespace api.Repositories.Data
 
         public override Task<GradeModelEntity?> GetAsync(int id) => throw new NotImplementedException();
         public async Task<GradeModelEntity?> GetAsync(Guid id) => await _db.GradeModel.FirstOrDefaultAsync(gradesDb => gradesDb.Id == id);
-        public async Task<GradeModelEntity?> GetAsync(DateTime setDate) => await _db.GradeModel.FirstOrDefaultAsync(gradesDb => gradesDb.SetDate == setDate);
+        public async Task<GradeModelEntity?> GetAsync(DateTime setDate)
+        {
+            GradeModelEntity? gradeModel = await
+                _db.GradeModel
+                .Include(g => g.Type)
+                .Include(g => g.GradeList)
+                .FirstOrDefaultAsync(gradesDb => gradesDb.SetDate == setDate);
+
+            if (gradeModel is not null)
+            {
+                foreach (GradeEntity grade in gradeModel.GradeList)
+                {
+                    grade.GradeModelEntity = null!;
+                }
+            }
+
+            return gradeModel;
+        }
 
         public override GradeModelEntity Create(GradeModelDTO gradesDTO)
         {
@@ -137,25 +154,25 @@ namespace api.Repositories.Data
             };
         }
 
-        public async void UpdateGradeList(GradeModelEntity gradesEntity, HashSet<GradeDTO> gradeDTOList)
+        public async void UpdateGradeList(GradeModelEntity gradesEntity, HashSet<GradeDTO> gradeList)
         {
-            HashSet<GradeEntity> gradeEntityList = [];
+            HashSet<GradeEntity> gradeEntitieList = gradesEntity.GradeList;
 
-            foreach (GradeDTO grade in gradeDTOList)
+            foreach (GradeDTO grade in gradeList)
             {
-                gradeEntityList.Add(new()
+                GradeEntity? gradeEntity = gradeEntitieList.FirstOrDefault(ge => ge.StudentId == grade.StudentId);
+
+                if (gradeEntity is not null)
                 {
-                    GradeModelId = gradesEntity.Id,
-                    Value = grade.Value,
-                    StudentId = grade.StudentId
-                });
-            }
+                    gradesEntity.GradeList.Remove(gradeEntity);
+                }
 
-            foreach (GradeEntity grade in gradeEntityList)
-            {
-                gradesEntity.GradeList.Remove(grade);
-
-                gradesEntity.GradeList.Add(grade);
+                gradesEntity.GradeList.Add(new()
+                    {
+                        Value = grade.Value,
+                        StudentId = grade.StudentId,
+                        GradeModelId = gradesEntity.Id
+                    });
             }
 
             await _db.SaveChangesAsync();
