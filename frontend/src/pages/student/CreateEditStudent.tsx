@@ -36,17 +36,32 @@ export function CreateEditStudent() {
   const { lang } = useContext(LanguageContext);
   const { id } = useParams();
 
-  const setStudentToEdit = async () => {
+  const sexOptions = [
+    { name: Translator[lang.name]["woman"], code: 0 },
+    { name: Translator[lang.name]["man"], code: 1 },
+  ];
+
+  const updateData = async () => {
     if (!id) return;
+    const groups = await groupService.get();
     const student = await studentService.getById(id);
     const person = await personService.getById(student.personId);
 
-    setStudentData({ ...student, ...person });
+    setGroups(groups);
+
+    setStudentData({
+      ...student,
+      ...person,
+      sex: sexOptions[person.sex],
+      group: groups.find((g: Group) => g.id === student.groupId),
+      birthDate: person.birthDate.split("T")[0],
+      addedDate: student.addedDate.split("T")[0],
+      removedDate: student.removedDate.split("T")[0],
+    });
   };
 
   useEffect(() => {
-    groupService.get().then((groups) => setGroups(groups));
-    setStudentToEdit();
+    updateData();
   }, []);
 
   const handleSexSelectChange = (value: { name: string; code: boolean }) => {
@@ -184,11 +199,8 @@ export function CreateEditStudent() {
                 <Select
                   value={studentData?.sex}
                   setValue={handleSexSelectChange}
-                  placeholder=""
-                  options={[
-                    { name: Translator[lang.name]["man"], code: 1 },
-                    { name: Translator[lang.name]["woman"], code: 0 },
-                  ]}
+                  placeholder={Translator[lang.name]["select_sex"]}
+                  options={sexOptions}
                 />
                 <Select
                   value={studentData?.group}

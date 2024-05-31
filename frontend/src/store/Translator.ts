@@ -88,6 +88,7 @@ export const Translator = {
     data_about_start: "Enrollment data",
     date_start: "Enrollment date",
     date_finish: "End date",
+    select_sex: "Select sex",
   },
   BE: {
     student_list: "Спіс навучэнцаў",
@@ -179,6 +180,7 @@ export const Translator = {
     data_about_start: "Дадзеныя аб зарахаванні",
     date_start: "Дата зарахавання",
     date_finish: "Дата заканчэння",
+    select_sex: "Пазначце пол",
   },
   RU: {
     student_list: "Список учащихся",
@@ -269,5 +271,6 @@ export const Translator = {
     data_about_start: "Данные о зачислении",
     date_start: "Дата зачисления",
     date_finish: "Дата окончания",
+    select_sex: "Укажите пол",
   },
 };
