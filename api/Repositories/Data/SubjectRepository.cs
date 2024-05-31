@@ -20,11 +20,11 @@ namespace api.Repositories.Data
         public async Task<IEnumerable<SubjectEntity>> GetListByGroupAsync(int id)
         {
             IEnumerable<SubjectEntity> subjectList = await _db.Subject.Where(subjectDb => subjectDb.GroupId == id).ToArrayAsync();
-            IEnumerable<GradesEntity> gradesList = await _db.Grades.Include(gradesDb => gradesDb.StudentToValueList).ToArrayAsync();
+            IEnumerable<GradeModelEntity> gradesList = await _db.GradeModel.Include(gradesDb => gradesDb.GradeList).ToArrayAsync();
 
             foreach (SubjectEntity subject in subjectList)
             {
-                foreach (GradesEntity grades in gradesList)
+                foreach (GradeModelEntity grades in gradesList)
                 {
                     if (subject.Id == grades.SubjectId)
                     {
@@ -69,9 +69,9 @@ namespace api.Repositories.Data
                 double summGrades = 0;
                 int countGrades = 0;
 
-                foreach (GradesEntity gradesEntity in subject.GradesList)
+                foreach (GradeModelEntity gradesEntity in subject.GradesList)
                 {
-                    StudentToValueEntity? grade = gradesEntity.StudentToValueList.FirstOrDefault(grade => grade.StudentId == student.Id);
+                    GradeEntity? grade = gradesEntity.GradeList.FirstOrDefault(grade => grade.StudentId == student.Id);
 
                     if (grade is not null)
                     {

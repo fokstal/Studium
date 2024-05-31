@@ -7,14 +7,14 @@ using api.Helpers.Enums;
 
 namespace api.Repositories.Data
 {
-    public class GradeRepository(AppDbContext db) : DataRepositoryBase<GradesEntity, GradesDTO>(db)
+    public class GradeModelRepository(AppDbContext db) : DataRepositoryBase<GradeModelEntity, GradeModelDTO>(db)
     {
-        public async override Task<IEnumerable<GradesEntity>> GetListAsync()
+        public async override Task<IEnumerable<GradeModelEntity>> GetListAsync()
         {
-            IEnumerable<GradesEntity> gradeList = await 
-                _db.Grades
+            IEnumerable<GradeModelEntity> gradeList = await
+                _db.GradeModel
                 .Include(gradeDb => gradeDb.Type)
-                .Include(gradeDb => gradeDb.StudentToValueList)
+                .Include(gradeDb => gradeDb.GradeList)
                 .ToArrayAsync();
 
             return gradeList;
@@ -22,17 +22,17 @@ namespace api.Repositories.Data
 
         public async Task<IEnumerable<GradeStudentDTO>> GetListByStudentIdAsync(Guid id)
         {
-            IEnumerable<GradesEntity> gradesList = await 
-                _db.Grades
+            IEnumerable<GradeModelEntity> gradesList = await
+                _db.GradeModel
                 .Include(gradeDb => gradeDb.Type)
-                .Include(gradeDb => gradeDb.StudentToValueList)
+                .Include(gradeDb => gradeDb.GradeList)
                 .ToArrayAsync();
 
             List<GradeStudentDTO> gradeStudentList = [];
 
-            foreach (GradesEntity grades in gradesList)
+            foreach (GradeModelEntity grades in gradesList)
             {
-                StudentToValueEntity? studentToValueEntity = grades.StudentToValueList.FirstOrDefault(grade => grade.StudentId == id);
+                GradeEntity? studentToValueEntity = grades.GradeList.FirstOrDefault(grade => grade.StudentId == id);
 
                 if (studentToValueEntity is not null)
                 {
@@ -44,7 +44,7 @@ namespace api.Repositories.Data
                     {
                         StudentId = id,
                         SubjectId = grades.SubjectId,
-                        Type = (GradeTypeEnum) gradeTypeEnum,
+                        Type = (GradeTypeEnum)gradeTypeEnum,
                         SetDate = grades.SetDate,
                         Value = studentToValueEntity.Value,
                     });
@@ -54,13 +54,13 @@ namespace api.Repositories.Data
             return gradeStudentList;
         }
 
-        public async Task<IEnumerable<GradesEntity>> GetListBySubjectIdAsync(int id)
+        public async Task<IEnumerable<GradeModelEntity>> GetListBySubjectIdAsync(int id)
         {
-            IEnumerable<GradesEntity> gradesList = await 
-                _db.Grades
+            IEnumerable<GradeModelEntity> gradesList = await
+                _db.GradeModel
                 .Where(gradesDb => gradesDb.SubjectId == id)
                 .Include(gradeDb => gradeDb.Type)
-                .Include(gradeDb => gradeDb.StudentToValueList)
+                .Include(gradeDb => gradeDb.GradeList)
                 .ToArrayAsync();
 
             return gradesList;
@@ -68,17 +68,17 @@ namespace api.Repositories.Data
 
         public async Task<IEnumerable<GradeStudentDTO>> GetListByStudentAndSubjectIdAsync(Guid studentId, int subjectId)
         {
-            IEnumerable<GradesEntity> gradesList = await 
-                _db.Grades
+            IEnumerable<GradeModelEntity> gradesList = await
+                _db.GradeModel
                 .Include(gradeDb => gradeDb.Type)
-                .Include(gradeDb => gradeDb.StudentToValueList)
+                .Include(gradeDb => gradeDb.GradeList)
                 .ToArrayAsync();
 
             List<GradeStudentDTO> gradeStudentAndSubjectList = [];
 
-            foreach (GradesEntity grades in gradesList)
+            foreach (GradeModelEntity grades in gradesList)
             {
-                StudentToValueEntity? studentToValueEntity = grades.StudentToValueList.FirstOrDefault(grade => grade.StudentId == studentId);
+                GradeEntity? studentToValueEntity = grades.GradeList.FirstOrDefault(grade => grade.StudentId == studentId);
 
                 if (studentToValueEntity is not null && grades.SubjectId == subjectId)
                 {
@@ -90,7 +90,7 @@ namespace api.Repositories.Data
                     {
                         StudentId = studentId,
                         SubjectId = subjectId,
-                        Type = (GradeTypeEnum) gradeTypeEnum,
+                        Type = (GradeTypeEnum)gradeTypeEnum,
                         SetDate = grades.SetDate,
                         Value = studentToValueEntity.Value,
                     });
@@ -100,32 +100,44 @@ namespace api.Repositories.Data
             return gradeStudentAndSubjectList;
         }
 
-        public async Task<GradesEntity?> GetAsync(DateTime setDate) => await _db.Grades.FirstOrDefaultAsync(gradesDb => gradesDb.SetDate == setDate);
+        public async Task<GradeModelEntity?> GetAsync(DateTime setDate) => await _db.GradeModel.FirstOrDefaultAsync(gradesDb => gradesDb.SetDate == setDate);
 
-        public override GradesEntity Create(GradesDTO gradesDTO)
+        public override GradeModelEntity Create(GradeModelDTO gradesDTO)
         {
             return new()
             {
                 SubjectId = gradesDTO.SubjectId,
-                SetDate = DateTime.Now,
+                SetDate = DateTime.Now.Date,
                 Type = GetGradeTypeEntitiesByEnum(gradesDTO.Type),
-                StudentToValueList = gradesDTO.StudentToValueList
+                GradeList = gradesDTO.StudentToValueList
             };
         }
 
-        public override async Task UpdateAsync(GradesEntity gradesToUpdate, GradesDTO gradesDTO)
+        public async void UpdateGradeList(GradeModelEntity gradesEntity, HashSet<GradeEntity> gradeList)
+        {
+            foreach (GradeEntity grade in gradeList)
+            {
+                gradesEntity.GradeList.Remove(grade);
+
+                gradesEntity.GradeList.Add(grade);
+            }
+
+            await _db.SaveChangesAsync();
+        }
+
+        public override async Task UpdateAsync(GradeModelEntity gradesToUpdate, GradeModelDTO gradesDTO)
         {
             gradesToUpdate.SubjectId = gradesDTO.SubjectId;
             gradesToUpdate.SetDate = DateTime.Now;
             gradesToUpdate.Type = GetGradeTypeEntitiesByEnum(gradesDTO.Type);
-            gradesToUpdate.StudentToValueList = gradesDTO.StudentToValueList;
+            gradesToUpdate.GradeList = gradesDTO.StudentToValueList;
 
             await _db.SaveChangesAsync();
         }
 
         public GradeTypeEntity GetGradeTypeEntitiesByEnum(GradeTypeEnum gradeTypeEnum)
         {
-            return _db.GradeTypeEntity
+            return _db.GradeType
                     .SingleOrDefault(gradeTypeDb => gradeTypeDb.Name == gradeTypeEnum.ToString())
                     ?? throw new Exception("GradeTypeDb and GradeTypeEnum is not Equal!");
         }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Data;
 
@@ -10,37 +11,14 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240531133009_addCascadeDeleteToStudentToValueListInGrades")]
+    partial class addCascadeDeleteToStudentToValueListInGrades
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.5");
-
-            modelBuilder.Entity("api.Models.Entities.GradeEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("GradeModelEntityId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("GradeModelId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Value")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GradeModelEntityId");
-
-                    b.ToTable("GradeEntity");
-                });
 
             modelBuilder.Entity("api.Models.Entities.GradeTypeEntity", b =>
                 {
@@ -74,7 +52,29 @@ namespace api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("api.Models.GradeModelEntity", b =>
+            modelBuilder.Entity("api.Models.Entities.StudentToValueEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GradesEntityId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GradesEntityId");
+
+                    b.ToTable("StudentToValueEntity");
+                });
+
+            modelBuilder.Entity("api.Models.GradesEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -835,14 +835,16 @@ namespace api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("api.Models.Entities.GradeEntity", b =>
+            modelBuilder.Entity("api.Models.Entities.StudentToValueEntity", b =>
                 {
-                    b.HasOne("api.Models.GradeModelEntity", null)
-                        .WithMany("GradeList")
-                        .HasForeignKey("GradeModelEntityId");
+                    b.HasOne("api.Models.GradesEntity", null)
+                        .WithMany("StudentToValueList")
+                        .HasForeignKey("GradesEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("api.Models.GradeModelEntity", b =>
+            modelBuilder.Entity("api.Models.GradesEntity", b =>
                 {
                     b.HasOne("api.Models.SubjectEntity", null)
                         .WithMany("GradesList")
@@ -916,9 +918,9 @@ namespace api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("api.Models.GradeModelEntity", b =>
+            modelBuilder.Entity("api.Models.GradesEntity", b =>
                 {
-                    b.Navigation("GradeList");
+                    b.Navigation("StudentToValueList");
                 });
 
             modelBuilder.Entity("api.Models.GroupEntity", b =>

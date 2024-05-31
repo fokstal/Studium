@@ -4,7 +4,7 @@ using api.Models.Entities;
 
 namespace api.Models.DTO
 {
-    public class GradesDTO
+    public class GradeModelDTO
     {
         [Required]
         public int SubjectId { get; set; }
@@ -16,6 +16,6 @@ namespace api.Models.DTO
         public DateTime SetDate { get; set; }
 
         [Required]
-        public List<StudentToValueEntity> StudentToValueList { get; set; } = [];
+        public HashSet<GradeEntity> StudentToValueList { get; set; } = [];
     }
 }

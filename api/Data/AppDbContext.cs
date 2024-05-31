@@ -10,8 +10,8 @@ namespace api.Data
     {
         private readonly AuthorizationOptions _authOptions;
 
-        public DbSet<GradesEntity> Grades { get; set; }
-        public DbSet<GradeTypeEntity> GradeTypeEntity { get; set; }
+        public DbSet<GradeModelEntity> GradeModel { get; set; }
+        public DbSet<GradeTypeEntity> GradeType { get; set; }
         public DbSet<GroupEntity> Group { get; set; }
         public DbSet<PassportEntity> Passport { get; set; }
         public DbSet<PersonEntity> Person { get; set; }
@@ -19,7 +19,7 @@ namespace api.Data
         public DbSet<SubjectEntity> Subject { get; set; }
 
         public DbSet<UserEntity> User { get; set; }
-        public DbSet<RoleEntity> Role { get; set;}
+        public DbSet<RoleEntity> Role { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options, IOptions<AuthorizationOptions> authOptions) : base(options)
         {

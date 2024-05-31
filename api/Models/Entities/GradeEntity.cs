@@ -1,11 +1,11 @@
 namespace api.Models.Entities
 {
-    public class StudentToValueEntity
+    public class GradeEntity
     {
         public int Id { get; set; }
         public Guid StudentId { get; set; }
         public int Value { get; set; }
         
-        public int GradesEntityId { get; set; }
+        public int GradeModelId { get; set; }
     }
 }
