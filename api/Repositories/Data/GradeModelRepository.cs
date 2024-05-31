@@ -137,7 +137,7 @@ namespace api.Repositories.Data
                 .Include(g => g.GradeList)
                 .FirstOrDefaultAsync
                 (
-                    gradesDb => 
+                    gradesDb =>
                         gradesDb.SetDate == setDate &&
                         gradesDb.SubjectId == subjectId &&
                         gradesDb.Type.Name == typeName
@@ -179,19 +179,12 @@ namespace api.Repositories.Data
             };
         }
 
-        public async void UpdateGradeList(GradeModelEntity gradesEntity, HashSet<GradeDTO> gradeList)
+        public async Task UpdateGradeList(GradeModelEntity gradesEntity, HashSet<GradeDTO> gradeList)
         {
             HashSet<GradeEntity> gradeEntityList = gradesEntity.GradeList;
 
             foreach (GradeDTO grade in gradeList)
             {
-                GradeEntity? gradeEntity = gradeEntityList.FirstOrDefault(ge => ge.StudentId == grade.StudentId);
-
-                if (gradeEntity is not null)
-                {
-                    gradeEntityList.Remove(gradeEntity);
-                }
-
                 gradeEntityList.Add(new()
                 {
                     Value = grade.Value,
@@ -213,10 +206,9 @@ namespace api.Repositories.Data
                 {
                     StudentEntity? student = await _db.Student.FirstOrDefaultAsync(s => s.Id == grade.StudentId);
 
-                    if (student is not null)
-                    {
-                        if (student.GroupId != subject.GroupId) return false;
-                    }
+                    if (student is null) return false;
+                    
+                    if (student.GroupId != subject.GroupId) return false;
                 }
             }
 

@@ -173,7 +173,7 @@ namespace api.Controllers
 
             if (gradesEntity is not null)
             {
-                _gradeModelRepository.UpdateGradeList(gradesEntity, gradeDTO.StudentToValueList);
+                await _gradeModelRepository.UpdateGradeList(gradesEntity, gradeDTO.StudentToValueList);
             }
 
             if (gradesEntity is null)
