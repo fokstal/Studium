@@ -169,9 +169,9 @@ namespace api.Controllers
 
             gradeDTO.SetDate = gradeDTO.SetDate.Date;
 
-            GradeModelEntity? gradesEntity = await _gradeModelRepository.GetAsync(gradeDTO.SetDate);
+            GradeModelEntity? gradesEntity = await _gradeModelRepository.GetCurrentAsync(gradeDTO.SetDate, gradeDTO.SubjectId, gradeDTO.Type.ToString());
 
-            if (gradesEntity is not null && gradesEntity.Type.Name == gradeDTO.Type.ToString())
+            if (gradesEntity is not null)
             {
                 _gradeModelRepository.UpdateGradeList(gradesEntity, gradeDTO.StudentToValueList);
             }
