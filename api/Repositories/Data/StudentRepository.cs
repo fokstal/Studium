@@ -32,8 +32,8 @@ namespace api.Repositories.Data
             return new()
             {
                 Id = studentDTO.Id,
-                AddedDate = studentDTO.AddedDate,
-                RemovedDate = studentDTO.RemovedDate,
+                AddedDate = studentDTO.AddedDate.Date,
+                RemovedDate = studentDTO.RemovedDate.Date,
                 PersonId = studentDTO.PersonId,
                 GroupId = studentDTO.GroupId,
             };
@@ -42,8 +42,8 @@ namespace api.Repositories.Data
         public async override Task UpdateAsync(StudentEntity studentToUpdate, StudentDTO studentDTO)
         {
             studentToUpdate.Id = studentDTO.Id;
-            studentToUpdate.AddedDate = studentDTO.AddedDate;
-            studentToUpdate.RemovedDate = studentDTO.RemovedDate;
+            studentToUpdate.AddedDate = studentDTO.AddedDate.Date;
+            studentToUpdate.RemovedDate = studentDTO.RemovedDate.Date;
             studentToUpdate.PersonId = studentDTO.PersonId;
             studentToUpdate.GroupId = studentDTO.GroupId;
 
