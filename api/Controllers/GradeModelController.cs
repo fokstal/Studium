@@ -65,7 +65,7 @@ namespace api.Controllers
             return Ok(gradeList);
         }
 
-        [HttpGet("list-by-subject/{id:int}")]
+        [HttpGet("list-by-subject/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -182,15 +182,13 @@ namespace api.Controllers
             return Created("GradeEntity", gradeDTO);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditGrade])]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] GradeModelDTO gradeDTO)
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] GradeModelDTO gradeDTO)
         {
-            if (id < 1) return BadRequest();
-
             GradeModelEntity? gradeToUpdate = await _gradeModelRepository.GetAsync(id);
             GradeModelEntity? gradeAnother = await _gradeModelRepository.GetAsync(gradeDTO.SetDate);
 
@@ -210,16 +208,14 @@ namespace api.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditGrade])]
-        public async Task<ActionResult> RemoveAsync(int id)
+        public async Task<ActionResult> RemoveAsync(Guid id)
         {
-            if (id < 1) return BadRequest();
-
             GradeModelEntity? gradeToRemove = await _gradeModelRepository.GetAsync(id);
 
             if (gradeToRemove is null) return NotFound();

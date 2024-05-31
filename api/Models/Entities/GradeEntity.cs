@@ -6,6 +6,6 @@ namespace api.Models.Entities
         public Guid StudentId { get; set; }
         public int Value { get; set; }
         
-        public int GradeModelId { get; set; }
+        public Guid GradeModelId { get; set; }
     }
 }

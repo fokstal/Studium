@@ -4,6 +4,7 @@ namespace api.Models
 {
     public class GradeModelEntity : ModelEntity
     {
+        public new Guid Id { get; set; }
         public int SubjectId { get; set; }
         public DateTime SetDate { get; set; }
 

@@ -100,12 +100,22 @@ namespace api.Repositories.Data
             return gradeStudentAndSubjectList;
         }
 
+        public override Task<GradeModelEntity?> GetAsync(int id) => throw new NotImplementedException();
+        public async Task<GradeModelEntity?> GetAsync(Guid id) => await _db.GradeModel.FirstOrDefaultAsync(gradesDb => gradesDb.Id == id);
         public async Task<GradeModelEntity?> GetAsync(DateTime setDate) => await _db.GradeModel.FirstOrDefaultAsync(gradesDb => gradesDb.SetDate == setDate);
 
         public override GradeModelEntity Create(GradeModelDTO gradesDTO)
         {
+            Guid gradeModelId = Guid.NewGuid();
+
+            foreach (GradeEntity grade in gradesDTO.StudentToValueList)
+            {
+                grade.GradeModelId = gradeModelId;
+            }
+
             return new()
             {
+                Id = gradeModelId,
                 SubjectId = gradesDTO.SubjectId,
                 SetDate = DateTime.Now.Date,
                 Type = GetGradeTypeEntitiesByEnum(gradesDTO.Type),
