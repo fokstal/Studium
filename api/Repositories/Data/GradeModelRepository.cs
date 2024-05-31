@@ -178,6 +178,26 @@ namespace api.Repositories.Data
             await _db.SaveChangesAsync();
         }
 
+        public async Task<bool> IsOwnSubjectStudent(int subjectId, HashSet<GradeDTO> gradeList)
+        {
+            SubjectEntity? subject = await _db.Subject.FirstOrDefaultAsync(s => s.Id == subjectId);
+
+            if (subject is not null)
+            {
+                foreach (GradeDTO grade in gradeList)
+                {
+                    StudentEntity? student = await _db.Student.FirstOrDefaultAsync(s => s.Id == grade.StudentId);
+
+                    if (student is not null)
+                    {
+                        if (student.GroupId != subject.GroupId) return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         public override async Task UpdateAsync(GradeModelEntity gradesToUpdate, GradeModelDTO gradesDTO)
         {
             gradesToUpdate.SubjectId = gradesDTO.SubjectId;

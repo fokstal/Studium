@@ -165,6 +165,8 @@ namespace api.Controllers
         {
             if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
 
+            if (!await _gradeModelRepository.IsOwnSubjectStudent(gradeDTO.SubjectId, gradeDTO.StudentToValueList)) return BadRequest("Students dont have Access to this Subject!");
+
             gradeDTO.SetDate = gradeDTO.SetDate.Date;
 
             GradeModelEntity? gradesEntity = await _gradeModelRepository.GetAsync(gradeDTO.SetDate);
