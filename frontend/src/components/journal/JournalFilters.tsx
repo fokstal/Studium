@@ -10,6 +10,7 @@ import {
 } from "../../services";
 import { GradeModal } from "../modal";
 import { LanguageContext, Translator } from "../../store";
+import { useRoles } from "../../hooks";
 
 const groupService = new GroupService();
 const personService = new PersonService();
@@ -29,7 +30,8 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
     students?: Student[];
   }>();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { lang} = useContext(LanguageContext);
+  const { lang } = useContext(LanguageContext);
+  const roles = useRoles();
 
   const { group, person, subject } = filters;
 
@@ -94,7 +96,9 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
         value={subject}
         setValue={setSubject}
       />
-      <Button onClick={onOpen}>{Translator[lang.name]["add_mark"]}</Button>
+      {roles.include("Student") || roles.include("Curator") ? null : (
+        <Button onClick={onOpen}>{Translator[lang.name]["add_mark"]}</Button>
+      )}
       <GradeModal onClose={onClose} isOpen={isOpen} />
     </Flex>
   );

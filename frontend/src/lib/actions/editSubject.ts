@@ -13,7 +13,7 @@ export async function editSubject(id: number, data: {
     return "Заполните данные полностью";
   }
   const res = await subjectService.put(id, { ...data, groupId: data.group.id, teacherId: data.teacher.id });
-  if (res.status !== 201) {
+  if (res.status !== 204) {
     return "Данные введены не коректно, пожалуйста проверьте формат данных";
   } else {
     return "Created";

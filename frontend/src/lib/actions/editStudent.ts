@@ -41,12 +41,27 @@ export async function editStudent(
 
   if (passport) {
     const passports = await passportService.get();
-    const passportId = passports.find((p: any) => p.personId === studentData.personId);
+    const passportId = passports.find(
+      (p: any) => p.personId === studentData.personId
+    );
 
-    passportService
-      .put(passportId, objectToFormData({ personId: studentData.personId, scan: passport }))
-      .catch((err) => {
-        throw new Error(err);
-      });
+    if (passportId) {
+      await passportService
+        .put(
+          passportId,
+          objectToFormData({ personId: studentData.personId, scan: passport })
+        )
+        .catch((err) => {
+          throw new Error(err);
+        });
+    } else {
+      await passportService
+        .post(
+          objectToFormData({ personId: studentData.personId, scan: passport })
+        )
+        .catch((err) => {
+          throw new Error(err);
+        });
+    }
   }
 }

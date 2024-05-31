@@ -1,7 +1,7 @@
 import { Service } from "./Service";
 
 export class PassportService extends Service {
-  protected url = "http://localhost:5141/passport";
+  protected url = process.env.REACT_APP_IP + "/passport";
 
   public async post(data: any) {
     const res = await fetch(this.url, {

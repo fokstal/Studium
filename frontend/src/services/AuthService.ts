@@ -1,7 +1,8 @@
 export class AuthServise {
-  private url = "http://localhost:5141/user/";
+  private url = process.env.REACT_APP_IP + "/user/";
 
   public async login(login: string, password: string) {
+    console.log(this.url);
     const res = await fetch(`${this.url}login`, {
       method: "POST",
       headers: {

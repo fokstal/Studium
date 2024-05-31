@@ -99,7 +99,7 @@ export function CreateEditGroup() {
                   options={curators || []}
                   value={data?.curator}
                   setValue={handleCuratorChange}
-                  name="firstName"
+                  name="lastName"
                 />
                 <Input
                   placeholder="16"

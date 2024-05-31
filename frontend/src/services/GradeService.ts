@@ -1,7 +1,7 @@
 import { Service } from "./Service";
 
 export class GradeService extends Service {
-  protected url = "http://localhost:5141/grade";
+  protected url = process.env.REACT_APP_IP + "/grade";
 
   public async averageGrade(id: string) {
     return await this.baseGetMethod(`student-average/${id}`);

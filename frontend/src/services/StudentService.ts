@@ -1,5 +1,5 @@
 import { Service } from "./Service";
 
 export class StudentService extends Service {
-  protected url = "http://localhost:5141/student";
+  protected url = process.env.REACT_APP_IP + "/student";
 }

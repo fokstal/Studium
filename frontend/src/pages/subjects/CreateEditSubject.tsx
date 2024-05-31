@@ -32,7 +32,9 @@ export function CreateEditSubject() {
       .get()
       .then((data) =>
         setTeachers(
-          data.filter((user: User) => user.roleList[0].name === "Teacher")
+          data.filter((user: User) =>
+            user.roleList.find((role) => role.name === "Teacher")
+          )
         )
       );
     if (id) {
@@ -104,7 +106,7 @@ export function CreateEditSubject() {
                 value={data.teacher}
                 options={teachers || []}
                 setValue={handleTeacherSelect}
-                name="firstName"
+                name="lastName"
               />
               <Select
                 placeholder="2120"
