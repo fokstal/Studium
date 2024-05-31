@@ -96,7 +96,7 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
         value={subject}
         setValue={setSubject}
       />
-      {roles.include("Student") || roles.include("Curator") ? null : (
+      {roles.includes("Student") || roles.includes("Curator") ? null : (
         <Button onClick={onOpen}>{Translator[lang.name]["add_mark"]}</Button>
       )}
       <GradeModal onClose={onClose} isOpen={isOpen} />

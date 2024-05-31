@@ -44,17 +44,24 @@ export function CreateEditGroup() {
     setErrorMessage(null);
   }, [data]);
 
-  useEffect(() => {
-    userService
-      .get()
-      .then((data) =>
-        setCurators(
-          data.filter((user: User) => user.roleList[0].name === "Curator")
-        )
-      );
+  const updateData = async () => {
+    const users = await userService.get();
+    setCurators(
+      users.filter((user: User) =>
+        user.roleList.map((r) => r.name).includes("Curator")
+      )
+    );
     if (id) {
-      groupService.getById(id).then((data) => setData(data));
+      const data = await groupService.getById(id);
+      setData({
+        ...data,
+        curator: users.filter((user: User) => user.id === data.curatorId),
+      });
     }
+  };
+
+  useEffect(() => {
+    updateData();
   }, []);
 
   return (

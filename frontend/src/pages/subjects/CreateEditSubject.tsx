@@ -26,20 +26,28 @@ export function CreateEditSubject() {
   const { lang } = useContext(LanguageContext);
   const { id } = useParams();
 
-  useEffect(() => {
-    groupService.get().then((value) => setGroups(value));
-    userService
-      .get()
-      .then((data) =>
-        setTeachers(
-          data.filter((user: User) =>
-            user.roleList.find((role) => role.name === "Teacher")
-          )
-        )
-      );
+  const updateData = async () => {
+    const groups = await groupService.get();
+    setGroups(groups);
+    const users = await userService.get();
+
+    setTeachers(
+      users.filter((user: User) =>
+        user.roleList.find((role) => role.name === "Teacher")
+      )
+    );
     if (id) {
-      subjectService.getById(id).then((data) => setData(data));
+      const data = await subjectService.getById(id);
+      setData({
+        ...data,
+        group: groups.find((g: Group) => g.id === data.groupId),
+        teacher: users.find((u: User) => u.id === data.teacherId),
+      });
     }
+  };
+
+  useEffect(() => {
+    updateData();
   }, []);
 
   useEffect(() => {
