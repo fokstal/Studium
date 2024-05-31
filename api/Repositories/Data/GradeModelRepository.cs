@@ -148,7 +148,7 @@ namespace api.Repositories.Data
             {
                 Id = gradeModelId,
                 SubjectId = gradesDTO.SubjectId,
-                SetDate = DateTime.Now.Date,
+                SetDate = gradesDTO.SetDate.Date,
                 Type = GetGradeTypeEntitiesByEnum(gradesDTO.Type),
                 GradeList = gradeList,
             };
