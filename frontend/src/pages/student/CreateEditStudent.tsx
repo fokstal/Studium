@@ -32,6 +32,7 @@ export function CreateEditStudent() {
   const [groups, setGroups] = useState<Group[]>();
   const [isPending, startTransaction] = useTransition();
   const [passport, setPassport] = useState<File>();
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const navigator = useNavigate();
   const { lang } = useContext(LanguageContext);
   const { id } = useParams();
@@ -98,7 +99,9 @@ export function CreateEditStudent() {
             avatarFileName: avatar,
           },
           passport
-        ).then(() => navigator("/students"));
+        )
+          .then(() => navigator("/students"))
+          .catch(() => setErrorMessage(Translator[lang.name]["error_in_data"]));
       } else {
         createStudent(
           {
@@ -108,7 +111,9 @@ export function CreateEditStudent() {
             avatarFileName: avatar,
           },
           passport
-        ).then(() => navigator("/students"));
+        )
+          .then(() => navigator("/students"))
+          .catch(() => setErrorMessage(Translator[lang.name]["error_in_data"]));
       }
     });
   };
@@ -282,6 +287,9 @@ export function CreateEditStudent() {
             </VStack>
           </Flex>
         </Flex>
+        <Box fontSize="24px" color={colors.red}>
+          {errorMessage}
+        </Box>
         <Button onClick={handleSubmit} disabled={isPending}>
           {id ? Translator[lang.name]["edit"] : Translator[lang.name]["create"]}
         </Button>

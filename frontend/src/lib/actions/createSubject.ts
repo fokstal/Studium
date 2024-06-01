@@ -1,4 +1,6 @@
+import { useContext } from "react";
 import { SubjectService } from "../../services";
+import { LanguageContext, Translator } from "../../store";
 import { Group, User } from "../../types";
 
 const subjectService = new SubjectService();
@@ -9,12 +11,17 @@ export async function createSubject(data: {
   teacher?: User;
   group?: Group;
 }) {
+  const { lang } = useContext(LanguageContext);
   if (!data.description || !data.group || !data.name || !data.teacher) {
-    return "Заполните данные полностью";
+    return Translator[lang.name]["fill_data_full"];
   }
-  const res = await subjectService.post({ ...data, groupId: data.group.id, teacherId: data.teacher.id });
+  const res = await subjectService.post({
+    ...data,
+    groupId: data.group.id,
+    teacherId: data.teacher.id,
+  });
   if (res.status !== 201) {
-    return "Данные введены не коректно, пожалуйста проверьте формат данных";
+    return Translator[lang.name]["error_in_data"];
   } else {
     return "Created";
   }
