@@ -13,7 +13,7 @@ export async function createSubject(data: {
 }) {
   const { lang } = useContext(LanguageContext);
   if (!data.description || !data.group || !data.name || !data.teacher) {
-    return Translator[lang.name]["fill_data_full"];
+    return "fill_data_full";
   }
   const res = await subjectService.post({
     ...data,
@@ -21,7 +21,7 @@ export async function createSubject(data: {
     teacherId: data.teacher.id,
   });
   if (res.status !== 201) {
-    return Translator[lang.name]["error_in_data"];
+    return "error_in_data";
   } else {
     return "Created";
   }

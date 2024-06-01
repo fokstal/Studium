@@ -66,11 +66,11 @@ export function CreateEditSubject() {
     if (id) {
       const res = await editSubject(+id, data);
       if (res === "Created") return navigator("/subject");
-      setErrorMessage(res);
+      setErrorMessage(Translator[lang.name][res]);
     } else {
       const res = await createSubject(data);
       if (res === "Created") return navigator("/subject");
-      setErrorMessage(res);
+      setErrorMessage(Translator[lang.name][res]);
     }
   };
 

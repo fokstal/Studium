@@ -66,7 +66,7 @@ export function StudentsTable({
       <TableWrapper>
         <DataTable
           value={data}
-          paginator={data.length > 7}
+          paginator={data?.length > 7}
           rows={7}
           resizableColumns
           onSelectionChange={(e) =>

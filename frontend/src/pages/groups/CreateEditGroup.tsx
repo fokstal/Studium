@@ -28,11 +28,11 @@ export function CreateEditGroup() {
     if (id) {
       const res = await editGroup(+id, data);
       if (res === "Created") return navigator("/group");
-      setErrorMessage(res);
+      setErrorMessage(Translator[lang.name][res]);
     } else {
       const res = await createGroup(data);
       if (res === "Created") return navigator("/group");
-      setErrorMessage(res);
+      setErrorMessage(Translator[lang.name][res]);
     }
   };
 
