@@ -17,8 +17,9 @@ import {
   SubjectService,
   UserService,
 } from "../../services";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Student, Subject, User } from "../../types";
+import { LanguageContext, Translator } from "../../store";
 
 type GradeModalProps = {
   isOpen: boolean;
@@ -40,6 +41,7 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
     type?: number;
     setDate?: string;
   }>({});
+  const { lang } = useContext(LanguageContext);
 
   useEffect(() => {
     subjectService.get().then((subjects) => setSubjects(subjects));
@@ -54,7 +56,6 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
   const updateStudents = async () => {
     // const students = await studentService.get();
     // const subject = await subjectService.getById(data.subjectId || 0);
-
     // const filteredStudents = students.filter(
     //   (s: Student) => s.groupId === subject.groupId
     // );
@@ -90,7 +91,7 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
           alignItems="center"
         >
           <Text fontSize="24px" fontWeight="bold">
-            Добавление оценки
+            {Translator[lang.name]["adding_mark"]}
           </Text>
           <AiOutlineCloseSquare
             fontSize="24px"
@@ -101,7 +102,7 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
         <ModalBody>
           <VStack w="100%" align="stretch" gap="20px">
             <VStack align="stretch">
-              <Text>Предмет:</Text>
+              <Text>{Translator[lang.name]["subject"]}:</Text>
               <Select
                 borderColor={colors.darkGrey}
                 _focusVisible={{ borderColor: colors.darkGrey }}
@@ -110,14 +111,14 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
                   setData({ ...data, subjectId: +e.target.value })
                 }
               >
-                <option>Выберите предмет</option>
+                <option>{Translator[lang.name]["select_subject"]}</option>
                 {subjects?.map((subject) => (
                   <option value={subject.id}>{subject.name}</option>
                 ))}
               </Select>
             </VStack>
             <VStack align="stretch">
-              <Text>Учащийся:</Text>
+              <Text>{Translator[lang.name]["student"]}:</Text>
               <Select
                 borderColor={colors.darkGrey}
                 _focusVisible={{ borderColor: colors.darkGrey }}
@@ -125,7 +126,7 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
                   setData({ ...data, studentId: e.target.value })
                 }
               >
-                <option>Выберите учащегося</option>
+                <option>{Translator[lang.name]["select_student"]}</option>
                 {studentsUsers?.map((student) => (
                   <option value={student.id}>
                     {student.firstName} {student.lastName}
@@ -134,20 +135,24 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
               </Select>
             </VStack>
             <VStack align="stretch">
-              <Text>Тип отметки:</Text>
+              <Text>{Translator[lang.name]["grade_type"]}:</Text>
               <Select
                 borderColor={colors.darkGrey}
                 _focusVisible={{ borderColor: colors.darkGrey }}
                 onChange={(e) => setData({ ...data, type: +e.target.value })}
               >
-                <option>Выберите тип</option>
-                <option value={1}>Практическая работа</option>
-                <option value={2}>Контрольная работа</option>
-                <option value={3}>Лекция</option>
+                <option>{Translator[lang.name]["select_type"]}</option>
+                <option value={1}>
+                  {Translator[lang.name]["practical_work"]}
+                </option>
+                <option value={2}>
+                  {Translator[lang.name]["control_work"]}
+                </option>
+                <option value={3}>{Translator[lang.name]["lecture"]}</option>
               </Select>
             </VStack>
             <VStack align="stretch">
-              <Text>Оценка:</Text>
+              <Text>{Translator[lang.name]["mark"]}:</Text>
               <Input
                 type="text"
                 value={data.value}
@@ -155,7 +160,7 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
               />
             </VStack>
             <VStack align="stretch">
-              <Text>Дата:</Text>
+              <Text>{Translator[lang.name]["date"]}:</Text>
               <Input
                 type="date"
                 value={data.setDate}
@@ -166,7 +171,9 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
         </ModalBody>
         <ModalFooter w="100%">
           <VStack w="100%" align="stretch">
-            <Button onClick={handleSubmit}>Добавить оценку</Button>
+            <Button onClick={handleSubmit}>
+              {Translator[lang.name]["adding_mark"]}
+            </Button>
           </VStack>
         </ModalFooter>
       </ModalContent>
