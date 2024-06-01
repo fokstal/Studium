@@ -12,12 +12,12 @@ namespace api.Data.Configurations
         {
             builder.HasKey(user => user.Id);
 
-            builder.HasMany(user => user.RoleList)
-                .WithMany(role => role.UserList)
+            builder.HasMany(user => user.RoleEntityList)
+                .WithMany(role => role.UserEntityList)
                 .UsingEntity<UserRoleEntity>
                 (
-                    l => l.HasOne<RoleEntity>().WithMany().HasForeignKey(l => l.RoleId),
-                    r => r.HasOne<UserEntity>().WithMany().HasForeignKey(r => r.UserId)
+                    l => l.HasOne<RoleEntity>().WithMany().HasForeignKey(l => l.RoleEntityId),
+                    r => r.HasOne<UserEntity>().WithMany().HasForeignKey(r => r.UserEntityId)
                 );
 
             IEnumerable<UserEntity> userList = Enum.GetValues<RoleEnum>().Select(roleEnum => new UserEntity

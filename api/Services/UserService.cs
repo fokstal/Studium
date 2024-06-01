@@ -10,7 +10,7 @@ namespace api.Services
         {
             HashSet<RoleEnum> roleList = userRepository.GetRoleListAsync(user.Id).Result;
 
-            user.RoleList = roleList.ToList().Select
+            user.RoleEntityList = roleList.ToList().Select
             (
                 role => new RoleEntity()
                 {
@@ -20,7 +20,7 @@ namespace api.Services
             )
             .ToList();
 
-            return user.RoleList.Select(roleDb => roleDb.Name).ToList().Contains(role.ToString());
+            return user.RoleEntityList.Select(roleDb => roleDb.Name).ToList().Contains(role.ToString());
         }
     }
 }

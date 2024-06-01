@@ -22,7 +22,7 @@ namespace api.Repositories.Data
                     LastName = userDb.LastName,
                     PasswordHash = userDb.PasswordHash,
                     DateCreated = userDb.DateCreated,
-                    RoleList = userDb.RoleList.Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name }).ToList(),
+                    RoleEntityList = userDb.RoleEntityList.Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name }).ToList(),
                 })
                 .ToListAsync();
 
@@ -33,11 +33,11 @@ namespace api.Repositories.Data
 
         public async Task<UserEntity?> GetAsync(Guid id)
         {
-            UserEntity? user = await _db.User.Include(userDb => userDb.RoleList).FirstOrDefaultAsync(userDb => userDb.Id == id);
+            UserEntity? user = await _db.User.Include(userDb => userDb.RoleEntityList).FirstOrDefaultAsync(userDb => userDb.Id == id);
 
             if (user is not null)
             {
-                user.RoleList = user.RoleList.Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name }).ToList();
+                user.RoleEntityList = user.RoleEntityList.Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name }).ToList();
             }
 
             return user;
@@ -75,7 +75,7 @@ namespace api.Repositories.Data
                 LastName = userDTO.LastName,
                 PasswordHash = StringHasher.Generate(userDTO.Password),
                 DateCreated = DateTime.Now,
-                RoleList = GetRolesEntityByEnum(userDTO.RoleList),
+                RoleEntityList = GetRolesEntityByEnum(userDTO.RoleList),
             };
         }
 
@@ -86,15 +86,15 @@ namespace api.Repositories.Data
             List<RoleEntity>[] roleList = await
                 _db.User
                     .AsNoTracking()
-                    .Include(user => user.RoleList)
-                    .ThenInclude(role => role.PermissionList)
+                    .Include(user => user.RoleEntityList)
+                    .ThenInclude(role => role.PermissionEntityList)
                     .Where(user => user.Id == id)
-                    .Select(user => user.RoleList)
+                    .Select(user => user.RoleEntityList)
                     .ToArrayAsync();
 
             return roleList
                 .SelectMany(role => role)
-                .SelectMany(role => role.PermissionList)
+                .SelectMany(role => role.PermissionEntityList)
                 .Select(permission => (PermissionEnum)permission.Id)
                 .ToHashSet();
         }
@@ -104,10 +104,10 @@ namespace api.Repositories.Data
             List<RoleEntity>[] roleList = await
                 _db.User
                     .AsNoTracking()
-                    .Include(user => user.RoleList)
-                    .ThenInclude(role => role.PermissionList)
+                    .Include(user => user.RoleEntityList)
+                    .ThenInclude(role => role.PermissionEntityList)
                     .Where(user => user.Id == id)
-                    .Select(user => user.RoleList)
+                    .Select(user => user.RoleEntityList)
                     .ToArrayAsync();
 
             return roleList

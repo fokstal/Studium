@@ -11,14 +11,14 @@ namespace api.Repositories.Data
     {
         public async override Task<IEnumerable<PersonEntity>> GetListAsync()
         {
-            IEnumerable<PersonEntity> personList = await _db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).ToArrayAsync();
+            IEnumerable<PersonEntity> personList = await _db.Person.Include(personDb => personDb.PassportEntity).Include(personDb => personDb.StudentEntity).ToArrayAsync();
 
             return personList;
         }
 
         public async override Task<PersonEntity?> GetAsync(int id)
         {
-            PersonEntity? person = await _db.Person.Include(personDb => personDb.Passport).Include(personDb => personDb.Student).FirstOrDefaultAsync(personDb => personDb.Id == id);
+            PersonEntity? person = await _db.Person.Include(personDb => personDb.PassportEntity).Include(personDb => personDb.StudentEntity).FirstOrDefaultAsync(personDb => personDb.Id == id);
 
             return person;
         }
@@ -27,8 +27,8 @@ namespace api.Repositories.Data
         {
             PersonEntity? person =
             await _db.Person
-                .Include(personDb => personDb.Passport)
-                .Include(personDb => personDb.Student)
+                .Include(personDb => personDb.PassportEntity)
+                .Include(personDb => personDb.StudentEntity)
                 .FirstOrDefaultAsync
                 (
                     personDb =>

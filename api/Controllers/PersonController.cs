@@ -138,9 +138,9 @@ namespace api.Controllers
 
             if (personToRemove is null) return NotFound();
 
-            if (personToRemove.Passport is not null)
+            if (personToRemove.PassportEntity is not null)
             {
-                PictureRepository.RemovePicture(PictureFolders.Passport, personToRemove.Passport.ScanFileName);
+                PictureRepository.RemovePicture(PictureFolders.Passport, personToRemove.PassportEntity.ScanFileName);
             }
 
             PictureRepository.RemovePicture(PictureFolders.Person, personToRemove.AvatarFileName);

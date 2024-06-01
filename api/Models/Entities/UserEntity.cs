@@ -10,6 +10,6 @@ namespace api.Models
         public string PasswordHash { get; set; } = null!;
         public DateTime DateCreated { get; set; }
 
-        public List<RoleEntity> RoleList { get; set; } = [];
+        public List<RoleEntity> RoleEntityList { get; set; } = [];
     }
 }

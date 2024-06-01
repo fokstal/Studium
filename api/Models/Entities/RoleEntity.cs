@@ -4,7 +4,7 @@ namespace api.Models
     {
         public string Name { get; set; } = null!;
 
-        public List<UserEntity> UserList { get; set; } = [];
-        public List<PermissionEntity> PermissionList { get; set; } = [];
+        public List<UserEntity> UserEntityList { get; set; } = [];
+        public List<PermissionEntity> PermissionEntityList { get; set; } = [];
     }
 }

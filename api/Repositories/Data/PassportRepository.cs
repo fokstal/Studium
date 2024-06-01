@@ -13,14 +13,14 @@ namespace api.Repositories.Data
             return new()
             {
                 ScanFileName = UploadPassportScanAsync(passportDTO.Scan).Result,
-                PersonId = passportDTO.PersonId,
+                PersonEntityId = passportDTO.PersonId,
             };
         }
 
         public override async Task UpdateAsync(PassportEntity passportToUpdate, PassportDTO passportDTO)
         {
             passportToUpdate.ScanFileName = await UploadPassportScanAsync(passportDTO.Scan);
-            passportToUpdate.PersonId = passportDTO.Id;
+            passportToUpdate.PersonEntityId = passportDTO.Id;
 
             await _db.SaveChangesAsync();
         }

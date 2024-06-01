@@ -4,6 +4,6 @@ namespace api.Models
     {
         public string Name { get; set; } = null!;
 
-        public List<RoleEntity> RoleList { get; set; } = [];
+        public List<RoleEntity> RoleEntityList { get; set; } = [];
     }
 }

@@ -11,7 +11,7 @@ namespace api.Repositories.Data
 
         public override async Task<IEnumerable<GroupEntity>> GetListAsync()
         {
-            IEnumerable<GroupEntity> groupList = await _db.Group.Include(groupDb => groupDb.StudentList).Include(groupdDb => groupdDb.SubjectList).ToArrayAsync();
+            IEnumerable<GroupEntity> groupList = await _db.Group.Include(groupDb => groupDb.StudentEntityList).Include(groupdDb => groupdDb.SubjectEntityList).ToArrayAsync();
 
             return groupList;
         }
@@ -19,8 +19,8 @@ namespace api.Repositories.Data
         public async Task<GroupEntity?> GetAsync(int? id)
         {
             GroupEntity? group = await _db.Group
-                .Include(groupDb => groupDb.StudentList)
-                .Include(groupdDb => groupdDb.SubjectList)
+                .Include(groupDb => groupDb.StudentEntityList)
+                .Include(groupdDb => groupdDb.SubjectEntityList)
                 .FirstOrDefaultAsync(groupdId => groupdId.Id == id);
 
             return group;
@@ -29,8 +29,8 @@ namespace api.Repositories.Data
         public async Task<GroupEntity?> GetAsync(string name)
         {
             GroupEntity? group = await _db.Group
-                .Include(groupDb => groupDb.StudentList)
-                .Include(groupdDb => groupdDb.SubjectList)
+                .Include(groupDb => groupDb.StudentEntityList)
+                .Include(groupdDb => groupdDb.SubjectEntityList)
                 .FirstOrDefaultAsync(groupdId => groupdId.Name.ToLower() == name.ToLower());
 
             return group;
@@ -39,9 +39,9 @@ namespace api.Repositories.Data
         public async Task<GroupEntity> GetAsync(SubjectEntity subject)
         {
             GroupEntity? group = await _db.Group
-                .Include(groupDb => groupDb.StudentList)
-                .Include(groupdDb => groupdDb.SubjectList)
-                .FirstOrDefaultAsync(groupdId => groupdId.SubjectList.Contains(subject)) 
+                .Include(groupDb => groupDb.StudentEntityList)
+                .Include(groupdDb => groupdDb.SubjectEntityList)
+                .FirstOrDefaultAsync(groupdId => groupdId.SubjectEntityList.Contains(subject)) 
                 ?? throw new Exception("Subject exists without Group ib Db!");
                 
             return group;

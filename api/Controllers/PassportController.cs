@@ -44,7 +44,7 @@ namespace api.Controllers
 
             if (passport is null) return NotFound();
 
-            PersonEntity? person = await _personRepository.GetAsync(passport.PersonId);
+            PersonEntity? person = await _personRepository.GetAsync(passport.PersonEntityId);
 
             // if (person!.Student is not null)
             // {

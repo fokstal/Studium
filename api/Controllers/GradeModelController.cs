@@ -151,7 +151,7 @@ namespace api.Controllers
             StudentEntity? student = await _studentRepository.GetAsync(id);
 
             if (student is null) return NotFound("Student is null!");
-            if (student.GroupId is null) return NotFound("Group is null!");
+            if (student.GroupEntityId is null) return NotFound("Group is null!");
 
             return Ok(await _subjectRepository.GetAverageAsync(student));
         }

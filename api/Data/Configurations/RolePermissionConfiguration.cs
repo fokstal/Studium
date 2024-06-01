@@ -11,7 +11,7 @@ namespace api.Data.Configurations
 
         public void Configure(EntityTypeBuilder<RolePermissionEntity> builder)
         {
-            builder.HasKey(rolePermission => new { rolePermission.RoleId, rolePermission.PermissionId });
+            builder.HasKey(rolePermission => new { rolePermission.RoleEntityId, rolePermission.PermissionEntityId });
 
             builder.HasData(ParseRolePermissionList());
         }
@@ -23,8 +23,8 @@ namespace api.Data.Configurations
                 rolePermission => 
                     rolePermission.PermissionList.Select(permission => new RolePermissionEntity
                     {
-                        RoleId = Convert.ToInt32(Enum.Parse<RoleEnum>(rolePermission.Role)),
-                        PermissionId = Convert.ToInt32(Enum.Parse<PermissionEnum>(permission)),
+                        RoleEntityId = Convert.ToInt32(Enum.Parse<RoleEnum>(rolePermission.Role)),
+                        PermissionEntityId = Convert.ToInt32(Enum.Parse<PermissionEnum>(permission)),
                     })
             ).ToArray();
         }

@@ -12,14 +12,14 @@ namespace api.Repositories.Data
 
         public async override Task<IEnumerable<SubjectEntity>> GetListAsync()
         {
-            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradeModelList).ToArrayAsync();
+            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradeModelEntityList).ToArrayAsync();
 
             return subjectList;
         }
 
         public async Task<IEnumerable<SubjectEntity>> GetListByGroupAsync(int id)
         {
-            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Where(subjectDb => subjectDb.GroupId == id).ToArrayAsync();
+            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Where(subjectDb => subjectDb.GroupEntityId == id).ToArrayAsync();
             IEnumerable<GradeModelEntity> gradesList = await _db.GradeModel.Include(gradesDb => gradesDb.GradeEntityList).ToArrayAsync();
 
             foreach (SubjectEntity subject in subjectList)
@@ -28,7 +28,7 @@ namespace api.Repositories.Data
                 {
                     if (subject.Id == grades.SubjectEntityId)
                     {
-                        subject.GradeModelList.Add(grades);
+                        subject.GradeModelEntityList.Add(grades);
                     }
                 }
             }
@@ -38,7 +38,7 @@ namespace api.Repositories.Data
 
         public async override Task<SubjectEntity?> GetAsync(int id)
         {
-            SubjectEntity? subject = await _db.Subject.Include(subjectDb => subjectDb.GradeModelList).FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
+            SubjectEntity? subject = await _db.Subject.Include(subjectDb => subjectDb.GradeModelEntityList).FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
 
             return subject;
         }
@@ -47,7 +47,7 @@ namespace api.Repositories.Data
         {
             SubjectEntity? subject = 
             await _db.Subject
-                .Include(subjectDb => subjectDb.GradeModelList)
+                .Include(subjectDb => subjectDb.GradeModelEntityList)
                 .FirstOrDefaultAsync
                 (
                     subjectDb =>
@@ -60,7 +60,7 @@ namespace api.Repositories.Data
 
         public async Task<double> GetAverageAsync(StudentEntity student)
         {
-            IEnumerable<SubjectEntity> subjectList = await GetListByGroupAsync(Convert.ToInt32(student.GroupId));
+            IEnumerable<SubjectEntity> subjectList = await GetListByGroupAsync(Convert.ToInt32(student.GroupEntityId));
 
             double summaryGrades = 0;
 
@@ -69,7 +69,7 @@ namespace api.Repositories.Data
                 double summGrades = 0;
                 int countGrades = 0;
 
-                foreach (GradeModelEntity gradesEntity in subject.GradeModelList)
+                foreach (GradeModelEntity gradesEntity in subject.GradeModelEntityList)
                 {
                     GradeEntity? grade = gradesEntity.GradeEntityList.FirstOrDefault(grade => grade.StudentEntityId == student.Id);
 
@@ -94,7 +94,7 @@ namespace api.Repositories.Data
                 Name = subjectDTO.Name,
                 Description = subjectDTO.Description,
                 TeacherId = subjectDTO.TeacherId,
-                GroupId = subjectDTO.GroupId,
+                GroupEntityId = subjectDTO.GroupId,
             };
         }
 
@@ -103,7 +103,7 @@ namespace api.Repositories.Data
             subjectToUpdate.Name = subjectDTO.Name;
             subjectToUpdate.Description = subjectDTO.Description;
             subjectToUpdate.TeacherId = subjectDTO.TeacherId;
-            subjectToUpdate.GroupId = subjectDTO.GroupId;
+            subjectToUpdate.GroupEntityId = subjectDTO.GroupId;
 
             await _db.SaveChangesAsync();
         }

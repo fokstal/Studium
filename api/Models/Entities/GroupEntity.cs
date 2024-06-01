@@ -7,7 +7,7 @@ namespace api.Models
         public Guid CuratorId { get; set; }
         public string AuditoryName { get; set; } = null!;
 
-        public List<StudentEntity> StudentList { get; set; } = [];
-        public List<SubjectEntity> SubjectList { get; set; } = [];
+        public List<StudentEntity> StudentEntityList { get; set; } = [];
+        public List<SubjectEntity> SubjectEntityList { get; set; } = [];
     }
 }

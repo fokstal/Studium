@@ -196,7 +196,7 @@ namespace api.Repositories.Data
 
                     if (student is null) return false;
 
-                    if (student.GroupId != subject.GroupId) return false;
+                    if (student.GroupEntityId != subject.GroupEntityId) return false;
                 }
             }
 
