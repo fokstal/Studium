@@ -36,7 +36,7 @@ namespace api.Migrations
 
                     b.HasIndex("GradeModelId");
 
-                    b.ToTable("GradeEntity");
+                    b.ToTable("GradeEntity", (string)null);
                 });
 
             modelBuilder.Entity("api.Models.Entities.GradeTypeEntity", b =>
@@ -51,7 +51,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GradeType");
+                    b.ToTable("GradeType", (string)null);
 
                     b.HasData(
                         new
@@ -95,7 +95,7 @@ namespace api.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("GradeModel");
+                    b.ToTable("GradeModel", (string)null);
                 });
 
             modelBuilder.Entity("api.Models.GroupEntity", b =>
@@ -121,7 +121,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Group");
+                    b.ToTable("Group", (string)null);
                 });
 
             modelBuilder.Entity("api.Models.PassportEntity", b =>
@@ -139,7 +139,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Passport");
+                    b.ToTable("Passport", (string)null);
                 });
 
             modelBuilder.Entity("api.Models.PermissionEntity", b =>
@@ -154,7 +154,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PermissionEntity");
+                    b.ToTable("PermissionEntity", (string)null);
 
                     b.HasData(
                         new
@@ -299,7 +299,7 @@ namespace api.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Person");
+                    b.ToTable("Person", (string)null);
                 });
 
             modelBuilder.Entity("api.Models.RoleEntity", b =>
@@ -314,7 +314,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role");
+                    b.ToTable("Role", (string)null);
 
                     b.HasData(
                         new
@@ -356,7 +356,7 @@ namespace api.Migrations
 
                     b.HasIndex("PermissionId");
 
-                    b.ToTable("RolePermissionEntity");
+                    b.ToTable("RolePermissionEntity", (string)null);
 
                     b.HasData(
                         new
@@ -671,7 +671,7 @@ namespace api.Migrations
 
                     b.HasIndex("GroupEntityId");
 
-                    b.ToTable("Student");
+                    b.ToTable("Student", (string)null);
                 });
 
             modelBuilder.Entity("api.Models.SubjectEntity", b =>
@@ -701,7 +701,7 @@ namespace api.Migrations
 
                     b.HasIndex("GroupEntityId");
 
-                    b.ToTable("Subject");
+                    b.ToTable("Subject", (string)null);
                 });
 
             modelBuilder.Entity("api.Models.UserEntity", b =>
@@ -735,7 +735,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
 
                     b.HasData(
                         new
@@ -802,7 +802,7 @@ namespace api.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoleEntity");
+                    b.ToTable("UserRoleEntity", (string)null);
 
                     b.HasData(
                         new

@@ -161,27 +161,27 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditGrade])]
-        public async Task<ActionResult<GradeModelDTO>> AddAsync([FromBody] GradeModelDTO gradeDTO)
+        public async Task<ActionResult<GradeModelDTO>> AddAsync([FromBody] GradeModelDTO gradeModelDTO)
         {
-            if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
+            if (await _subjectRepository.CheckExistsAsync(gradeModelDTO.SubjectId) is false) return NotFound("Subject is null!");
 
-            if (!await _gradeModelRepository.IsOwnSubjectStudent(gradeDTO.SubjectId, gradeDTO.StudentToValueList)) return BadRequest("Students dont have Access to this Subject!");
+            if (!await _gradeModelRepository.IsOwnSubjectStudent(gradeModelDTO.SubjectId, gradeModelDTO.GradeList)) return BadRequest("Students dont have Access to this Subject!");
 
-            gradeDTO.SetDate = gradeDTO.SetDate.Date;
+            gradeModelDTO.SetDate = gradeModelDTO.SetDate.Date;
 
-            GradeModelEntity? gradesEntity = await _gradeModelRepository.GetCurrentAsync(gradeDTO.SetDate, gradeDTO.SubjectId, gradeDTO.Type.ToString());
+            GradeModelEntity? gradeModelEntity = await _gradeModelRepository.GetCurrentAsync(gradeModelDTO.SetDate, gradeModelDTO.SubjectId, gradeModelDTO.Type.ToString());
 
-            if (gradesEntity is not null)
+            if (gradeModelEntity is not null)
             {
-                await _gradeModelRepository.UpdateGradeList(gradesEntity, gradeDTO.StudentToValueList);
+                await _gradeModelRepository.UpdateGradeListAsync(gradeModelEntity, gradeModelDTO);
             }
 
-            if (gradesEntity is null)
+            if (gradeModelEntity is null)
             {
-                await _gradeModelRepository.AddAsync(_gradeModelRepository.Create(gradeDTO));
+                await _gradeModelRepository.AddAsync(_gradeModelRepository.Create(gradeModelDTO));
             }
 
-            return Created("GradeEntity", gradeDTO);
+            return Created("GradeEntity", gradeModelDTO);
         }
 
         [HttpPut("{id}")]

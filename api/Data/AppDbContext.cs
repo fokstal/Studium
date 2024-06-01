@@ -10,6 +10,7 @@ namespace api.Data
     {
         private readonly AuthorizationOptions _authOptions;
 
+        public DbSet<GradeEntity> Grade { get; set; }
         public DbSet<GradeModelEntity> GradeModel { get; set; }
         public DbSet<GradeTypeEntity> GradeType { get; set; }
         public DbSet<GroupEntity> Group { get; set; }
