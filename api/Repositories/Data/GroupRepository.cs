@@ -31,7 +31,7 @@ namespace api.Repositories.Data
             GroupEntity? group = await _db.Group
                 .Include(groupDb => groupDb.StudentEntityList)
                 .Include(groupdDb => groupdDb.SubjectEntityList)
-                .FirstOrDefaultAsync(groupdId => groupdId.Name.ToLower() == name.ToLower());
+                .FirstOrDefaultAsync(groupdId => StringComparer.CurrentCultureIgnoreCase.Compare(groupdId.Name, name) == 0);
 
             return group;
         }

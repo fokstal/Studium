@@ -51,7 +51,7 @@ namespace api.Repositories.Data
                 .FirstOrDefaultAsync
                 (
                     subjectDb =>
-                        subjectDb.Name.ToLower() == name.ToLower() &&
+                        StringComparer.CurrentCultureIgnoreCase.Compare(subjectDb.Name, name) == 0 &&
                         subjectDb.TeacherId == teacherId
                 );
 

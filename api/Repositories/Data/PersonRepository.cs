@@ -32,9 +32,9 @@ namespace api.Repositories.Data
                 .FirstOrDefaultAsync
                 (
                     personDb =>
-                        personDb.FirstName.ToLower() == firstName.ToLower() &&
-                        personDb.MiddleName.ToLower() == middleName.ToLower() &&
-                        personDb.LastName.ToLower() == lastName.ToLower()
+                        StringComparer.CurrentCultureIgnoreCase.Compare(personDb.FirstName, firstName) == 0 &&
+                        StringComparer.CurrentCultureIgnoreCase.Compare(personDb.MiddleName, middleName) == 0 &&
+                    StringComparer.CurrentCultureIgnoreCase.Compare(personDb.LastName, lastName) == 0
                 );
 
             return person;
