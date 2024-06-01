@@ -1,13 +1,14 @@
 using api.Data;
 using api.Extensions;
 using api.Models;
-using api.Model.DTO;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
+using api.Services;
+using api.Models.DTO;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
-using api.Services;
+using api.Models.Entities;
 
 namespace api.Controllers
 {
@@ -26,7 +27,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGradeList])]
-        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListAsync() => Ok(await _gradeRepository.GetListAsync());
+        public async Task<ActionResult<IEnumerable<GradesEntity>>> GetListAsync() => Ok(await _gradeRepository.GetListAsync());
 
         [HttpGet("list-by-student/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -34,46 +35,32 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGrade])]
-        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentIdAsync(Guid id)
+        public async Task<ActionResult<IEnumerable<GradeStudentDTO>>> GetListByStudentIdAsync(Guid id)
         {
             if (await _studentRepository.CheckExistsAsync(id) is false) return NotFound();
 
-            IEnumerable<GradeEntity> gradeList = await _gradeRepository.GetListByStudentIdAsync(id);
+            IEnumerable<GradeStudentDTO> gradeList = await _gradeRepository.GetListByStudentIdAsync(id);
 
-            ActionResult actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-                    Teacher
-                );
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
+                        Role = Student
+                    },
+                ]);
 
-            if (actionResultUserAccess.GetType() != new OkResult().GetType())
-            {
-                actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-                    Curator
-                );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        gradeList.Select(grade => grade.StudentId).ToArray(),
-                        Student
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                }
-            }
+            if (userAccess is false) return Forbid();
 
             return Ok(gradeList);
         }
@@ -84,114 +71,107 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGrade])]
-        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListBySubjectIdAsync(int id)
+        public async Task<ActionResult<IEnumerable<GradesEntity>>> GetListBySubjectIdAsync(int id)
         {
             if (id < 1) return BadRequest();
 
             if (await _subjectRepository.CheckExistsAsync(id) is false) return NotFound();
 
-            IEnumerable<GradeEntity> gradeList = await _gradeRepository.GetListBySubjectIdAsync(id);
+            IEnumerable<GradesEntity> gradeList = await _gradeRepository.GetListBySubjectIdAsync(id);
 
-            ActionResult actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-                    Teacher
-                );
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = gradeList.SelectMany(grade => grade.StudentToValueList.Select(sv => sv.StudentId)).ToArray(),
+                        Role = Student
+                    },
+                ]);
 
-            if (actionResultUserAccess.GetType() != new OkResult().GetType())
-            {
-                actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-                    Curator
-                );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        gradeList.Select(grade => grade.StudentId).ToArray(),
-                        Student
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                }
-            }
+            if (userAccess is false) return Forbid();
 
             return Ok(gradeList);
         }
 
-        [HttpGet("list-by-student/{studentId:int}/by-subject/{subjectId:int}")]
+        [HttpGet("list-by-student/{studentId}/by-subject/{subjectId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGrade])]
-        public async Task<ActionResult<IEnumerable<GradeEntity>>> GetListByStudentAndSubjectIdAsync(Guid studentId, int subjectId)
+        public async Task<ActionResult<IEnumerable<GradeStudentDTO>>> GetListByStudentAndSubjectIdAsync(Guid studentId, int subjectId)
         {
             if (subjectId < 1) return BadRequest();
 
             if (await _studentRepository.CheckExistsAsync(studentId) is false) return NotFound("Student is null!");
             if (await _subjectRepository.CheckExistsAsync(subjectId) is false) return NotFound("Subject is null!");
 
-            IEnumerable<GradeEntity> gradeList = await _gradeRepository.GetListByStudentAndSubjectIdAsync(studentId, subjectId);
+            IEnumerable<GradeStudentDTO> gradeList = await _gradeRepository.GetListByStudentAndSubjectIdAsync(studentId, subjectId);
 
-            ActionResult actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-                    Teacher
-                );
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
+                        Role = Student
+                    },
+                ]);
 
-            if (actionResultUserAccess.GetType() != new OkResult().GetType())
-            {
-                actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-                    Curator
-                );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        gradeList.Select(grade => grade.StudentId).ToArray(),
-                        Student
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                }
-            }
+            if (userAccess is false) return Forbid();
 
             return Ok(gradeList);
         }
 
+        [HttpGet("student-average/{id}")]
+        public async Task<ActionResult<double>> GetAverageAsync(Guid id)
+        {
+            StudentEntity? student = await _studentRepository.GetAsync(id);
+
+            if (student is null) return NotFound("Student is null!");
+            if (student.GroupId is null) return NotFound("Group is null!");
+
+            return Ok(_gradeRepository.GetAverage
+            (
+                await _subjectRepository.GetListByGroupAsync(Convert.ToInt32(student.GroupId)),
+                student.Id
+            ));
+        }
+        
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditGrade])]
-        public async Task<ActionResult<GradeDTO>> AddAsync([FromBody] GradeDTO gradeDTO)
+        public async Task<ActionResult<GradesDTO>> AddAsync([FromBody] GradesDTO gradeDTO)
         {
-            if (await _studentRepository.CheckExistsAsync(gradeDTO.StudentId) is false) return NotFound("Student is null!");
             if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
+
+            if (await _gradeRepository.GetAsync(gradeDTO.SetDate) is not null)
+            {
+                ModelState.AddModelError("Custom Error", "GradesEntity already Exists!");
+
+                return BadRequest(ModelState);
+            }
 
             await _gradeRepository.AddAsync(_gradeRepository.Create(gradeDTO));
 
@@ -203,16 +183,23 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditGrade])]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] GradeDTO gradeDTO)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] GradesDTO gradeDTO)
         {
             if (id < 1) return BadRequest();
 
-            GradeEntity? gradeToUpdate = await _gradeRepository.GetAsync(id);
+            GradesEntity? gradeToUpdate = await _gradeRepository.GetAsync(id);
+            GradesEntity? gradeAnother = await _gradeRepository.GetAsync(gradeDTO.SetDate);
 
             if (gradeToUpdate is null) return NotFound("GradeEntity is null");
 
-            if (await _studentRepository.CheckExistsAsync(gradeDTO.StudentId) is false) return NotFound("Student is null!");
             if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
+
+            if (gradeAnother is not null && gradeAnother.Id != gradeToUpdate.Id)
+            {
+                ModelState.AddModelError("Custom Error", "GradesEntity already Exists!");
+
+                return BadRequest(ModelState);
+            }
 
             await _gradeRepository.UpdateAsync(gradeToUpdate, gradeDTO);
 
@@ -229,7 +216,7 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            GradeEntity? gradeToRemove = await _gradeRepository.GetAsync(id);
+            GradesEntity? gradeToRemove = await _gradeRepository.GetAsync(id);
 
             if (gradeToRemove is null) return NotFound();
 

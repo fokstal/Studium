@@ -73,7 +73,7 @@ export function CreateEditGroup() {
         p="80px 0px"
       >
         <Text fontSize="32px" fontWeight="bold">
-          {id
+          {!id
             ? Translator[lang.name]["group_create"]
             : Translator[lang.name]["group_edit"]}
         </Text>

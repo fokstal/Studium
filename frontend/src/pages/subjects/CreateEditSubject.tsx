@@ -83,7 +83,7 @@ export function CreateEditSubject() {
         p="80px 0px"
       >
         <Text fontSize="32px" fontWeight="bold">
-          {id
+          {!id
             ? Translator[lang.name]["subject_create"]
             : Translator[lang.name]["subject_edit"]}
         </Text>

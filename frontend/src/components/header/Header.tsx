@@ -1,4 +1,12 @@
-import { Flex, Text } from "@chakra-ui/react";
+import {
+  Flex,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+} from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
 import { Avatar, Select } from "../ui-kit";
 import { colors } from "../ui-kit/variables";
@@ -11,6 +19,8 @@ import { AuthServise, PersonService, StudentService } from "../../services";
 import { Error401Page } from "../../pages";
 import { getAvatarPath } from "../../lib";
 import { Person } from "../../types";
+import { useRoles } from "../../hooks";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 const authService = new AuthServise();
 const studentService = new StudentService();
@@ -21,6 +31,7 @@ export function Header() {
   const [person, setPerson] = useState<Person>();
   const location = useLocation();
   const { lang, setLang } = useContext(LanguageContext);
+  const roles = useRoles();
 
   useEffect(() => {
     updateAvatar();
@@ -54,7 +65,7 @@ export function Header() {
           />
         </Link>
         <Flex gap="20px">
-          {localStorage.getItem("role") === "Student" ? null : (
+          {roles.includes("Student") ? null : (
             <>
               <Text>
                 <Link
@@ -94,7 +105,7 @@ export function Header() {
             value={lang}
             setValue={setLang}
           />
-          {localStorage.getItem("role") === "Student" ? (
+          {roles.includes("Student") ? (
             <Link to="/profile">
               <Avatar
                 img={
@@ -104,7 +115,31 @@ export function Header() {
                 }
               />
             </Link>
-          ) : null}
+          ) : (
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="Options"
+                icon={<GiHamburgerMenu />}
+                variant="outline"
+                _hover={{ background: colors.green }}
+                _active={{ background: colors.darkGreen }}
+              />
+              <MenuList>
+                <MenuItem _hover={{ background: colors.darkGrey }}>
+                  <Link to="/group">{Translator[lang.name]["group_list"]}</Link>
+                </MenuItem>
+                <MenuItem _hover={{ background: colors.darkGrey }}>
+                  <Link to="/subject">
+                    {Translator[lang.name]["subject_list"]}
+                  </Link>
+                </MenuItem>
+                <MenuItem _hover={{ background: colors.darkGrey }}>
+                  <Link to="/users">{Translator[lang.name]["user_list"]}</Link>
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          )}
         </Flex>
       </Flex>
     </BaseLayout>

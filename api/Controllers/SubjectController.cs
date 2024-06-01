@@ -40,40 +40,26 @@ namespace api.Controllers
 
             if (subject is null) return NotFound();
 
-            ActionResult actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [subject.TeacherId],
-                    Teacher
-                );
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [subject.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(subject).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = _groupRepository.GetAsync(subject).Result!.StudentList.Select(student => student.Id).ToArray(),
+                        Role = Student
+                    },
+                ]);
 
-            if (actionResultUserAccess.GetType() != new OkResult().GetType())
-            {
-                actionResultUserAccess = await
-                new PermissionService(_userRepository)
-                .RequireUserAccess
-                (
-                    HttpContext,
-                    [_groupRepository.GetAsync(subject).Result!.CuratorId],
-                    Curator
-                );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        _groupRepository.GetAsync(subject).Result!.StudentList.Select(student => student.Id).ToArray(),
-                        Student
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                }
-            }
+            if (userAccess is false) return Forbid();
 
             return Ok(subject);
         }
@@ -103,6 +89,7 @@ namespace api.Controllers
 
             if (user is null) return NotFound("Teacher is null");
             if (!UserService.CheckRoleContains(_userRepository, user, Teacher)) return BadRequest("User is not a Teacher!");
+            if (await _subjectRepository.CheckExistsAsync(user.Id)) return BadRequest("Teacher already have the Subject!");
 
             await _subjectRepository.AddAsync(_subjectRepository.Create(subjectDTO));
 
@@ -119,16 +106,17 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            if (await _subjectRepository.GetAsync(subjectDTO.Name, subjectDTO.TeacherId) is not null)
+            SubjectEntity? subjectToUpdate = await _subjectRepository.GetAsync(id);
+            SubjectEntity? subjectAnother = await _subjectRepository.GetAsync(subjectDTO.Name, subjectDTO.TeacherId);
+
+            if (subjectToUpdate is null) return NotFound();
+
+            if (subjectAnother is not null && subjectAnother.Id != subjectToUpdate.Id)
             {
                 ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
-
-            SubjectEntity? subjectToUpdate = await _subjectRepository.GetAsync(id);
-
-            if (subjectToUpdate is null) return NotFound();
 
             int? groupId = null;
 
@@ -143,10 +131,11 @@ namespace api.Controllers
 
             subjectDTO.GroupId = groupId;
 
-            UserEntity? user = await _userRepository.GetAsync(subjectDTO.TeacherId);
+            UserEntity? user = await _userRepository.GetNoTrackingAsync(subjectDTO.TeacherId);
 
             if (user is null) return NotFound("Teacher is null");
             if (!UserService.CheckRoleContains(_userRepository, user, Teacher)) return BadRequest("User is not a Teacher!");
+            if (await _subjectRepository.CheckExistsAsync(user.Id) && user.Id != subjectToUpdate.TeacherId) return BadRequest("Teacher already have the Subject!");
 
             await _subjectRepository.UpdateAsync(subjectToUpdate, subjectDTO);
 

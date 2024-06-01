@@ -42,22 +42,22 @@ export function CreateEditStudent() {
   ];
 
   const updateData = async () => {
-    if (!id) return;
     const groups = await groupService.get();
-    const student = await studentService.getById(id);
-    const person = await personService.getById(student.personId);
+    if (id) {
+      const student = await studentService.getById(id);
+      const person = await personService.getById(student.personId);
 
+      setStudentData({
+        ...student,
+        ...person,
+        sex: sexOptions[person.sex],
+        group: groups.find((g: Group) => g.id === student.groupId),
+        birthDate: person.birthDate.split("T")[0],
+        addedDate: student.addedDate.split("T")[0],
+        removedDate: student.removedDate.split("T")[0],
+      });
+    }
     setGroups(groups);
-
-    setStudentData({
-      ...student,
-      ...person,
-      sex: sexOptions[person.sex],
-      group: groups.find((g: Group) => g.id === student.groupId),
-      birthDate: person.birthDate.split("T")[0],
-      addedDate: student.addedDate.split("T")[0],
-      removedDate: student.removedDate.split("T")[0],
-    });
   };
 
   useEffect(() => {
@@ -98,7 +98,7 @@ export function CreateEditStudent() {
             avatarFileName: avatar,
           },
           passport
-        );
+        ).then(() => navigator("/students"));
       } else {
         createStudent(
           {
@@ -108,10 +108,9 @@ export function CreateEditStudent() {
             avatarFileName: avatar,
           },
           passport
-        );
+        ).then(() => navigator("/students"));
       }
     });
-    navigator("/students");
   };
 
   return (

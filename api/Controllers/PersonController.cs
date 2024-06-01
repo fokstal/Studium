@@ -44,40 +44,26 @@ namespace api.Controllers
 
             if (person.Student is not null)
             {
-                ActionResult actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        [person.Student.Id],
-                        Student
-                    );
-
-                if (actionResultUserAccess.GetType() != new OkResult().GetType())
-                {
-                    actionResultUserAccess = await
-                    new PermissionService(_userRepository)
-                    .RequireUserAccess
-                    (
-                        HttpContext,
-                        [_groupRepository.GetAsync(person.Student.GroupId).Result!.CuratorId],
-                        Curator
-                    );
-
-                    if (actionResultUserAccess.GetType() != new OkResult().GetType())
+                bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
                     {
-                        actionResultUserAccess = await
-                        new PermissionService(_userRepository)
-                        .RequireUserAccess
-                        (
-                            HttpContext,
-                            _groupRepository.GetAsync(person.Student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
-                            Teacher
-                        );
+                        IdList = [person.Student.Id],
+                        Role = Student
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(person.Student.GroupId).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = _groupRepository.GetAsync(person.Student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
+                        Role = Teacher
+                    },
+                ]);
 
-                        if (actionResultUserAccess.GetType() != new OkResult().GetType()) return actionResultUserAccess;
-                    }
-                }
+                if (userAccess is false) return Forbid();
             }
 
 
@@ -119,10 +105,12 @@ namespace api.Controllers
             if (id < 1) return BadRequest();
 
             PersonEntity? personToUpdate = await _personRepository.GetAsync(id);
+            PersonEntity? personAnother = await _personRepository.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName);
 
             if (personToUpdate is null) return NotFound();
 
-            if (await _personRepository.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
+
+            if (personAnother is not null && personAnother.Id != personToUpdate.Id)
             {
                 ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 

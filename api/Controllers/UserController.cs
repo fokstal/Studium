@@ -9,6 +9,8 @@ using api.Helpers.Constants;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace api.Controllers
 {
@@ -18,13 +20,35 @@ namespace api.Controllers
     {
         private readonly IConfiguration _configuration = configuration;
         private readonly UserRepository _userRepository = new(db);
+        private readonly StudentRepository _studentRepository = new(db);
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequireRoles([Admin, Secretar])]
-        [RequirePermissions([ViewUserList])]
-        public async Task<ActionResult> GetListAsync() => Ok(await _userRepository.GetListAsync());
+        [RequirePermissions([ViewUser])]
+        public async Task<ActionResult<IEnumerable<UserEntity>>> GetListAsync() => Ok(await _userRepository.GetListAsync());
+
+        [HttpGet("session")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<UserEntity>> GetSessionAsync()
+        {
+            string? token = HttpContext.Request.Cookies[CookieNames.USER_TOKEN];
+
+            if (token is null) return Unauthorized();
+
+            JwtSecurityTokenHandler handler = new();
+
+            JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
+
+            Claim userIdClaim = jwtToken.Claims.First(claim => claim.Type == CustomClaims.USER_ID);
+
+            if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out Guid userId)) return Unauthorized();
+
+            return Ok(await _userRepository.GetAsync(userId));
+        }
 
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -40,6 +64,8 @@ namespace api.Controllers
 
                 return BadRequest(ModelState);
             }
+
+            userDTO.Id = Guid.NewGuid();
 
             await _userRepository.AddAsync(_userRepository.Create(userDTO));
 
@@ -62,6 +88,29 @@ namespace api.Controllers
             HttpContext.Response.Cookies.Append(CookieNames.USER_TOKEN, new JwtProvider(_configuration).GenerateToken(user));
 
             return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([EditUser])]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            UserEntity? userToRemove = await _userRepository.GetNoTrackingAsync(id);
+
+            if (userToRemove is null) return NotFound();
+
+            if (UserService.CheckRoleContains(_userRepository, userToRemove, Student))
+            {
+                StudentEntity studentToRemove = await _studentRepository.GetAsync(userToRemove.Id) ?? throw new Exception("Student on User is null!");
+
+                await _studentRepository.RemoveAsync(studentToRemove);
+            }
+
+            await _userRepository.RemoveAsync(userToRemove);
+
+            return NoContent();
         }
     }
 }

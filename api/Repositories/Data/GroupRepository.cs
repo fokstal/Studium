@@ -7,6 +7,8 @@ namespace api.Repositories.Data
 {
     public class GroupRepository(AppDbContext db) : DataRepositoryBase<GroupEntity, GroupDTO>(db)
     {
+        public async Task<bool> CheckExistsAsync(Guid userId) => await _db.Group.FirstOrDefaultAsync(valueDb => valueDb.CuratorId == userId) is not null;
+
         public override async Task<IEnumerable<GroupEntity>> GetListAsync()
         {
             IEnumerable<GroupEntity> groupList = await _db.Group.Include(groupDb => groupDb.StudentList).Include(groupdDb => groupdDb.SubjectList).ToArrayAsync();

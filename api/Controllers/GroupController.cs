@@ -61,6 +61,7 @@ namespace api.Controllers
 
             if (user is null) return NotFound("Curator is null");
             if (!UserService.CheckRoleContains(_userRepository, user, Curator)) return BadRequest("User is not a Curator!");
+            if (await _groupRepository.CheckExistsAsync(user.Id)) return BadRequest("Curator already have the Group!");
 
             await _groupRepository.AddAsync(_groupRepository.Create(groupDTO));
 
@@ -77,21 +78,23 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            if (await _groupRepository.GetAsync(groupDTO.Name) is not null)
+            GroupEntity? groupToUpdate = await _groupRepository.GetAsync(id);
+            GroupEntity? groupAnother = await _groupRepository.GetAsync(groupDTO.Name);
+
+            if (groupToUpdate is null) return NotFound();
+
+            if (groupAnother is not null && groupAnother.Id != groupToUpdate.Id)
             {
                 ModelState.AddModelError("Custom Error", "GroupEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            GroupEntity? groupToUpdate = await _groupRepository.GetAsync(id);
-
-            if (groupToUpdate is null) return NotFound();
-
             UserEntity? user = await _userRepository.GetNoTrackingAsync(groupDTO.CuratorId);
 
             if (user is null) return NotFound("Curator is null");
             if (!UserService.CheckRoleContains(_userRepository, user, Curator)) return BadRequest("User is not a Curator!");
+            if (await _groupRepository.CheckExistsAsync(user.Id) && user.Id != groupToUpdate.CuratorId) return BadRequest("Curator already have the Group!");
 
             await _groupRepository.UpdateAsync(groupToUpdate, groupDTO);
 

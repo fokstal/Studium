@@ -29,10 +29,7 @@ namespace api.Repositories.Data
             return userList;
         }
 
-        public override Task<UserEntity?> GetAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        public override Task<UserEntity?> GetAsync(int id) => throw new NotImplementedException();
 
         public async Task<UserEntity?> GetAsync(Guid id)
         {
@@ -77,10 +74,7 @@ namespace api.Repositories.Data
             };
         }
 
-        public override Task UpdateAsync(UserEntity valueToUpdate, RegisterUserDTO valueDTO)
-        {
-            throw new NotImplementedException();
-        }
+        public override Task UpdateAsync(UserEntity valueToUpdate, RegisterUserDTO valueDTO) => throw new NotImplementedException();
 
         public async Task<HashSet<PermissionEnum>> GetPermissionListAsync(Guid id)
         {
