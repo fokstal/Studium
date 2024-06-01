@@ -1,20 +1,12 @@
 {
   "Files": [
     {
-      "Id": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/1cc080d8-e7e1-4845-8273-46d1c9b403ba.png",
-      "PackagePath": "staticwebassets/pictures/person/1cc080d8-e7e1-4845-8273-46d1c9b403ba.png"
+      "Id": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/ab0eb972-646b-49c8-9223-af6a33c7bd38.png",
+      "PackagePath": "staticwebassets/pictures/person/ab0eb972-646b-49c8-9223-af6a33c7bd38.png"
     },
     {
-      "Id": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/364fc2d1-a95d-436f-bda6-187bf2ad7157.png",
-      "PackagePath": "staticwebassets/pictures/person/364fc2d1-a95d-436f-bda6-187bf2ad7157.png"
-    },
-    {
-      "Id": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/4b255c95-b7d1-49a7-8b4d-7dd9a5302223.png",
-      "PackagePath": "staticwebassets/pictures/person/4b255c95-b7d1-49a7-8b4d-7dd9a5302223.png"
-    },
-    {
-      "Id": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/fd1858b5-1f7a-41b8-8707-f16f0fb7e139.png",
-      "PackagePath": "staticwebassets/pictures/person/fd1858b5-1f7a-41b8-8707-f16f0fb7e139.png"
+      "Id": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/e0a48244-81c8-4488-a24b-1b672534a45a.png",
+      "PackagePath": "staticwebassets/pictures/person/e0a48244-81c8-4488-a24b-1b672534a45a.png"
     },
     {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.api.Microsoft.AspNetCore.StaticWebAssets.props",
