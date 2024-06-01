@@ -15,8 +15,6 @@ export class AuthServise {
       credentials: "include",
     });
 
-    if (!res.ok) throw new Error("Not correct password or login");
-
     return res;
   }
 

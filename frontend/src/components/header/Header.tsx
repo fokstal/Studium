@@ -137,6 +137,9 @@ export function Header() {
                 <MenuItem _hover={{ background: colors.darkGrey }}>
                   <Link to="/users">{Translator[lang.name]["user_list"]}</Link>
                 </MenuItem>
+                <MenuItem _hover={{ background: colors.darkGrey }}>
+                  <Link to="/">{Translator[lang.name]["exit"]}</Link>
+                </MenuItem>
               </MenuList>
             </Menu>
           )}
