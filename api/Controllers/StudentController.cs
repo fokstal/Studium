@@ -183,7 +183,7 @@ namespace api.Controllers
 
             if (studentToRemove is null) return NotFound();
 
-            UserEntity userToRemove = await _userRepository.GetAsync(studentToRemove.Id) ?? throw new Exception("User on Student is null!");
+            UserEntity userToRemove = await _userRepository.GetNoTrackingAsync(studentToRemove.Id) ?? throw new Exception("User on Student is null!");
 
             await _userRepository.RemoveAsync(userToRemove);
 
