@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "zvAkkM9RlgMTysqXDKkk5qZVL9C6n9m/RjtZnKHQRdU=",
+  "Hash": "uhGaQ84Mf/n8GrMhJRBMtYfwNMzNQkMoUM8ehyO3Ia4=",
   "Source": "api",
   "BasePath": "_content/api",
   "Mode": "Default",
@@ -15,82 +15,5 @@
       "Pattern": "**"
     }
   ],
-  "Assets": [
-    {
-      "Identity": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/1cc080d8-e7e1-4845-8273-46d1c9b403ba.png",
-      "SourceId": "api",
-      "SourceType": "Discovered",
-      "ContentRoot": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/",
-      "BasePath": "_content/api",
-      "RelativePath": "pictures/person/1cc080d8-e7e1-4845-8273-46d1c9b403ba.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/pictures/person/1cc080d8-e7e1-4845-8273-46d1c9b403ba.png"
-    },
-    {
-      "Identity": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/364fc2d1-a95d-436f-bda6-187bf2ad7157.png",
-      "SourceId": "api",
-      "SourceType": "Discovered",
-      "ContentRoot": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/",
-      "BasePath": "_content/api",
-      "RelativePath": "pictures/person/364fc2d1-a95d-436f-bda6-187bf2ad7157.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/pictures/person/364fc2d1-a95d-436f-bda6-187bf2ad7157.png"
-    },
-    {
-      "Identity": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/4b255c95-b7d1-49a7-8b4d-7dd9a5302223.png",
-      "SourceId": "api",
-      "SourceType": "Discovered",
-      "ContentRoot": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/",
-      "BasePath": "_content/api",
-      "RelativePath": "pictures/person/4b255c95-b7d1-49a7-8b4d-7dd9a5302223.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/pictures/person/4b255c95-b7d1-49a7-8b4d-7dd9a5302223.png"
-    },
-    {
-      "Identity": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/pictures/person/fd1858b5-1f7a-41b8-8707-f16f0fb7e139.png",
-      "SourceId": "api",
-      "SourceType": "Discovered",
-      "ContentRoot": "/home/fokstal/Репозитории/Диплом/Studium/api/wwwroot/",
-      "BasePath": "_content/api",
-      "RelativePath": "pictures/person/fd1858b5-1f7a-41b8-8707-f16f0fb7e139.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/pictures/person/fd1858b5-1f7a-41b8-8707-f16f0fb7e139.png"
-    }
-  ]
+  "Assets": []
 }

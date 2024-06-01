@@ -75,7 +75,7 @@ namespace api.Repositories.Data
                 LastName = userDTO.LastName,
                 PasswordHash = StringHasher.Generate(userDTO.Password),
                 DateCreated = DateTime.Now,
-                RoleEntityList = GetRolesEntityByEnum(userDTO.RoleList),
+                RoleEntityList = GetRolesEntityByEnum(userDTO.RoleEnumList),
             };
         }
 

@@ -163,13 +163,13 @@ namespace api.Controllers
         [RequirePermissions([EditGrade])]
         public async Task<ActionResult<GradeModelDTO>> AddAsync([FromBody] GradeModelDTO gradeModelDTO)
         {
-            if (await _subjectRepository.CheckExistsAsync(gradeModelDTO.SubjectId) is false) return NotFound("Subject is null!");
+            if (await _subjectRepository.CheckExistsAsync(gradeModelDTO.SubjectEntityId) is false) return NotFound("Subject is null!");
 
-            if (!await _gradeModelRepository.IsOwnSubjectStudent(gradeModelDTO.SubjectId, gradeModelDTO.GradeList)) return BadRequest("Students dont have Access to this Subject!");
+            if (!await _gradeModelRepository.IsOwnSubjectStudent(gradeModelDTO.SubjectEntityId, gradeModelDTO.GradeDTOList)) return BadRequest("Students dont have Access to this Subject!");
 
             gradeModelDTO.SetDate = gradeModelDTO.SetDate.Date;
 
-            GradeModelEntity? gradeModelEntity = await _gradeModelRepository.GetCurrentAsync(gradeModelDTO.SetDate, gradeModelDTO.SubjectId, gradeModelDTO.Type.ToString());
+            GradeModelEntity? gradeModelEntity = await _gradeModelRepository.GetCurrentAsync(gradeModelDTO.SetDate, gradeModelDTO.SubjectEntityId, gradeModelDTO.TypeEnum.ToString());
 
             if (gradeModelEntity is not null)
             {
@@ -196,7 +196,7 @@ namespace api.Controllers
 
             if (gradeToUpdate is null) return NotFound("GradeEntity is null");
 
-            if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectId) is false) return NotFound("Subject is null!");
+            if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectEntityId) is false) return NotFound("Subject is null!");
 
             if (gradeAnother is not null && gradeAnother.Id != gradeToUpdate.Id)
             {

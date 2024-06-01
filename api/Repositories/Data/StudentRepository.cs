@@ -34,8 +34,8 @@ namespace api.Repositories.Data
                 Id = studentDTO.Id,
                 AddedDate = studentDTO.AddedDate.Date,
                 RemovedDate = studentDTO.RemovedDate.Date,
-                PersonEntityId = studentDTO.PersonId,
-                GroupEntityId = studentDTO.GroupId,
+                PersonEntityId = studentDTO.PersonEntityId,
+                GroupEntityId = studentDTO.GroupEntityId,
             };
         }
 
@@ -44,8 +44,8 @@ namespace api.Repositories.Data
             studentToUpdate.Id = studentDTO.Id;
             studentToUpdate.AddedDate = studentDTO.AddedDate.Date;
             studentToUpdate.RemovedDate = studentDTO.RemovedDate.Date;
-            studentToUpdate.PersonEntityId = studentDTO.PersonId;
-            studentToUpdate.GroupEntityId = studentDTO.GroupId;
+            studentToUpdate.PersonEntityId = studentDTO.PersonEntityId;
+            studentToUpdate.GroupEntityId = studentDTO.GroupEntityId;
 
             await _db.SaveChangesAsync();
         }

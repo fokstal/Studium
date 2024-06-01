@@ -94,7 +94,7 @@ namespace api.Repositories.Data
                 Name = subjectDTO.Name,
                 Description = subjectDTO.Description,
                 TeacherId = subjectDTO.TeacherId,
-                GroupEntityId = subjectDTO.GroupId,
+                GroupEntityId = subjectDTO.GroupEntityId,
             };
         }
 
@@ -103,7 +103,7 @@ namespace api.Repositories.Data
             subjectToUpdate.Name = subjectDTO.Name;
             subjectToUpdate.Description = subjectDTO.Description;
             subjectToUpdate.TeacherId = subjectDTO.TeacherId;
-            subjectToUpdate.GroupEntityId = subjectDTO.GroupId;
+            subjectToUpdate.GroupEntityId = subjectDTO.GroupEntityId;
 
             await _db.SaveChangesAsync();
         }

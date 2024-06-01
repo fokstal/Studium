@@ -49,7 +49,7 @@ namespace api.Repositories.Data
                 LastName = personDTO.LastName,
                 BirthDate = personDTO.BirthDate,
                 Sex = personDTO.Sex,
-                AvatarFileName = UploadPersonAvatarAsync(personDTO.Avatar, personDTO.Sex).Result,
+                AvatarFileName = UploadPersonAvatarAsync(personDTO.AvatarFile, personDTO.Sex).Result,
             };
         }
 
@@ -60,7 +60,7 @@ namespace api.Repositories.Data
             personToUpdate.LastName = personDTO.LastName;
             personToUpdate.BirthDate = personDTO.BirthDate;
             personToUpdate.Sex = personDTO.Sex;
-            personToUpdate.AvatarFileName = await UploadPersonAvatarAsync(personDTO.Avatar, personToUpdate.Sex);
+            personToUpdate.AvatarFileName = await UploadPersonAvatarAsync(personDTO.AvatarFile, personToUpdate.Sex);
 
             await _db.SaveChangesAsync();
         }

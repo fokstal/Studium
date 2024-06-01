@@ -29,6 +29,6 @@ namespace api.Model.DTO
         public string Password { get; set; } = null!;
 
         [Required]
-        public RoleEnum[] RoleList { get; set; } = [];
+        public RoleEnum[] RoleEnumList { get; set; } = [];
     }
 }

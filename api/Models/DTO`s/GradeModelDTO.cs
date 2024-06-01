@@ -6,15 +6,15 @@ namespace api.Models.DTO
     public class GradeModelDTO
     {
         [Required]
-        public int SubjectId { get; set; }
+        public int SubjectEntityId { get; set; }
 
         [Required]
-        public GradeTypeEnum Type { get; set; }
+        public GradeTypeEnum TypeEnum { get; set; }
 
         [Required]
         public DateTime SetDate { get; set; }
 
         [Required]
-        public List<GradeDTO> GradeList { get; set; } = [];
+        public List<GradeDTO> GradeDTOList { get; set; } = [];
     }
 }

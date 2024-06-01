@@ -8,8 +8,7 @@ namespace api.Models
         public DateTime SetDate { get; set; }
 
         public int SubjectEntityId { get; set; }
-        public int TypeId { get; set;}
-        public GradeTypeEntity Type { get; set; } = null!;
+        public GradeTypeEntity TypeEntity { get; set; } = null!;
         public List<GradeEntity> GradeEntityList { get; set; } = [];
     }
 }

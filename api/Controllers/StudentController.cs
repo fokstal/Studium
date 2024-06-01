@@ -71,20 +71,20 @@ namespace api.Controllers
         [RequirePermissions([EditStudent])]
         public async Task<ActionResult<StudentDTO>> CreateAsync([FromBody] StudentDTO studentDTO)
         {
-            if (await _studentRepository.GetAsync(studentDTO.PersonId, studentDTO.GroupId) is not null)
+            if (await _studentRepository.GetAsync(studentDTO.PersonEntityId, studentDTO.GroupEntityId) is not null)
             {
                 ModelState.AddModelError("Custom Error", "StudentEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            PersonEntity? person = await _personRepository.GetAsync(studentDTO.PersonId);
+            PersonEntity? person = await _personRepository.GetAsync(studentDTO.PersonEntityId);
 
             if (person is null) return NotFound("Person is null!");
 
-            if (studentDTO.GroupId is not null)
+            if (studentDTO.GroupEntityId is not null)
             {
-                GroupEntity? group = await _groupRepository.GetAsync(studentDTO.GroupId);
+                GroupEntity? group = await _groupRepository.GetAsync(studentDTO.GroupEntityId);
 
                 if (group is null) return NotFound("Group is null!");
             }
@@ -100,7 +100,7 @@ namespace api.Controllers
                 MiddleName = person.MiddleName,
                 LastName = person.LastName,
                 Password = login,
-                RoleList = [Student]
+                RoleEnumList = [Student]
             }));
 
             studentDTO.Id = userStudentId;
@@ -118,7 +118,7 @@ namespace api.Controllers
         [RequirePermissions([EditStudent])]
         public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] StudentDTO studentDTO)
         {
-            if (await _studentRepository.GetAsync(studentDTO.PersonId, studentDTO.GroupId) is not null)
+            if (await _studentRepository.GetAsync(studentDTO.PersonEntityId, studentDTO.GroupEntityId) is not null)
             {
                 ModelState.AddModelError("Custom Error", "StudentEntity already Exists!");
 
@@ -129,22 +129,22 @@ namespace api.Controllers
 
             if (studentToUpdate is null) return NotFound();
 
-            PersonEntity? person = await _personRepository.GetAsync(studentDTO.PersonId);
+            PersonEntity? person = await _personRepository.GetAsync(studentDTO.PersonEntityId);
 
             if (person is null) return NotFound("Person is null!");
 
             int? groupId = null;
 
-            if (studentDTO.GroupId is not null)
+            if (studentDTO.GroupEntityId is not null)
             {
-                GroupEntity? group = await _groupRepository.GetAsync(studentDTO.GroupId);
+                GroupEntity? group = await _groupRepository.GetAsync(studentDTO.GroupEntityId);
 
                 if (group is null) return NotFound("Group is null!");
 
                 groupId = group.Id;
             }
 
-            studentDTO.GroupId = groupId;
+            studentDTO.GroupEntityId = groupId;
 
             UserEntity userToRemove = await _userRepository.GetAsync(studentToUpdate.Id) ?? throw new Exception("User on Student is null!");
 
@@ -161,7 +161,7 @@ namespace api.Controllers
                 MiddleName = person.MiddleName,
                 LastName = person.LastName,
                 Password = login,
-                RoleList = [Student]
+                RoleEnumList = [Student]
             }));
 
             studentDTO.Id = userStudentId;

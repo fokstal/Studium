@@ -71,9 +71,9 @@ namespace api.Controllers
         [RequirePermissions([EditPassport])]
         public async Task<ActionResult<PassportDTO>> CreateAsync([FromForm] PassportDTO passportDTO)
         {
-            if (passportDTO.Scan is null) return BadRequest();
+            if (passportDTO.ScanFile is null) return BadRequest();
 
-            PersonEntity? person = await _personRepository.GetAsync(passportDTO.PersonId);
+            PersonEntity? person = await _personRepository.GetAsync(passportDTO.PersonEntityId);
 
             if (person is null) return NotFound("Person is null!");
 
@@ -93,13 +93,13 @@ namespace api.Controllers
         {
             if (id < 1) return BadRequest();
 
-            if (passportDTO.Scan is null) return BadRequest();
+            if (passportDTO.ScanFile is null) return BadRequest();
 
             PassportEntity? passportToUpdate = await _passportRepository.GetAsync(id);
 
             if (passportToUpdate is null) return NotFound();
 
-            PersonEntity? person = await _personRepository.GetAsync(passportDTO.PersonId);
+            PersonEntity? person = await _personRepository.GetAsync(passportDTO.PersonEntityId);
 
             if (person is null) return NotFound("Person is null!");
 
