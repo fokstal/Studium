@@ -14,7 +14,7 @@ namespace api.Controllers
     [Route("group")]
     [ApiController]
     [RequireRoles([Admin, Secretar, Curator, Teacher, Student])]
-    public class GroupEntityController(AppDbContext db) : ControllerBase
+    public class GroupController(AppDbContext db) : ControllerBase
     {
         private readonly GroupRepository _groupRepository = new(db);
         private readonly UserRepository _userRepository = new(db);
