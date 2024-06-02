@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using api.Models;
 using Microsoft.IdentityModel.Tokens;
@@ -27,6 +28,15 @@ namespace api.Services
             string encodedToken = new JwtSecurityTokenHandler().WriteToken(token);
 
             return encodedToken;
+        }
+
+        public static Claim GetClaimFromToken(string token, string claimName)
+        {
+            JwtSecurityTokenHandler handler = new();
+
+            JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
+
+            return jwtToken.Claims.First(claim => claim.Type == claimName);
         }
     }
 }

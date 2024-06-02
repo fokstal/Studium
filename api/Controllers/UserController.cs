@@ -65,11 +65,7 @@ namespace api.Controllers
 
             if (token is null) return Unauthorized();
 
-            JwtSecurityTokenHandler handler = new();
-
-            JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
-
-            Claim userIdClaim = jwtToken.Claims.First(claim => claim.Type == CustomClaims.USER_ID);
+            Claim userIdClaim = JwtProvider.GetClaimFromToken(token, CustomClaims.USER_ID);
 
             if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out Guid userId)) return Unauthorized();
 
