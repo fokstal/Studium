@@ -58,40 +58,101 @@ namespace api.Repositories.Data
             return subjectEntity;
         }
 
-        public async Task<double> GetAverageAsync(StudentEntity studentEntity)
+        public async Task<double> GetAverageGradeAsync(StudentEntity studentEntity)
         {
             IEnumerable<SubjectEntity> subjectEntityList = await
                 GetListAsync(groupEntityId: Convert.ToInt32(studentEntity.GroupEntityId));
 
+            return CalculateAverageGrade(subjectEntityList, studentEntity.Id);
+        }
+
+        public async Task<double> GetAverageGradeAsync(StudentEntity studentEntity, DateTime startCheck, DateTime endCheck)
+        {
+            IEnumerable<SubjectEntity> subjectEntityList = await
+                GetListAsync(groupEntityId: Convert.ToInt32(studentEntity.GroupEntityId));
+
+            return CalculateAverageGrade(subjectEntityList, studentEntity.Id, startCheck, endCheck);
+        }
+
+        public double CalculateAverageGrade(IEnumerable<SubjectEntity> subjectEntityList, Guid studentEntityId)
+        {
             double summaryGrades = 0;
             int summarySubjectCount = 0;
 
             foreach (SubjectEntity subjectEntity in subjectEntityList)
             {
-                double summGrades = 0;
-                int countGrades = 0;
-
-                foreach (GradeModelEntity gradeModelEntity in subjectEntity.GradeModelEntityList)
-                {
-                    GradeEntity? gradeEntity =
-                        gradeModelEntity.GradeEntityList
-                        .FirstOrDefault(g => g.StudentEntityId == studentEntity.Id);
-
-                    if (gradeEntity is not null)
-                    {
-                        summGrades += gradeEntity.Value;
-                        countGrades++;
-                    }
-                }
-
-                if (countGrades != 0)
-                {
-                    summaryGrades += Math.Round(summGrades / countGrades);
-                    summarySubjectCount++;
-                }
+                CalculateAverageGradeSubject
+                (
+                    ref summaryGrades,
+                    ref summarySubjectCount,
+                    subjectEntity.GradeModelEntityList,
+                    studentEntityId
+                );
             }
 
             return summaryGrades / summarySubjectCount;
+        }
+
+        public double CalculateAverageGrade
+            (
+                IEnumerable<SubjectEntity> subjectEntityList,
+                Guid studentEntityId,
+                DateTime startCheck,
+                DateTime endCheck
+            )
+        {
+            double summaryGrades = 0;
+            int summarySubjectCount = 0;
+
+            foreach (SubjectEntity subjectEntity in subjectEntityList)
+            {
+                List<GradeModelEntity> gradeModelListInInterval =
+                    subjectEntity
+                    .GradeModelEntityList
+                    .Where(gm => gm.SetDate > startCheck && gm.SetDate < endCheck)
+                    .ToList();
+
+                CalculateAverageGradeSubject
+                (
+                    ref summaryGrades,
+                    ref summarySubjectCount,
+                    gradeModelListInInterval,
+                    studentEntityId
+                );
+            }
+
+            return summaryGrades / summarySubjectCount;
+        }
+
+        public void CalculateAverageGradeSubject
+            (
+                ref double summaryGradeSubject,
+                ref int countSubject,
+                List<GradeModelEntity> gradeModelListInInterval,
+                Guid studentEntityId
+            )
+        {
+            double summGrade = 0;
+            int countGrade = 0;
+
+            foreach (GradeModelEntity gradeModelEntity in gradeModelListInInterval)
+            {
+                GradeEntity? gradeEntity =
+                    gradeModelEntity.GradeEntityList
+                    .FirstOrDefault(g => g.StudentEntityId == studentEntityId);
+
+                if (gradeEntity is not null)
+                {
+                    summGrade += gradeEntity.Value;
+                    countGrade++;
+                }
+            }
+
+            if (countGrade != 0)
+            {
+                summaryGradeSubject += Math.Round(summGrade / countGrade);
+                countSubject++;
+            }
         }
 
         public override SubjectEntity Create(SubjectDTO subjectDTO)

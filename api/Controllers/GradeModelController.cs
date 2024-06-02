@@ -27,7 +27,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGradeList])]
-        public async Task<ActionResult<IEnumerable<GradeModelEntity>>> GetListAsync() 
+        public async Task<ActionResult<IEnumerable<GradeModelEntity>>> GetListAsync()
             => Ok(await _gradeModelRepository.GetListAsync());
 
         [HttpGet("list-by-student/{studentId}")]
@@ -40,7 +40,7 @@ namespace api.Controllers
         {
             if (await _studentRepository.CheckExistsAsync(studentId) is false) return NotFound();
 
-            IEnumerable<GradeStudentDTO> gradeStudentDTOList = await 
+            IEnumerable<GradeStudentDTO> gradeStudentDTOList = await
                 _gradeModelRepository.GetListAsync(studentEntityId: studentId);
 
             // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
@@ -157,7 +157,27 @@ namespace api.Controllers
             if (studentEntity is null) return NotFound("Student is null!");
             if (studentEntity.GroupEntityId is null) return NotFound("Group is null!");
 
-            return Ok(await _subjectRepository.GetAverageAsync(studentEntity: studentEntity));
+            return Ok(await _subjectRepository.GetAverageGradeAsync(studentEntity: studentEntity));
+        }
+
+        [HttpPost("average-semester")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<double>> GetAverageAsync([FromBody] AverageSemesterGradeDTO averageSemesterGradeDTO)
+        {
+            StudentEntity? studentEntity = await 
+                _studentRepository.GetAsync(studentEntityId: averageSemesterGradeDTO.StudentEntityId);
+
+            if (studentEntity is null) return NotFound("Student is null!");
+            if (studentEntity.GroupEntityId is null) return NotFound("Group is null!");
+
+            return Ok(await _subjectRepository.GetAverageGradeAsync
+            (
+                studentEntity: studentEntity,
+                startCheck: averageSemesterGradeDTO.StartDate,
+                endCheck: averageSemesterGradeDTO.EndDate
+            ));
         }
 
         [HttpPost]
