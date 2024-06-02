@@ -155,7 +155,7 @@ namespace api.Controllers
 
             studentDTO.GroupEntityId = groupId;
 
-            UserEntity userEntityToRemove = await _userRepository.GetAsync(userEntityId: studentEntityToUpdate.Id) ?? throw new Exception("User on Student is null!");
+            UserEntity userEntityToRemove = await _userRepository.GetNoTrackingAsync(userEntityId: studentEntityToUpdate.Id) ?? throw new Exception("User on Student is null!");
 
             await _userRepository.RemoveAsync(userEntityToRemove);
 
