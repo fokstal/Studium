@@ -26,6 +26,7 @@ namespace api.Repositories.Data
             IEnumerable<SubjectEntity> subjectEntityList = await
                 _db.Subject
                 .Include(s => s.GradeModelEntityList)
+                .ThenInclude(gm => gm.GradeEntityList)
                 .Where(s => s.GroupEntityId == groupEntityId)
                 .ToArrayAsync();
 
@@ -59,10 +60,11 @@ namespace api.Repositories.Data
 
         public async Task<double> GetAverageAsync(StudentEntity studentEntity)
         {
-            IEnumerable<SubjectEntity> subjectEntityList = await 
+            IEnumerable<SubjectEntity> subjectEntityList = await
                 GetListAsync(groupEntityId: Convert.ToInt32(studentEntity.GroupEntityId));
 
             double summaryGrades = 0;
+            int summarySubjectCount = 0;
 
             foreach (SubjectEntity subjectEntity in subjectEntityList)
             {
@@ -71,22 +73,25 @@ namespace api.Repositories.Data
 
                 foreach (GradeModelEntity gradeModelEntity in subjectEntity.GradeModelEntityList)
                 {
-                    GradeEntity? gradeEntity = 
+                    GradeEntity? gradeEntity =
                         gradeModelEntity.GradeEntityList
                         .FirstOrDefault(g => g.StudentEntityId == studentEntity.Id);
 
                     if (gradeEntity is not null)
                     {
                         summGrades += gradeEntity.Value;
-                        countGrades += 1;
+                        countGrades++;
                     }
                 }
 
-                // if (countGrades >= 3) summaryGrades += Math.Round(summGrades / countGrades);
-                summaryGrades += Math.Round(summGrades / countGrades);
+                if (countGrades != 0)
+                {
+                    summaryGrades += Math.Round(summGrades / countGrades);
+                    summarySubjectCount++;
+                }
             }
 
-            return summaryGrades / subjectEntityList.Count();
+            return summaryGrades / summarySubjectCount;
         }
 
         public override SubjectEntity Create(SubjectDTO subjectDTO)
