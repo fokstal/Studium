@@ -5,7 +5,7 @@ export type User = {
   middleName: string;
   lastName: string;
   password?: string;
-  roleList: {
+  roleEntityList: {
     name: string;
   }[];
 };

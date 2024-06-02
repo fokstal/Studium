@@ -14,7 +14,7 @@ export function CreateUserForm() {
     middleName?: string;
     lastName?: string;
     password?: string;
-    roleList?: typeof roles;
+    roleEnumList?: typeof roles;
   }>({});
   const { lang } = useContext(LanguageContext);
   const navigator = useNavigate();
@@ -33,10 +33,10 @@ export function CreateUserForm() {
   };
 
   const handleRoleChange = (value: { value: number; name: string }) => {
-    if (!data.roleList) {
-      setData({ ...data, roleList: [value] });
+    if (!data.roleEnumList) {
+      setData({ ...data, roleEnumList: [value] });
     } else {
-      setData({ ...data, roleList: [...data?.roleList, value] });
+      setData({ ...data, roleEnumList: [...data?.roleEnumList, value] });
     }
   };
 
@@ -91,7 +91,7 @@ export function CreateUserForm() {
           />
           <Select
             options={roles}
-            value={data?.roleList}
+            value={data?.roleEnumList}
             placeholder={Translator[lang.name]["select_role"]}
             setValue={(e: any) => handleRoleChange(e)}
           />

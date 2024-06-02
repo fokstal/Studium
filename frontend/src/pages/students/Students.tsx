@@ -65,8 +65,8 @@ export function Students() {
 
     const studentsForTable = await Promise.all(
       students.map(async (student) => {
-        const person = await personService.getById(student.personId || 0);
-        const group = await groupService.getById(student.groupId || 0);
+        const person = await personService.getById(student.personEntityId || 0);
+        const group = await groupService.getById(student.groupEntityId || 0);
         return {
           ...student,
           name: `${person.firstName} ${person.lastName} ${person.middleName}`,
@@ -143,7 +143,7 @@ export function Students() {
             <Box w="340">
               {selectedStudent ? (
                 <SelectedStudent
-                  id={selectedStudent.personId || 0}
+                  id={selectedStudent.personEntityId || 0}
                   studentId={selectedStudent.id || 0}
                   setSelectedStudent={handleOpenSelectedStudent}
                   group={selectedStudent.groupName}

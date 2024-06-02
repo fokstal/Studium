@@ -42,8 +42,8 @@ export function StudentComponent({ id }: StudentComponentProps) {
     if (!id) return;
     const studentData = await studentService.getById(id);
     const [personData, groupData] = await Promise.all([
-      getPersonData(studentData.personId),
-      getGroupData(studentData.groupId),
+      getPersonData(studentData.personEntityId),
+      getGroupData(studentData.groupEntityId),
     ]);
     const student = {
       ...personData,
@@ -54,7 +54,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
 
     if (localStorage.getItem("role") === "Student") return;
     const passports = await passportService.get();
-    const passport = passports.find((p: any) => p.personId === personData.id);
+    const passport = passports.find((p: any) => p.personEntityId === personData.id);
     setPassport(passport?.scanFileName ?? null);
   };
 

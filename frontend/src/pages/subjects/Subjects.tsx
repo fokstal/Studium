@@ -19,7 +19,7 @@ export function Subjects() {
     const formatedSubjects = await Promise.all(
       subjects.map(async (s: Subject) => ({
         ...s,
-        groupId: (await groupService.getById(+s.groupId)).name,
+        groupId: (await groupService.getById(+s.groupEntityId)).name,
       }))
     );
     setSubjects(formatedSubjects);

@@ -46,13 +46,14 @@ export function CreateEditStudent() {
     const groups = await groupService.get();
     if (id) {
       const student = await studentService.getById(id);
-      const person = await personService.getById(student.personId);
+      const person = await personService.getById(student.personEntityId);
 
       setStudentData({
         ...student,
         ...person,
+        id: id,
         sex: sexOptions[person.sex],
-        group: groups.find((g: Group) => g.id === student.groupId),
+        group: groups.find((g: Group) => g.id === student.groupEntityId),
         birthDate: person.birthDate.split("T")[0],
         addedDate: student.addedDate.split("T")[0],
         removedDate: student.removedDate.split("T")[0],

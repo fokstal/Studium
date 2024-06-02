@@ -2,7 +2,7 @@ export abstract class Service {
   protected url: string = "";
 
   public async get() {
-    const res = await fetch(this.url, { credentials: "include" });
+    const res = await fetch(`${this.url}/list`, { credentials: "include" });
 
     return await res.json();
   }

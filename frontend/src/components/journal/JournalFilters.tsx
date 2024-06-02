@@ -46,7 +46,7 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
     const students = await studentService.get();
 
     const truePersons: Person[] = students.map((s: Student) =>
-      persons?.find((p: Person) => p.id === s.personId)
+      persons?.find((p: Person) => p.id === s.personEntityId)
     );
 
     setSelectOptions({
@@ -65,14 +65,14 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
     if (!group) return selectOptions?.persons;
 
     return selectOptions?.students
-      ?.filter((s) => s.groupId === group.id)
-      .map((s) => selectOptions.persons?.find((p) => p.id === s.personId));
+      ?.filter((s) => s.groupEntityId === group.id)
+      .map((s) => selectOptions.persons?.find((p) => p.id === s.personEntityId));
   };
 
   const subjectOptions = () => {
     if (!group) return selectOptions?.subjects;
 
-    return selectOptions?.subjects?.filter((s) => s.groupId === group.id);
+    return selectOptions?.subjects?.filter((s) => s.groupEntityId === group.id);
   };
 
   return (

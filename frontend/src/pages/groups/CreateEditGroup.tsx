@@ -48,7 +48,7 @@ export function CreateEditGroup() {
     const users = await userService.get();
     setCurators(
       users.filter((user: User) =>
-        user.roleList.map((r) => r.name).includes("Curator")
+        user.roleEntityList.map((r) => r.name).includes("Curator")
       )
     );
     if (id) {

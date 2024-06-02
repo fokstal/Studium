@@ -14,13 +14,12 @@ export async function editSubject(
     group?: Group;
   }
 ) {
-  const { lang } = useContext(LanguageContext);
   if (!data.description || !data.group || !data.name || !data.teacher) {
     return "fill_data_full";
   }
   const res = await subjectService.put(id, {
     ...data,
-    groupId: data.group.id,
+    groupEntityId: data.group.id,
     teacherId: data.teacher.id,
   });
   if (res.status !== 204) {

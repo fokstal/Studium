@@ -14,7 +14,6 @@ export async function editGroup(
     description?: string;
   }
 ) {
-  const { lang } = useContext(LanguageContext);
   if (
     !data?.name ||
     !data?.curator ||

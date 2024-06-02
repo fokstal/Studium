@@ -10,11 +10,11 @@ export async function editStudent(
   const personService = new PersonService();
   const passportService = new PassportService();
 
-  if (!studentData.personId || !studentData.id) return;
+  if (!studentData.personEntityId || !studentData.id) return;
 
   const person = await personService
     .put(
-      studentData.personId,
+      studentData.personEntityId,
       objectToFormData({
         firstName: studentData.firstName,
         middleName: studentData.middleName,
@@ -30,8 +30,8 @@ export async function editStudent(
 
   await studentService
     .put(studentData.id, {
-      personId: studentData.personId,
-      groupId: studentData?.group?.id,
+      personEntityId: studentData.personEntityId,
+      groupEntityId: studentData?.group?.id,
       addedDate: studentData.addedDate,
       removedDate: studentData.removedDate,
     })
@@ -42,14 +42,14 @@ export async function editStudent(
   if (passport) {
     const passports = await passportService.get();
     const passportId = passports.find(
-      (p: any) => p.personId === studentData.personId
+      (p: any) => p.personId === studentData.personEntityId
     );
 
     if (passportId) {
       await passportService
         .put(
           passportId,
-          objectToFormData({ personId: studentData.personId, scan: passport })
+          objectToFormData({ personEntityId: studentData.personEntityId, scanFile: passport })
         )
         .catch((err) => {
           throw new Error(err);
@@ -57,7 +57,7 @@ export async function editStudent(
     } else {
       await passportService
         .post(
-          objectToFormData({ personId: studentData.personId, scan: passport })
+          objectToFormData({ personEntityId: studentData.personEntityId, scanFile: passport })
         )
         .catch((err) => {
           throw new Error(err);

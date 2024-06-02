@@ -4,9 +4,9 @@ import { Person } from "./Person";
 export type Student = {
   id?: number;
   person?: Person;
-  personId?: number;
+  personEntityId?: number;
   group?: Group;
-  groupId?: number;
+  groupEntityId?: number;
   addedDate?: string;
   removedDate?: string;
 }

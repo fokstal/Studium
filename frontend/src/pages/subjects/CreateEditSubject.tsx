@@ -33,14 +33,14 @@ export function CreateEditSubject() {
 
     setTeachers(
       users.filter((user: User) =>
-        user.roleList.find((role) => role.name === "Teacher")
+        user.roleEntityList.find((role) => role.name === "Teacher")
       )
     );
     if (id) {
       const data = await subjectService.getById(id);
       setData({
         ...data,
-        group: groups.find((g: Group) => g.id === data.groupId),
+        group: groups.find((g: Group) => g.id === data.groupEntityId),
         teacher: users.find((u: User) => u.id === data.teacherId),
       });
     }

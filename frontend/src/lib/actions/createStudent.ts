@@ -27,8 +27,8 @@ export async function createStudent(
 
   await studentService
     .post({
-      personId: person.id,
-      groupId: studentData?.group?.id,
+      personEntityId: person.id,
+      groupEntityId: studentData?.group?.id,
       addedDate: studentData.addedDate,
       removedDate: studentData.removedDate,
     })
@@ -37,7 +37,7 @@ export async function createStudent(
     });
   if (passport) {
     await passportService
-      .post(objectToFormData({ personId: person.id, scan: passport }))
+      .post(objectToFormData({ personEntityId: person.id, scanFile: passport }))
       .catch((err) => {
         throw new Error(err);
       });

@@ -40,12 +40,12 @@ export function Header() {
   const updateAvatar = async () => {
     const res = await authService.session();
     setIsAuth(!!res);
-    const role = res?.roleList;
+    const role = res?.roleEntityList;
     localStorage.setItem("role", JSON.stringify(role));
 
     if (!!role.find((r: any) => r.name !== "Student")) return;
     const student = await studentService.getById(res.id);
-    const person = await personService.getById(student.personId);
+    const person = await personService.getById(student.personEntityId);
     setPerson(person);
   };
 

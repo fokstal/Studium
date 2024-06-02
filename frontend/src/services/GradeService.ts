@@ -4,7 +4,7 @@ export class GradeService extends Service {
   protected url = process.env.REACT_APP_IP + "/grade";
 
   public async averageGrade(id: string) {
-    return await this.baseGetMethod(`student-average/${id}`);
+    return await this.baseGetMethod(`average-by-student/${id}`);
   }
   public override async get() {
     return await this.baseGetMethod("list");

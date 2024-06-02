@@ -8,7 +8,6 @@ type JournalTableProps = {
 };
 
 export function JournalTable({ data, columns }: JournalTableProps) {
-  console.log(data);
   return (
     <TableWrapper>
       <DataTable value={data} scrollable paginator={data.length > 7} rows={7}>

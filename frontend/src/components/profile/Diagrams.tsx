@@ -27,7 +27,7 @@ export function Diagrams({ id }: DiagramsProps) {
     const student = await studentService.getById(id);
     const subjects = await subjectService.get();
     const studentSubjects = subjects.filter(
-      (subject: Subject) => student.groupId === subject.groupId
+      (subject: Subject) => student.groupId === subject.groupEntityId
     );
     setSubjects(studentSubjects);
   };

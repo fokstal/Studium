@@ -31,9 +31,9 @@ export function UserTable({ data }: UserTableProps) {
         ></Column>
         <Column
           header={Translator[lang.name]["roles"]}
-          body={({ roleList }) => (
+          body={({ roleEntityList }) => (
             <>
-              {roleList.map((role: { name: string }) => role.name).join(", ")}
+              {roleEntityList.map((role: { name: string }) => role.name).join(", ")}
             </>
           )}
         ></Column>

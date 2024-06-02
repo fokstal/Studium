@@ -5,8 +5,8 @@ export type Grade = {
   id?: number;
   value: number;
   setDate: Date | string;
-  studentId: number;
-  subjectId: number;
+  studentEntityId: number;
+  subjectEntityId: number;
   student?: Student;
   subject?: Subject;
 };

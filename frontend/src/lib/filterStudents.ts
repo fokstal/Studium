@@ -11,7 +11,7 @@ export function filterStudents(students: any, filters: {
     const studentAddedDate = new Date(student.addedDate);
     const studentRemovedDate = new Date(student.removedDate);
 
-    if (filters.group && student.groupId !== filters.group.id) {
+    if (filters.group && student.groupEntityId !== filters.group.id) {
       return false;
     }
 

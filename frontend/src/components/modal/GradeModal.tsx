@@ -45,21 +45,13 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
 
   useEffect(() => {
     subjectService.get().then((subjects) => setSubjects(subjects));
-    userService
-      .get()
-      .then((data) =>
-        setStudentsUsers(
-          data.filter((user: User) => user.roleList[0].name === "Student")
-        )
-      );
+    studentService.get().then((data) => setStudentsUsers(data));
   }, []);
   const updateStudents = async () => {
-    // const students = await studentService.get();
-    // const subject = await subjectService.getById(data.subjectId || 0);
-    // const filteredStudents = students.filter(
-    //   (s: Student) => s.groupId === subject.groupId
-    // );
-    // setStudentsUsers(filteredStudents);
+    if (data.subjectId) {
+      const res = await userService.getUsersBySubject(data.subjectId);
+      setStudentsUsers(res);
+    }
   };
 
   useEffect(() => {
@@ -68,12 +60,12 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
 
   const handleSubmit = async () => {
     const res = await gradeServcie.post({
-      subjectId: data.subjectId,
-      type: data.type,
+      subjectEntityId: data.subjectId,
+      typeEnum: data.type,
       setDate: data.setDate || null,
-      studentToValueList: [
+      gradeDTOList: [
         {
-          studentId: data.studentId,
+          studentEntityId: data.studentId,
           value: data.value,
         },
       ],
