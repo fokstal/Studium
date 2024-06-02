@@ -99,13 +99,10 @@ namespace api.Controllers
 
                 return BadRequest(ModelState);
             }
+            
+            GroupEntity? groupEntity = await _groupRepository.GetAsync(groupEntityId: subjectDTO.GroupEntityId);
 
-            if (subjectDTO.GroupEntityId is not null)
-            {
-                GroupEntity? groupEntity = await _groupRepository.GetAsync(groupEntityId: subjectDTO.GroupEntityId);
-
-                if (groupEntity is null) return NotFound("Group is null!");
-            }
+            if (groupEntity is null) return NotFound("Group is null!");
 
             UserEntity? userEntity = await _userRepository.GetNoTrackingAsync(userEntityId: subjectDTO.TeacherId);
 
@@ -128,7 +125,7 @@ namespace api.Controllers
             if (subjectId < 1) return BadRequest();
 
             SubjectEntity? subjectEntityToUpdate = await _subjectRepository.GetAsync(subjectId);
-            SubjectEntity? subjectEntityAnother = await 
+            SubjectEntity? subjectEntityAnother = await
                 _subjectRepository
                 .GetAsync(subjectEntityName: subjectDTO.Name, teacherId: subjectDTO.TeacherId);
 
@@ -141,18 +138,9 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            int? groupEntityId = null;
+            GroupEntity? groupEntity = await _groupRepository.GetAsync(groupEntityId: subjectDTO.GroupEntityId);
 
-            if (subjectDTO.GroupEntityId is not null)
-            {
-                GroupEntity? groupEntity = await _groupRepository.GetAsync(groupEntityId: subjectDTO.GroupEntityId);
-
-                if (groupEntity is null) return NotFound("Group is null!");
-
-                groupEntityId = groupEntity.Id;
-            }
-
-            subjectDTO.GroupEntityId = groupEntityId;
+            if (groupEntity is null) return NotFound("Group is null!");
 
             UserEntity? userEntity = await _userRepository.GetNoTrackingAsync(userEntityId: subjectDTO.TeacherId);
 
