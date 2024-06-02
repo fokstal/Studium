@@ -27,19 +27,21 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGradeList])]
-        public async Task<ActionResult<IEnumerable<GradeModelEntity>>> GetListAsync() => Ok(await _gradeModelRepository.GetListAsync());
+        public async Task<ActionResult<IEnumerable<GradeModelEntity>>> GetListAsync() 
+            => Ok(await _gradeModelRepository.GetListAsync());
 
-        [HttpGet("list-by-student/{id}")]
+        [HttpGet("list-by-student/{studentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGrade])]
-        public async Task<ActionResult<IEnumerable<GradeStudentDTO>>> GetListByStudentIdAsync(Guid id)
+        public async Task<ActionResult<IEnumerable<GradeStudentDTO>>> GetListAsync(Guid studentId)
         {
-            if (await _studentRepository.CheckExistsAsync(id) is false) return NotFound();
+            if (await _studentRepository.CheckExistsAsync(studentId) is false) return NotFound();
 
-            IEnumerable<GradeStudentDTO> gradeList = await _gradeModelRepository.GetListByStudentIdAsync(id);
+            IEnumerable<GradeStudentDTO> gradeStudentDTOList = await 
+                _gradeModelRepository.GetListAsync(studentEntityId: studentId);
 
             // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
             //     ([
@@ -62,22 +64,22 @@ namespace api.Controllers
 
             // if (userAccess is false) return Forbid();
 
-            return Ok(gradeList);
+            return Ok(gradeStudentDTOList);
         }
 
-        [HttpGet("list-by-subject/{id}")]
+        [HttpGet("list-by-subject/{subjectId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGrade])]
-        public async Task<ActionResult<IEnumerable<GradeModelEntity>>> GetListBySubjectIdAsync(int id)
+        public async Task<ActionResult<IEnumerable<GradeModelEntity>>> GetListAsync(int subjectId)
         {
-            if (id < 1) return BadRequest();
+            if (subjectId < 1) return BadRequest();
 
-            if (await _subjectRepository.CheckExistsAsync(id) is false) return NotFound();
+            if (await _subjectRepository.CheckExistsAsync(subjectId) is false) return NotFound();
 
-            IEnumerable<GradeModelEntity> gradeList = await _gradeModelRepository.GetListBySubjectIdAsync(id);
+            IEnumerable<GradeModelEntity> gradeModelEntityList = await _gradeModelRepository.GetListAsync(subjectEntityId: subjectId);
 
             // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
             //     ([
@@ -100,7 +102,7 @@ namespace api.Controllers
 
             // if (userAccess is false) return Forbid();
 
-            return Ok(gradeList);
+            return Ok(gradeModelEntityList);
         }
 
         [HttpGet("list-by-student/{studentId}/by-subject/{subjectId:int}")]
@@ -109,14 +111,16 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGrade])]
-        public async Task<ActionResult<IEnumerable<GradeStudentDTO>>> GetListByStudentAndSubjectIdAsync(Guid studentId, int subjectId)
+        public async Task<ActionResult<IEnumerable<GradeStudentDTO>>> GetListAsync(Guid studentId, int subjectId)
         {
             if (subjectId < 1) return BadRequest();
 
             if (await _studentRepository.CheckExistsAsync(studentId) is false) return NotFound("Student is null!");
             if (await _subjectRepository.CheckExistsAsync(subjectId) is false) return NotFound("Subject is null!");
 
-            IEnumerable<GradeStudentDTO> gradeList = await _gradeModelRepository.GetListByStudentAndSubjectIdAsync(studentId, subjectId);
+            IEnumerable<GradeStudentDTO> gradeStudentDTOList = await
+                _gradeModelRepository
+                .GetListAsync(studentEntityId: studentId, subjectEntityId: subjectId);
 
             // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
             //     ([
@@ -139,21 +143,21 @@ namespace api.Controllers
 
             // if (userAccess is false) return Forbid();
 
-            return Ok(gradeList);
+            return Ok(gradeStudentDTOList);
         }
 
-        [HttpGet("student-average/{id}")]
+        [HttpGet("average-by-student/{studentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<double>> GetAverageAsync(Guid id)
+        public async Task<ActionResult<double>> GetAverageAsync(Guid studentId)
         {
-            StudentEntity? student = await _studentRepository.GetAsync(id);
+            StudentEntity? studentEntity = await _studentRepository.GetAsync(studentEntityId: studentId);
 
-            if (student is null) return NotFound("Student is null!");
-            if (student.GroupEntityId is null) return NotFound("Group is null!");
+            if (studentEntity is null) return NotFound("Student is null!");
+            if (studentEntity.GroupEntityId is null) return NotFound("Group is null!");
 
-            return Ok(await _subjectRepository.GetAverageAsync(student));
+            return Ok(await _subjectRepository.GetAverageAsync(studentEntity: studentEntity));
         }
 
         [HttpPost]
@@ -161,64 +165,68 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditGrade])]
-        public async Task<ActionResult<GradeModelDTO>> AddAsync([FromBody] GradeModelDTO gradeModelDTO)
+        public async Task<ActionResult<GradeModelDTO>> CreateAddAsync([FromBody] GradeModelDTO gradeModelDTO)
         {
-            if (await _subjectRepository.CheckExistsAsync(gradeModelDTO.SubjectEntityId) is false) return NotFound("Subject is null!");
+            if (await _subjectRepository.CheckExistsAsync(gradeModelDTO.SubjectEntityId) is false)
+                return NotFound("Subject is null!");
 
-            if (!await _gradeModelRepository.IsOwnSubjectStudent(gradeModelDTO.SubjectEntityId, gradeModelDTO.GradeDTOList)) return BadRequest("Students dont have Access to this Subject!");
+            if (!await _gradeModelRepository.IsOwnSubjectStudent(gradeModelDTO.SubjectEntityId, gradeModelDTO.GradeDTOList))
+                return BadRequest("Students dont have Access to this Subject!");
 
             gradeModelDTO.SetDate = gradeModelDTO.SetDate.Date;
 
-            GradeModelEntity? gradeModelEntity = await _gradeModelRepository.GetCurrentAsync(gradeModelDTO.SetDate, gradeModelDTO.SubjectEntityId, gradeModelDTO.TypeEnum.ToString());
+            GradeModelEntity? gradeModelEntity = await
+                _gradeModelRepository.
+                GetAsync
+                (
+                    setDate: gradeModelDTO.SetDate,
+                    subjectEntityId: gradeModelDTO.SubjectEntityId,
+                    typeName: gradeModelDTO.TypeEnum.ToString()
+                );
 
-            if (gradeModelEntity is not null)
-            {
-                await _gradeModelRepository.UpdateGradeListAsync(gradeModelEntity, gradeModelDTO);
-            }
+            if (gradeModelEntity is not null) await _gradeModelRepository.UpdateGradeListAsync(gradeModelEntity, gradeModelDTO);
 
-            if (gradeModelEntity is null)
-            {
-                await _gradeModelRepository.AddAsync(_gradeModelRepository.Create(gradeModelDTO));
-            }
+            if (gradeModelEntity is null) await _gradeModelRepository.AddAsync(_gradeModelRepository.Create(gradeModelDTO));
 
             return Created("GradeEntity", gradeModelDTO);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{studentId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditGrade])]
-        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] GradeModelDTO gradeDTO)
+        public async Task<IActionResult> UpdateAsync(Guid studentId, [FromBody] GradeModelDTO gradeModelDTO)
         {
-            GradeModelEntity? gradeToUpdate = await _gradeModelRepository.GetAsync(id);
-            GradeModelEntity? gradeAnother = await _gradeModelRepository.GetAsync(gradeDTO.SetDate);
+            GradeModelEntity? gradeModelToUpdate = await _gradeModelRepository.GetAsync(studentEntityId: studentId);
+            GradeModelEntity? gradeModelInDate = await _gradeModelRepository.GetAsync(setDate: gradeModelDTO.SetDate);
 
-            if (gradeToUpdate is null) return NotFound("GradeEntity is null");
+            if (gradeModelToUpdate is null) return NotFound("GradeEntity is null");
 
-            if (await _subjectRepository.CheckExistsAsync(gradeDTO.SubjectEntityId) is false) return NotFound("Subject is null!");
+            if (await _subjectRepository.CheckExistsAsync(gradeModelDTO.SubjectEntityId) is false)
+                return NotFound("Subject is null!");
 
-            if (gradeAnother is not null && gradeAnother.Id != gradeToUpdate.Id)
+            if (gradeModelInDate is not null && gradeModelInDate.Id != gradeModelToUpdate.Id)
             {
                 ModelState.AddModelError("Custom Error", "GradesEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            await _gradeModelRepository.UpdateAsync(gradeToUpdate, gradeDTO);
+            await _gradeModelRepository.UpdateAsync(gradeModelToUpdate, gradeModelDTO);
 
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{studentId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditGrade])]
-        public async Task<ActionResult> RemoveAsync(Guid id)
+        public async Task<ActionResult> RemoveAsync(Guid studentId)
         {
-            GradeModelEntity? gradeToRemove = await _gradeModelRepository.GetAsync(id);
+            GradeModelEntity? gradeToRemove = await _gradeModelRepository.GetAsync(studentEntityId: studentId);
 
             if (gradeToRemove is null) return NotFound();
 

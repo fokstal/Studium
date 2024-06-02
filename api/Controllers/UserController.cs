@@ -22,12 +22,13 @@ namespace api.Controllers
         private readonly UserRepository _userRepository = new(db);
         private readonly StudentRepository _studentRepository = new(db);
 
-        [HttpGet]
+        [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequireRoles([Admin, Secretar])]
         [RequirePermissions([ViewUser])]
-        public async Task<ActionResult<IEnumerable<UserEntity>>> GetListAsync() => Ok(await _userRepository.GetListAsync());
+        public async Task<ActionResult<IEnumerable<UserEntity>>> GetListAsync()
+            => Ok(await _userRepository.GetListAsync());
 
         [HttpGet("session")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -47,7 +48,7 @@ namespace api.Controllers
 
             if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out Guid userId)) return Unauthorized();
 
-            return Ok(await _userRepository.GetAsync(userId));
+            return Ok(await _userRepository.GetAsync(userEntityId: userId));
         }
 
         [HttpPost("register")]
@@ -58,7 +59,7 @@ namespace api.Controllers
         [RequirePermissions([RegisterUser])]
         public async Task<ActionResult<RegisterUserDTO>> RegisterAsync([FromBody] RegisterUserDTO userDTO)
         {
-            if (await _userRepository.GetAsync(userDTO.Login) is not null)
+            if (await _userRepository.GetAsync(login: userDTO.Login) is not null)
             {
                 ModelState.AddModelError("Custom", "User already Exists!");
 
@@ -79,36 +80,42 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> LoginAsync([FromBody] LoginUserDTO userDTO)
         {
-            UserEntity? user = await _userRepository.GetAsync(userDTO.Login);
+            UserEntity? userEntity = await _userRepository.GetAsync(login: userDTO.Login);
 
-            if (user is null) return NotFound();
+            if (userEntity is null) return NotFound();
 
-            if (StringHasher.Verify(userDTO.Password, user.PasswordHash) is false) return BadRequest("Password is not valid!");
+            if (StringHasher.Verify(userDTO.Password, userEntity.PasswordHash) is false) 
+                return BadRequest("Password is not valid!");
 
-            HttpContext.Response.Cookies.Append(CookieNames.USER_TOKEN, new JwtProvider(_configuration).GenerateToken(user));
+            HttpContext.Response.Cookies
+            .Append(CookieNames.USER_TOKEN, new JwtProvider(_configuration)
+            .GenerateToken(userEntity));
 
             return Ok();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{userId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditUser])]
-        public async Task<IActionResult> DeleteAsync(Guid id)
+        public async Task<IActionResult> DeleteAsync(Guid userId)
         {
-            UserEntity? userToRemove = await _userRepository.GetNoTrackingAsync(id);
+            UserEntity? userEntityToRemove = await _userRepository.GetNoTrackingAsync(userEntityId: userId);
 
-            if (userToRemove is null) return NotFound();
+            if (userEntityToRemove is null) return NotFound();
 
-            if (UserService.CheckRoleContains(_userRepository, userToRemove, Student))
+            if (UserService.CheckRoleContains(_userRepository, userEntityToRemove, Student))
             {
-                StudentEntity studentToRemove = await _studentRepository.GetAsync(userToRemove.Id) ?? throw new Exception("Student on User is null!");
+                StudentEntity studentToRemove = await 
+                    _studentRepository
+                    .GetAsync(userEntityToRemove.Id) 
+                    ?? throw new Exception("Student on User is null!");
 
                 await _studentRepository.RemoveAsync(studentToRemove);
             }
 
-            await _userRepository.RemoveAsync(userToRemove);
+            await _userRepository.RemoveAsync(userEntityToRemove);
 
             return NoContent();
         }

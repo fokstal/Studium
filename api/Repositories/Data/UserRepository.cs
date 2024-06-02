@@ -11,7 +11,7 @@ namespace api.Repositories.Data
     {
         public async override Task<IEnumerable<UserEntity>> GetListAsync()
         {
-            IEnumerable<UserEntity> userList = await 
+            IEnumerable<UserEntity> userEntityList = await
                 _db.User
                 .Select(userDb => new UserEntity()
                 {
@@ -22,60 +22,67 @@ namespace api.Repositories.Data
                     LastName = userDb.LastName,
                     PasswordHash = userDb.PasswordHash,
                     DateCreated = userDb.DateCreated,
-                    RoleEntityList = userDb.RoleEntityList.Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name }).ToList(),
+                    RoleEntityList =
+                        userDb.RoleEntityList
+                        .Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name })
+                        .ToList(),
                 })
                 .ToListAsync();
 
-            return userList;
+            return userEntityList;
         }
 
         public override Task<UserEntity?> GetAsync(int id) => throw new NotImplementedException();
 
-        public async Task<UserEntity?> GetAsync(Guid id)
+        public async Task<UserEntity?> GetAsync(Guid userEntityId)
         {
-            UserEntity? user = await _db.User.Include(userDb => userDb.RoleEntityList).FirstOrDefaultAsync(userDb => userDb.Id == id);
+            UserEntity? userEntity = await
+                _db.User
+                .Include(u => u.RoleEntityList)
+                .FirstOrDefaultAsync(u => u.Id == userEntityId);
 
-            if (user is not null)
+            if (userEntity is not null)
             {
-                user.RoleEntityList = user.RoleEntityList.Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name }).ToList();
+                userEntity.RoleEntityList =
+                    userEntity.RoleEntityList
+                    .Select(r => new RoleEntity { Id = r.Id, Name = r.Name })
+                    .ToList();
             }
 
-            return user;
+            return userEntity;
         }
 
-        public async Task<UserEntity?> GetNoTrackingAsync(Guid id)
+        public async Task<UserEntity?> GetNoTrackingAsync(Guid userEntityId)
         {
-            UserEntity? user = await _db.User.AsNoTracking().FirstOrDefaultAsync(userDb => userDb.Id == id);
+            UserEntity? userEntity = await
+                _db.User
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userEntityId);
 
-            return user;
+            return userEntity;
         }
 
         public async Task<UserEntity?> GetAsync(string login)
         {
-            UserEntity? user = await _db.User.FirstOrDefaultAsync(userDb => userDb.Login.ToLower() == login.ToLower());
+            UserEntity? userEntity = await
+                _db.User
+                .FirstOrDefaultAsync(u => u.Login.ToLower() == login.ToLower());
 
-            return user;
+            return userEntity;
         }
 
-        public override async Task AddAsync(UserEntity user)
-        {
-            await _db.User.AddAsync(user);
-
-            await _db.SaveChangesAsync();
-        }
-
-        public override UserEntity Create(RegisterUserDTO userDTO)
+        public override UserEntity Create(RegisterUserDTO registerUserDTO)
         {
             return new()
             {
-                Id = userDTO.Id,
-                Login = userDTO.Login,
-                FirstName = userDTO.FirstName,
-                MiddleName = userDTO.MiddleName,
-                LastName = userDTO.LastName,
-                PasswordHash = StringHasher.Generate(userDTO.Password),
+                Id = registerUserDTO.Id,
+                Login = registerUserDTO.Login,
+                FirstName = registerUserDTO.FirstName,
+                MiddleName = registerUserDTO.MiddleName,
+                LastName = registerUserDTO.LastName,
+                PasswordHash = StringHasher.Generate(registerUserDTO.Password),
                 DateCreated = DateTime.Now,
-                RoleEntityList = GetRolesEntityByEnum(userDTO.RoleEnumList),
+                RoleEntityList = GetRolesEntityByEnum(registerUserDTO.RoleEnumList),
             };
         }
 
@@ -83,49 +90,49 @@ namespace api.Repositories.Data
 
         public async Task<HashSet<PermissionEnum>> GetPermissionListAsync(Guid id)
         {
-            List<RoleEntity>[] roleList = await
+            List<RoleEntity>[] roleEntityList = await
                 _db.User
                     .AsNoTracking()
-                    .Include(user => user.RoleEntityList)
-                    .ThenInclude(role => role.PermissionEntityList)
-                    .Where(user => user.Id == id)
-                    .Select(user => user.RoleEntityList)
+                    .Include(u => u.RoleEntityList)
+                    .ThenInclude(r => r.PermissionEntityList)
+                    .Where(u => u.Id == id)
+                    .Select(u => u.RoleEntityList)
                     .ToArrayAsync();
 
-            return roleList
-                .SelectMany(role => role)
-                .SelectMany(role => role.PermissionEntityList)
-                .Select(permission => (PermissionEnum)permission.Id)
+            return roleEntityList
+                .SelectMany(r => r)
+                .SelectMany(r => r.PermissionEntityList)
+                .Select(p => (PermissionEnum)p.Id)
                 .ToHashSet();
         }
 
-        public async Task<HashSet<RoleEnum>> GetRoleListAsync(Guid id)
+        public async Task<HashSet<RoleEnum>> GetRoleListAsync(Guid userId)
         {
-            List<RoleEntity>[] roleList = await
+            List<RoleEntity>[] roleEntityList = await
                 _db.User
-                    .AsNoTracking()
-                    .Include(user => user.RoleEntityList)
-                    .ThenInclude(role => role.PermissionEntityList)
-                    .Where(user => user.Id == id)
-                    .Select(user => user.RoleEntityList)
-                    .ToArrayAsync();
+                .AsNoTracking()
+                .Include(u => u.RoleEntityList)
+                .ThenInclude(r => r.PermissionEntityList)
+                .Where(u => u.Id == userId)
+                .Select(u => u.RoleEntityList)
+                .ToArrayAsync();
 
-            return roleList
-                .SelectMany(role => role)
-                .Select(role => (RoleEnum)role.Id)
+            return roleEntityList
+                .SelectMany(r => r)
+                .Select(r => (RoleEnum)r.Id)
                 .ToHashSet();
         }
 
         public List<RoleEntity> GetRolesEntityByEnum(RoleEnum[] roleEnumList)
         {
-            List<RoleEntity> roleEntityList = new();
+            List<RoleEntity> roleEntityList = [];
 
             foreach (RoleEnum roleEnum in roleEnumList)
             {
                 roleEntityList.Add
                 (
                     _db.Role
-                    .SingleOrDefault(roleDb => roleDb.Name == roleEnum.ToString())
+                    .SingleOrDefault(r => r.Name == roleEnum.ToString())
                     ?? throw new Exception("RoleDb and RoleEnum is not Equal!")
                 );
             }

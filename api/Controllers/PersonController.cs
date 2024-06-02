@@ -22,25 +22,26 @@ namespace api.Controllers
         private readonly GroupRepository _groupRepository = new(db);
         private readonly UserRepository _userRepository = new(db);
 
-        [HttpGet]
+        [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewPersonList])]
-        public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListAsync() => Ok(await _personRepository.GetListAsync());
+        public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListAsync()
+            => Ok(await _personRepository.GetListAsync());
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{personId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewPerson])]
-        public async Task<ActionResult<PersonEntity>> GetAsync(int id)
+        public async Task<ActionResult<PersonEntity>> GetAsync(int personId)
         {
-            if (id < 1) return BadRequest();
+            if (personId < 1) return BadRequest();
 
-            PersonEntity? person = await _personRepository.GetAsync(id);
+            PersonEntity? personEntity = await _personRepository.GetAsync(personEntityId: personId);
 
-            if (person is null) return NotFound();
+            if (personEntity is null) return NotFound();
 
             // if (person.Student is not null)
             // {
@@ -67,7 +68,7 @@ namespace api.Controllers
             // }
 
 
-            return Ok(person);
+            return Ok(personEntity);
         }
 
         [HttpPost]
@@ -79,73 +80,81 @@ namespace api.Controllers
         [RequirePermissions([EditPerson])]
         public async Task<ActionResult<PersonEntity>> CreateAsync([FromForm] PersonDTO personDTO)
         {
-            if (await _personRepository.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName) is not null)
+            if (await _personRepository.GetAsync
+                (
+                    firstName: personDTO.FirstName,
+                    middleName: personDTO.MiddleName,
+                    lastName: personDTO.LastName
+                ) is not null)
             {
                 ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            PersonEntity personToAdd = _personRepository.Create(personDTO);
+            PersonEntity personEntityToAdd = _personRepository.Create(personDTO);
 
-            await _personRepository.AddAsync(personToAdd);
+            await _personRepository.AddAsync(personEntityToAdd);
 
-            return Created("PersonEntity", personToAdd);
+            return Created("PersonEntity", personEntityToAdd);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{personId:int}")]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditPerson])]
-        public async Task<IActionResult> UpdateAsync(int id, [FromForm] PersonDTO personDTO)
+        public async Task<IActionResult> UpdateAsync(int personId, [FromForm] PersonDTO personDTO)
         {
-            if (id < 1) return BadRequest();
+            if (personId < 1) return BadRequest();
 
-            PersonEntity? personToUpdate = await _personRepository.GetAsync(id);
-            PersonEntity? personAnother = await _personRepository.GetAsync(personDTO.FirstName, personDTO.MiddleName, personDTO.LastName);
+            PersonEntity? personEntityToUpdate = await _personRepository.GetAsync(personEntityId: personId);
 
-            if (personToUpdate is null) return NotFound();
+            if (personEntityToUpdate is null) return NotFound();
 
-
-            if (personAnother is not null && personAnother.Id != personToUpdate.Id)
+            if (await _personRepository.GetAsync
+                (
+                    firstName: personDTO.FirstName,
+                    middleName: personDTO.MiddleName,
+                    lastName: personDTO.LastName
+                ) is not null)
             {
                 ModelState.AddModelError("Custom Error", "PersonEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            PictureRepository.RemovePicture(PictureFolders.Person, personToUpdate.AvatarFileName);
+            PictureRepository.RemovePicture(PictureFolders.Person, personEntityToUpdate.AvatarFileName);
 
-            await _personRepository.UpdateAsync(personToUpdate, personDTO);
+            await _personRepository.UpdateAsync(personEntityToUpdate, personDTO);
 
             return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{personId:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditPerson])]
-        public async Task<IActionResult> DeleteAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int personId)
         {
-            if (id < 1) return BadRequest();
+            if (personId < 1) return BadRequest();
 
-            PersonEntity? personToRemove = await _personRepository.GetAsync(id);
+            PersonEntity? personEntityToRemove = await _personRepository.GetAsync(personEntityId: personId);
 
-            if (personToRemove is null) return NotFound();
+            if (personEntityToRemove is null) return NotFound();
 
-            if (personToRemove.PassportEntity is not null)
+            if (personEntityToRemove.PassportEntity is not null)
             {
-                PictureRepository.RemovePicture(PictureFolders.Passport, personToRemove.PassportEntity.ScanFileName);
+                PictureRepository.RemovePicture(PictureFolders.Passport, personEntityToRemove.PassportEntity.ScanFileName);
             }
 
-            PictureRepository.RemovePicture(PictureFolders.Person, personToRemove.AvatarFileName);
+            PictureRepository.RemovePicture(PictureFolders.Person, personEntityToRemove.AvatarFileName);
 
-            await _personRepository.RemoveAsync(personToRemove);
+            await _personRepository.RemoveAsync(personEntityToRemove);
 
             return NoContent();
         }

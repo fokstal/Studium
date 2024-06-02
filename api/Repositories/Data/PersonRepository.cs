@@ -11,33 +11,41 @@ namespace api.Repositories.Data
     {
         public async override Task<IEnumerable<PersonEntity>> GetListAsync()
         {
-            IEnumerable<PersonEntity> personList = await _db.Person.Include(personDb => personDb.PassportEntity).Include(personDb => personDb.StudentEntity).ToArrayAsync();
+            IEnumerable<PersonEntity> personList = await
+                _db.Person
+                .Include(p => p.PassportEntity)
+                .Include(p => p.StudentEntity)
+                .ToArrayAsync();
 
             return personList;
         }
 
-        public async override Task<PersonEntity?> GetAsync(int id)
+        public async override Task<PersonEntity?> GetAsync(int personEntityId)
         {
-            PersonEntity? person = await _db.Person.Include(personDb => personDb.PassportEntity).Include(personDb => personDb.StudentEntity).FirstOrDefaultAsync(personDb => personDb.Id == id);
+            PersonEntity? personEntity = await
+                _db.Person
+                .Include(p => p.PassportEntity)
+                .Include(p => p.StudentEntity)
+                .FirstOrDefaultAsync(p => p.Id == personEntityId);
 
-            return person;
+            return personEntity;
         }
 
         public async Task<PersonEntity?> GetAsync(string firstName, string middleName, string lastName)
         {
-            PersonEntity? person =
-            await _db.Person
-                .Include(personDb => personDb.PassportEntity)
-                .Include(personDb => personDb.StudentEntity)
+            PersonEntity? personEntity = await
+                _db.Person
+                .Include(p => p.PassportEntity)
+                .Include(p => p.StudentEntity)
                 .FirstOrDefaultAsync
                 (
-                    personDb =>
-                        StringComparer.CurrentCultureIgnoreCase.Compare(personDb.FirstName, firstName) == 0 &&
-                        StringComparer.CurrentCultureIgnoreCase.Compare(personDb.MiddleName, middleName) == 0 &&
-                    StringComparer.CurrentCultureIgnoreCase.Compare(personDb.LastName, lastName) == 0
+                    p =>
+                        StringComparer.CurrentCultureIgnoreCase.Compare(p.FirstName, firstName) == 0 &&
+                        StringComparer.CurrentCultureIgnoreCase.Compare(p.MiddleName, middleName) == 0 &&
+                        StringComparer.CurrentCultureIgnoreCase.Compare(p.LastName, lastName) == 0
                 );
 
-            return person;
+            return personEntity;
         }
 
         public override PersonEntity Create(PersonDTO personDTO)
@@ -53,14 +61,14 @@ namespace api.Repositories.Data
             };
         }
 
-        public async override Task UpdateAsync(PersonEntity personToUpdate, PersonDTO personDTO)
+        public async override Task UpdateAsync(PersonEntity personEntityToUpdate, PersonDTO personDTO)
         {
-            personToUpdate.FirstName = personDTO.FirstName;
-            personToUpdate.MiddleName = personDTO.MiddleName;
-            personToUpdate.LastName = personDTO.LastName;
-            personToUpdate.BirthDate = personDTO.BirthDate;
-            personToUpdate.Sex = personDTO.Sex;
-            personToUpdate.AvatarFileName = await UploadPersonAvatarAsync(personDTO.AvatarFile, personToUpdate.Sex);
+            personEntityToUpdate.FirstName = personDTO.FirstName;
+            personEntityToUpdate.MiddleName = personDTO.MiddleName;
+            personEntityToUpdate.LastName = personDTO.LastName;
+            personEntityToUpdate.BirthDate = personDTO.BirthDate;
+            personEntityToUpdate.Sex = personDTO.Sex;
+            personEntityToUpdate.AvatarFileName = await UploadPersonAvatarAsync(personDTO.AvatarFile, personEntityToUpdate.Sex);
 
             await _db.SaveChangesAsync();
         }

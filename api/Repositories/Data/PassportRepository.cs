@@ -17,10 +17,10 @@ namespace api.Repositories.Data
             };
         }
 
-        public override async Task UpdateAsync(PassportEntity passportToUpdate, PassportDTO passportDTO)
+        public override async Task UpdateAsync(PassportEntity passportEntityToUpdate, PassportDTO passportDTO)
         {
-            passportToUpdate.ScanFileName = await UploadPassportScanAsync(passportDTO.ScanFile);
-            passportToUpdate.PersonEntityId = passportDTO.Id;
+            passportEntityToUpdate.ScanFileName = await UploadPassportScanAsync(passportDTO.ScanFile);
+            passportEntityToUpdate.PersonEntityId = passportDTO.Id;
 
             await _db.SaveChangesAsync();
         }

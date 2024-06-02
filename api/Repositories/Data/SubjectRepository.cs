@@ -8,85 +8,76 @@ namespace api.Repositories.Data
 {
     public class SubjectRepository(AppDbContext db) : DataRepositoryBase<SubjectEntity, SubjectDTO>(db)
     {
-        public async Task<bool> CheckExistsAsync(Guid userId) => await _db.Subject.FirstOrDefaultAsync(valueDb => valueDb.TeacherId == userId) is not null;
+        public async Task<bool> CheckExistsAsync(Guid userId)
+            => await _db.Subject.FirstOrDefaultAsync(s => s.TeacherId == userId) is not null;
 
         public async override Task<IEnumerable<SubjectEntity>> GetListAsync()
         {
-            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradeModelEntityList).ToArrayAsync();
+            IEnumerable<SubjectEntity> subjectEntityList = await
+                _db.Subject
+                .Include(s => s.GradeModelEntityList)
+                .ToArrayAsync();
 
-            return subjectList;
+            return subjectEntityList;
         }
 
         public async Task<IEnumerable<SubjectEntity>> GetListAsync(int groupEntityId)
         {
-            IEnumerable<SubjectEntity> subjectList = await 
+            IEnumerable<SubjectEntity> subjectEntityList = await
                 _db.Subject
-                .Include(subjectDb => subjectDb.GradeModelEntityList)
+                .Include(s => s.GradeModelEntityList)
                 .Where(s => s.GroupEntityId == groupEntityId)
                 .ToArrayAsync();
 
-            return subjectList;
+            return subjectEntityList;
         }
 
-        public async Task<IEnumerable<SubjectEntity>> GetListByGroupAsync(int id)
+        public async override Task<SubjectEntity?> GetAsync(int subjectEntityId)
         {
-            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Where(subjectDb => subjectDb.GroupEntityId == id).ToArrayAsync();
-            IEnumerable<GradeModelEntity> gradesList = await _db.GradeModel.Include(gradesDb => gradesDb.GradeEntityList).ToArrayAsync();
+            SubjectEntity? subjectEntity = await
+                _db.Subject
+                .Include(s => s.GradeModelEntityList)
+                .FirstOrDefaultAsync(s => s.Id == subjectEntityId);
 
-            foreach (SubjectEntity subject in subjectList)
-            {
-                foreach (GradeModelEntity grades in gradesList)
-                {
-                    if (subject.Id == grades.SubjectEntityId)
-                    {
-                        subject.GradeModelEntityList.Add(grades);
-                    }
-                }
-            }
-
-            return subjectList;
+            return subjectEntity;
         }
 
-        public async override Task<SubjectEntity?> GetAsync(int id)
+        public async Task<SubjectEntity?> GetAsync(string subjectEntityName, Guid? teacherId)
         {
-            SubjectEntity? subject = await _db.Subject.Include(subjectDb => subjectDb.GradeModelEntityList).FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
-
-            return subject;
-        }
-
-        public async Task<SubjectEntity?> GetAsync(string name, Guid? teacherId)
-        {
-            SubjectEntity? subject = 
-            await _db.Subject
-                .Include(subjectDb => subjectDb.GradeModelEntityList)
+            SubjectEntity? subjectEntity = await
+                _db.Subject
+                .Include(s => s.GradeModelEntityList)
                 .FirstOrDefaultAsync
                 (
-                    subjectDb =>
-                        StringComparer.CurrentCultureIgnoreCase.Compare(subjectDb.Name, name) == 0 &&
-                        subjectDb.TeacherId == teacherId
+                    s =>
+                        StringComparer.CurrentCultureIgnoreCase.Compare(s.Name, subjectEntityName) == 0 &&
+                        s.TeacherId == teacherId
                 );
 
-            return subject;
+            return subjectEntity;
         }
 
-        public async Task<double> GetAverageAsync(StudentEntity student)
+        public async Task<double> GetAverageAsync(StudentEntity studentEntity)
         {
-            IEnumerable<SubjectEntity> subjectList = await GetListByGroupAsync(Convert.ToInt32(student.GroupEntityId));
+            IEnumerable<SubjectEntity> subjectEntityList = await 
+                GetListAsync(groupEntityId: Convert.ToInt32(studentEntity.GroupEntityId));
 
             double summaryGrades = 0;
 
-            foreach (SubjectEntity subject in subjectList)
+            foreach (SubjectEntity subjectEntity in subjectEntityList)
             {
                 double summGrades = 0;
                 int countGrades = 0;
 
-                foreach (GradeModelEntity gradesEntity in subject.GradeModelEntityList)
+                foreach (GradeModelEntity gradeModelEntity in subjectEntity.GradeModelEntityList)
                 {
-                    GradeEntity? grade = gradesEntity.GradeEntityList.FirstOrDefault(grade => grade.StudentEntityId == student.Id);
+                    GradeEntity? gradeEntity = 
+                        gradeModelEntity.GradeEntityList
+                        .FirstOrDefault(g => g.StudentEntityId == studentEntity.Id);
 
-                    if (grade is not null)
+                    if (gradeEntity is not null)
                     {
-                        summGrades += grade.Value;
+                        summGrades += gradeEntity.Value;
                         countGrades += 1;
                     }
                 }
@@ -95,7 +86,7 @@ namespace api.Repositories.Data
                 summaryGrades += Math.Round(summGrades / countGrades);
             }
 
-            return summaryGrades / subjectList.Count();
+            return summaryGrades / subjectEntityList.Count();
         }
 
         public override SubjectEntity Create(SubjectDTO subjectDTO)
@@ -109,12 +100,12 @@ namespace api.Repositories.Data
             };
         }
 
-        public async override Task UpdateAsync(SubjectEntity subjectToUpdate, SubjectDTO subjectDTO)
+        public async override Task UpdateAsync(SubjectEntity subjectEntityToUpdate, SubjectDTO subjectDTO)
         {
-            subjectToUpdate.Name = subjectDTO.Name;
-            subjectToUpdate.Description = subjectDTO.Description;
-            subjectToUpdate.TeacherId = subjectDTO.TeacherId;
-            subjectToUpdate.GroupEntityId = subjectDTO.GroupEntityId;
+            subjectEntityToUpdate.Name = subjectDTO.Name;
+            subjectEntityToUpdate.Description = subjectDTO.Description;
+            subjectEntityToUpdate.TeacherId = subjectDTO.TeacherId;
+            subjectEntityToUpdate.GroupEntityId = subjectDTO.GroupEntityId;
 
             await _db.SaveChangesAsync();
         }
