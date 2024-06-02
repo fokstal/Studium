@@ -86,7 +86,18 @@ namespace api.Repositories.Data
             };
         }
 
-        public override Task UpdateAsync(UserEntity valueToUpdate, RegisterUserDTO valueDTO) => throw new NotImplementedException();
+        public override async Task UpdateAsync(UserEntity userEntityToUpdate, RegisterUserDTO registerUserDTO)
+        {
+            userEntityToUpdate.Login = registerUserDTO.Login;
+            userEntityToUpdate.FirstName = registerUserDTO.FirstName;
+            userEntityToUpdate.MiddleName = registerUserDTO.MiddleName;
+            userEntityToUpdate.LastName = registerUserDTO.LastName;
+            userEntityToUpdate.PasswordHash = StringHasher.Generate(registerUserDTO.Password);
+            userEntityToUpdate.DateCreated = DateTime.Now;
+            userEntityToUpdate.RoleEntityList = GetRolesEntityByEnum(registerUserDTO.RoleEnumList);
+
+            await _db.SaveChangesAsync();
+        }
 
         public async Task<HashSet<PermissionEnum>> GetPermissionListAsync(Guid id)
         {

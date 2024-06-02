@@ -44,7 +44,6 @@ namespace api.Repositories.Data
 
         public async override Task UpdateAsync(StudentEntity studentEntityToUpdate, StudentDTO studentDTO)
         {
-            studentEntityToUpdate.Id = studentDTO.Id;
             studentEntityToUpdate.AddedDate = studentDTO.AddedDate.Date;
             studentEntityToUpdate.RemovedDate = studentDTO.RemovedDate.Date;
             studentEntityToUpdate.PersonEntityId = studentDTO.PersonEntityId;

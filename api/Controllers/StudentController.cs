@@ -155,25 +155,19 @@ namespace api.Controllers
 
             studentDTO.GroupEntityId = groupId;
 
-            UserEntity userEntityToRemove = await _userRepository.GetNoTrackingAsync(userEntityId: studentEntityToUpdate.Id) ?? throw new Exception("User on Student is null!");
+            UserEntity userEntityToUpdate = await _userRepository.GetAsync(userEntityId: studentEntityToUpdate.Id) ?? throw new Exception("User on Student is null!");
 
-            await _userRepository.RemoveAsync(userEntityToRemove);
+            await _userRepository.RemoveAsync(userEntityToUpdate);
 
-            Guid userStudentId = Guid.NewGuid();
-            string login = Guid.NewGuid().ToString()[..10];
-
-            await _userRepository.AddAsync(_userRepository.Create(new RegisterUserDTO()
+            await _userRepository.UpdateAsync(userEntityToUpdate, new()
             {
-                Id = userStudentId,
-                Login = login,
+                Login = userEntityToUpdate.Login,
                 FirstName = person.FirstName,
                 MiddleName = person.MiddleName,
                 LastName = person.LastName,
-                Password = login,
+                Password = userEntityToUpdate.Login,
                 RoleEnumList = [Student]
-            }));
-
-            studentDTO.Id = userStudentId;
+            });
 
             await _studentRepository.UpdateAsync(studentEntityToUpdate, studentDTO);
 
