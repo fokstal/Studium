@@ -8,6 +8,7 @@ using api.Extensions;
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
 using api.Services;
+using api.Models.DTO;
 
 namespace api.Controllers
 {
@@ -155,9 +156,7 @@ namespace api.Controllers
 
             studentDTO.GroupEntityId = groupId;
 
-            UserEntity userEntityToUpdate = await _userRepository.GetAsync(userEntityId: studentEntityToUpdate.Id) ?? throw new Exception("User on Student is null!");
-
-            await _userRepository.RemoveAsync(userEntityToUpdate);
+            UserEntity userEntityToUpdate = await _userRepository.GetNoTrackingRoleAsync(userEntityId: studentEntityToUpdate.Id) ?? throw new Exception("User on Student is null!");
 
             await _userRepository.UpdateAsync(userEntityToUpdate, new()
             {
@@ -170,6 +169,21 @@ namespace api.Controllers
             });
 
             await _studentRepository.UpdateAsync(studentEntityToUpdate, studentDTO);
+
+            return NoContent();
+        }
+
+        [HttpPut("date/{studentId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([EditStudent])]
+        public async Task<IActionResult> UpdateAsync(Guid studentId, [FromBody] DateStudentDTO dateStudentDTO)
+        {
+            StudentEntity? studentEntityToUpdate = await _studentRepository.GetAsync(studentEntityId: studentId);
+
+            if (studentEntityToUpdate is null) return NotFound();
 
             return NoContent();
         }

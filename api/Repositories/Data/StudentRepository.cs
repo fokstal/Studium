@@ -2,6 +2,7 @@ using api.Data;
 using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
+using api.Models.DTO;
 
 namespace api.Repositories.Data
 {
@@ -48,6 +49,14 @@ namespace api.Repositories.Data
             studentEntityToUpdate.RemovedDate = studentDTO.RemovedDate.Date;
             studentEntityToUpdate.PersonEntityId = studentDTO.PersonEntityId;
             studentEntityToUpdate.GroupEntityId = studentDTO.GroupEntityId;
+
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(StudentEntity studentEntityToUpdate, DateStudentDTO dateStudentDTO)
+        {
+            studentEntityToUpdate.AddedDate = dateStudentDTO.AddedDate;
+            studentEntityToUpdate.RemovedDate = dateStudentDTO.RemovedDate;
 
             await _db.SaveChangesAsync();
         }

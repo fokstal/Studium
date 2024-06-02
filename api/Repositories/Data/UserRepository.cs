@@ -62,6 +62,15 @@ namespace api.Repositories.Data
             return userEntity;
         }
 
+        public async Task<UserEntity?> GetNoTrackingRoleAsync(Guid userEntityId)
+        {
+            UserEntity? userEntity = await
+                _db.User
+                .FirstOrDefaultAsync(u => u.Id == userEntityId);
+
+            return userEntity;
+        }
+
         public async Task<UserEntity?> GetAsync(string login)
         {
             UserEntity? userEntity = await
@@ -94,7 +103,6 @@ namespace api.Repositories.Data
             userEntityToUpdate.LastName = registerUserDTO.LastName;
             userEntityToUpdate.PasswordHash = StringHasher.Generate(registerUserDTO.Password);
             userEntityToUpdate.DateCreated = DateTime.Now;
-            userEntityToUpdate.RoleEntityList = GetRolesEntityByEnum(registerUserDTO.RoleEnumList);
 
             await _db.SaveChangesAsync();
         }
