@@ -3,6 +3,7 @@ using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 using api.Models.Entities;
+using api.Models.DTO;
 
 namespace api.Repositories.Data
 {
@@ -66,7 +67,17 @@ namespace api.Repositories.Data
             return CalculateAverageGrade(subjectEntityList, studentEntity.Id);
         }
 
-        public async Task<double> GetAverageGradeAsync(StudentEntity studentEntity, DateTime startCheck, DateTime endCheck)
+        public async Task<List<AverageGradeToSubjectDTO>> GetAverageGradeListAsync
+            (StudentEntity studentEntity, DateTime startCheck, DateTime endCheck)
+        {
+            IEnumerable<SubjectEntity> subjectEntityList = await
+                GetListAsync(groupEntityId: Convert.ToInt32(studentEntity.GroupEntityId));
+
+            return CalculateAverageGradeToSubjectList(subjectEntityList, studentEntity.Id, startCheck, endCheck);
+        }
+
+        public async Task<double> GetAverageGradeAsync
+            (StudentEntity studentEntity, DateTime startCheck, DateTime endCheck)
         {
             IEnumerable<SubjectEntity> subjectEntityList = await
                 GetListAsync(groupEntityId: Convert.ToInt32(studentEntity.GroupEntityId));
@@ -76,33 +87,71 @@ namespace api.Repositories.Data
 
         public double CalculateAverageGrade(IEnumerable<SubjectEntity> subjectEntityList, Guid studentEntityId)
         {
+            double averageGrade = 0;
             double summaryGrades = 0;
-            int summarySubjectCount = 0;
+            int countSubject = 0;
 
             foreach (SubjectEntity subjectEntity in subjectEntityList)
             {
                 CalculateAverageGradeSubject
                 (
                     ref summaryGrades,
-                    ref summarySubjectCount,
+                    ref countSubject,
                     subjectEntity.GradeModelEntityList,
                     studentEntityId
                 );
             }
 
-            return summaryGrades / summarySubjectCount;
+            if (countSubject != 0) averageGrade = summaryGrades / countSubject;
+
+            return averageGrade;
+        }
+
+        public List<AverageGradeToSubjectDTO> CalculateAverageGradeToSubjectList
+            (IEnumerable<SubjectEntity> subjectEntityList, Guid studentEntityId,
+            DateTime startCheck, DateTime endCheck)
+        {
+            List<AverageGradeToSubjectDTO> averageGradeToSubjectList = new();
+
+            foreach (SubjectEntity subjectEntity in subjectEntityList)
+            {
+                List<GradeModelEntity> gradeModelListInInterval =
+                    subjectEntity
+                    .GradeModelEntityList
+                    .Where(gm => gm.SetDate > startCheck && gm.SetDate < endCheck)
+                    .ToList();
+
+                double summaryGrades = 0;
+                int countGradeModel = 0;
+
+                CalculateAverageGradeSubject
+                (
+                    ref summaryGrades,
+                    ref countGradeModel,
+                    gradeModelListInInterval,
+                    studentEntityId
+                );
+
+                if (countGradeModel != 0)
+                {
+                    averageGradeToSubjectList.Add(new()
+                    {
+                        SubjectName = subjectEntity.Name,
+                        AverageGrade = summaryGrades / countGradeModel,
+                    });
+                }
+            }
+
+            return averageGradeToSubjectList;
         }
 
         public double CalculateAverageGrade
-            (
-                IEnumerable<SubjectEntity> subjectEntityList,
-                Guid studentEntityId,
-                DateTime startCheck,
-                DateTime endCheck
-            )
+            (IEnumerable<SubjectEntity> subjectEntityList, Guid studentEntityId,
+            DateTime startCheck, DateTime endCheck)
         {
+            double averageGrade = 0;
             double summaryGrades = 0;
-            int summarySubjectCount = 0;
+            int countSubject = 0;
 
             foreach (SubjectEntity subjectEntity in subjectEntityList)
             {
@@ -115,19 +164,21 @@ namespace api.Repositories.Data
                 CalculateAverageGradeSubject
                 (
                     ref summaryGrades,
-                    ref summarySubjectCount,
+                    ref countSubject,
                     gradeModelListInInterval,
                     studentEntityId
                 );
             }
 
-            return summaryGrades / summarySubjectCount;
+            if (countSubject != 0) averageGrade = summaryGrades / countSubject;
+
+            return averageGrade;
         }
 
         public void CalculateAverageGradeSubject
             (
                 ref double summaryGradeSubject,
-                ref int countSubject,
+                ref int countGradeModel,
                 List<GradeModelEntity> gradeModelListInInterval,
                 Guid studentEntityId
             )
@@ -151,7 +202,7 @@ namespace api.Repositories.Data
             if (countGrade != 0)
             {
                 summaryGradeSubject += Math.Round(summGrade / countGrade);
-                countSubject++;
+                countGradeModel++;
             }
         }
 

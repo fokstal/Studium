@@ -160,13 +160,34 @@ namespace api.Controllers
             return Ok(await _subjectRepository.GetAverageGradeAsync(studentEntity: studentEntity));
         }
 
+        [HttpPost("average-to-subject-list-by-student")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<AverageGradeToSubjectDTO>>> GetAverageToSubjectListAsync([FromBody] AverageSemesterGradeDTO averageSemesterGradeDTO)
+        {
+            StudentEntity? studentEntity = await
+                _studentRepository
+                .GetAsync(studentEntityId: averageSemesterGradeDTO.StudentEntityId);
+
+            if (studentEntity is null) return NotFound("Student is null!");
+            if (studentEntity.GroupEntityId is null) return NotFound("Group is null!");
+
+            return Ok(await _subjectRepository.GetAverageGradeListAsync
+            (
+                studentEntity: studentEntity,
+                startCheck: averageSemesterGradeDTO.StartDate,
+                endCheck: averageSemesterGradeDTO.EndDate
+            ));
+        }
+
         [HttpPost("average-semester")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<double>> GetAverageAsync([FromBody] AverageSemesterGradeDTO averageSemesterGradeDTO)
         {
-            StudentEntity? studentEntity = await 
+            StudentEntity? studentEntity = await
                 _studentRepository.GetAsync(studentEntityId: averageSemesterGradeDTO.StudentEntityId);
 
             if (studentEntity is null) return NotFound("Student is null!");
