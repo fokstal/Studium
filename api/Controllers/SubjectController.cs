@@ -23,7 +23,7 @@ namespace api.Controllers
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([ViewSubjectList])]
+        [RequirePermissions([ViewSubject])]
         public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync()
             => Ok(await _subjectRepository.GetListAsync());
 
