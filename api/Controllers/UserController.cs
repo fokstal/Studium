@@ -21,6 +21,8 @@ namespace api.Controllers
         private readonly IConfiguration _configuration = configuration;
         private readonly UserRepository _userRepository = new(db);
         private readonly StudentRepository _studentRepository = new(db);
+        private readonly SubjectRepository _subjectRepository = new(db);
+        private readonly GroupRepository _groupRepository = new(db);
 
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -29,6 +31,29 @@ namespace api.Controllers
         [RequirePermissions([ViewUser])]
         public async Task<ActionResult<IEnumerable<UserEntity>>> GetListAsync()
             => Ok(await _userRepository.GetListAsync());
+
+        [HttpGet("list-by-subject/{subjectId:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<UserEntity>>> GetListAsync(int subjectId)
+        {
+            if (subjectId < 1) return BadRequest();
+
+            SubjectEntity? subjectEntity = await _subjectRepository.GetAsync(subjectEntityId: subjectId);
+
+            if (subjectEntity is null) return NotFound();
+
+            GroupEntity groupEntity = await 
+                _groupRepository
+                .GetAsync(groupEntityId: subjectEntity.GroupEntityId) 
+                ?? throw new Exception("Group on Subject in Db is null!"); 
+
+            List<StudentEntity> studentEntityList = groupEntity.StudentEntityList;
+
+            return Ok(await _userRepository.GetListAsync(studentEntityList: studentEntityList));
+        }
 
         [HttpGet("session")]
         [ProducesResponseType(StatusCodes.Status200OK)]

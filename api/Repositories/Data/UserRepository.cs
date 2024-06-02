@@ -32,6 +32,22 @@ namespace api.Repositories.Data
             return userEntityList;
         }
 
+        public async Task<IEnumerable<UserEntity>> GetListAsync(List<StudentEntity> studentEntityList)
+        {
+            List<UserEntity> userEntityList = [];
+
+            foreach (StudentEntity studentEntity in studentEntityList)
+            {
+                userEntityList.Add
+                (
+                    await _db.User.FirstOrDefaultAsync(u => u.Id == studentEntity.Id)
+                    ?? throw new Exception("Student on User is null!")
+                );
+            }
+
+            return userEntityList;
+        }
+
         public override Task<UserEntity?> GetAsync(int id) => throw new NotImplementedException();
 
         public async Task<UserEntity?> GetAsync(Guid userEntityId)
