@@ -89,17 +89,19 @@ namespace api.Controllers
         [RequirePermissions([EditSubject])]
         public async Task<ActionResult<SubjectDTO>> CreateAsync([FromBody] SubjectDTO subjectDTO)
         {
-            if (await _subjectRepository.GetAsync
+            SubjectEntity? subjectEntityAnother = await _subjectRepository.GetAsync
                 (
                     subjectEntityName: subjectDTO.Name,
                     teacherId: subjectDTO.TeacherId
-                ) is not null)
+                );
+
+            if (subjectEntityAnother is not null && subjectEntityAnother.GroupEntityId != subjectDTO.GroupEntityId)
             {
                 ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
-            
+
             GroupEntity? groupEntity = await _groupRepository.GetAsync(groupEntityId: subjectDTO.GroupEntityId);
 
             if (groupEntity is null) return NotFound("Group is null!");
@@ -125,13 +127,20 @@ namespace api.Controllers
             if (subjectId < 1) return BadRequest();
 
             SubjectEntity? subjectEntityToUpdate = await _subjectRepository.GetAsync(subjectId);
-            SubjectEntity? subjectEntityAnother = await
-                _subjectRepository
-                .GetAsync(subjectEntityName: subjectDTO.Name, teacherId: subjectDTO.TeacherId);
 
             if (subjectEntityToUpdate is null) return NotFound();
 
-            if (subjectEntityAnother is not null && subjectEntityAnother.Id != subjectEntityToUpdate.Id)
+            SubjectEntity? subjectEntityAnother = await _subjectRepository.GetAsync
+                (
+                    subjectEntityName: subjectDTO.Name,
+                    teacherId: subjectDTO.TeacherId
+                );
+
+            if (
+                subjectEntityAnother is not null &&
+                subjectEntityAnother.GroupEntityId != subjectDTO.GroupEntityId &&
+                subjectEntityAnother.Id != subjectEntityToUpdate.Id
+                )
             {
                 ModelState.AddModelError("Custom Error", "SubjectEntity already Exists!");
 
