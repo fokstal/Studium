@@ -17,6 +17,17 @@ namespace api.Repositories.Data
             return subjectList;
         }
 
+        public async Task<IEnumerable<SubjectEntity>> GetListAsync(int groupEntityId)
+        {
+            IEnumerable<SubjectEntity> subjectList = await 
+                _db.Subject
+                .Include(subjectDb => subjectDb.GradeModelEntityList)
+                .Where(s => s.GroupEntityId == groupEntityId)
+                .ToArrayAsync();
+
+            return subjectList;
+        }
+
         public async Task<IEnumerable<SubjectEntity>> GetListByGroupAsync(int id)
         {
             IEnumerable<SubjectEntity> subjectList = await _db.Subject.Where(subjectDb => subjectDb.GroupEntityId == id).ToArrayAsync();

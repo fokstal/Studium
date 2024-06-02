@@ -23,8 +23,25 @@ namespace api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([ViewSubject])]
+        [RequirePermissions([ViewSubjectList])]
         public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync() => Ok(await _subjectRepository.GetListAsync());
+
+        [HttpGet("list/{groupId:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([ViewSubject])]
+        public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync(int groupId) 
+        {
+            // custom auth
+
+            if (groupId < 1) return BadRequest();
+
+            GroupEntity? groupEntity = await _groupRepository.GetAsync(groupId);
+
+            if (groupEntity is null) return NotFound();
+
+            return Ok(await _subjectRepository.GetListAsync(groupEntityId: groupId));
+        }
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
