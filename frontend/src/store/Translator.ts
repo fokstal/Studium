@@ -112,6 +112,9 @@ export const Translator = {
     group_name: "Name",
     group_description: "Description",
     group_auditory: "Auditory",
+    semester_grades: "Semester Grades",
+    fill_semester_date_in_input:
+      "Enter the start and end date of the desired semester in the field below",
   },
   BE: {
     student_list: "Спіс навучэнцаў",
@@ -226,6 +229,9 @@ export const Translator = {
     group_name: "Назва",
     group_description: "Апісанне",
     group_auditory: "Аўдыторыя",
+    semester_grades: "Ацэнкі за семестр",
+    fill_semester_date_in_input:
+      "Увядзіце ў поле ніжэй дату пачатку і канца патрэбнага семестра",
   },
   RU: {
     student_list: "Список учащихся",
@@ -340,5 +346,8 @@ export const Translator = {
     group_name: "Название",
     group_description: "Описание",
     group_auditory: "Аудитория",
+    semester_grades: "Оценки за семестр",
+    fill_semester_date_in_input:
+      "Введите в поле ниже дату начала и конца нужного семестра",
   },
 };

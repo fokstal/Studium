@@ -15,6 +15,7 @@ import {
   AiOutlineEye,
 } from "react-icons/ai";
 import { LanguageContext, Translator } from "../../store";
+import { useRoles } from "../../hooks";
 
 const studentService = new StudentService();
 const personService = new PersonService();
@@ -28,6 +29,7 @@ type StudentComponentProps = {
 export function StudentComponent({ id }: StudentComponentProps) {
   const [student, setStudent] = useState<Person & Group & Student>();
   const [passport, setPassport] = useState<string>();
+  const roles = useRoles();
   const { lang } = useContext(LanguageContext);
 
   const getPersonData = async (personId: number): Promise<Person> => {
@@ -52,9 +54,11 @@ export function StudentComponent({ id }: StudentComponentProps) {
     };
     setStudent(student);
 
-    if (localStorage.getItem("role") === "Student") return;
+    if (roles.includes("Student")) return;
     const passports = await passportService.get();
-    const passport = passports.find((p: any) => p.personEntityId === personData.id);
+    const passport = passports.find(
+      (p: any) => p.personEntityId === personData.id
+    );
     setPassport(passport?.scanFileName ?? null);
   };
 
@@ -83,7 +87,13 @@ export function StudentComponent({ id }: StudentComponentProps) {
                 : ""
             }
           />
-          <Flex gap="10px" p="20px" bg={colors.darkGrey} borderRadius="5px" w="100%">
+          <Flex
+            gap="10px"
+            p="20px"
+            bg={colors.darkGrey}
+            borderRadius="5px"
+            w="100%"
+          >
             <VStack gap="22px" align="end" p="7px 0" whiteSpace="nowrap">
               <Text>{Translator[lang.name]["name_student"]}:</Text>
               <Text>{Translator[lang.name]["date_birthday"]}:</Text>
@@ -104,7 +114,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
         </Flex>
       </Flex>
       <Flex gap="20px">
-        {localStorage.getItem("role") !== "Student" ? (
+        {!roles.includes("Student") ? (
           <Flex
             bg={colors.white}
             direction="column"
@@ -152,11 +162,7 @@ export function StudentComponent({ id }: StudentComponentProps) {
           gap="20px"
           p="20px"
           borderRadius="5px"
-          w={
-            localStorage.getItem("role") === "Student"
-              ? "100%"
-              : "calc(50% - 10px)"
-          }
+          w={roles.includes("Student") ? "100%" : "calc(50% - 10px)"}
         >
           <Text fontSize="24px" fontWeight="bold">
             {Translator[lang.name]["data_about_start"]}

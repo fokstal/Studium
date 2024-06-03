@@ -1,4 +1,4 @@
-import { Flex, useDisclosure } from "@chakra-ui/react";
+import { Flex, Text, useDisclosure } from "@chakra-ui/react";
 import { Button, Select } from "../ui-kit";
 import { useContext, useEffect, useState } from "react";
 import { Group, Person, Student, Subject } from "../../types";
@@ -11,6 +11,7 @@ import {
 import { GradeModal } from "../modal";
 import { LanguageContext, Translator } from "../../store";
 import { useRoles } from "../../hooks";
+import { AiOutlineClose } from "react-icons/ai";
 
 const groupService = new GroupService();
 const personService = new PersonService();
@@ -66,7 +67,9 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
 
     return selectOptions?.students
       ?.filter((s) => s.groupEntityId === group.id)
-      .map((s) => selectOptions.persons?.find((p) => p.id === s.personEntityId));
+      .map((s) =>
+        selectOptions.persons?.find((p) => p.id === s.personEntityId)
+      );
   };
 
   const subjectOptions = () => {
@@ -99,6 +102,15 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
       {roles.includes("Student") || roles.includes("Curator") ? null : (
         <Button onClick={onOpen}>{Translator[lang.name]["add_mark"]}</Button>
       )}
+      <Flex
+        gap="10px"
+        align="center"
+        cursor="pointer"
+        onClick={() => setFilters({})}
+      >
+        <Text userSelect="none">{Translator[lang.name]["clear_filters"]}</Text>
+        <AiOutlineClose />
+      </Flex>
       <GradeModal onClose={onClose} isOpen={isOpen} />
     </Flex>
   );

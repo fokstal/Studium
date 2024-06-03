@@ -30,17 +30,9 @@ export function AverageGrade({ id }: AverageGradeProps) {
     >
       <VStack gap="20px" align="stretch">
         <Text fontSize="24px" fontWeight="bold">
-          {Translator[lang.name]["average_mark_calculation"]}
+          {Translator[lang.name]["average_grade"]}
         </Text>
-        <Flex gap="20px" align="center">
-          <Text>{Translator[lang.name]["calculate_average_mark_for"]}</Text>
-          <Select
-            value={null}
-            placeholder={Translator[lang.name]["select_subject"]}
-            setValue={() => {}}
-            options={[]}
-          />
-        </Flex>
+        <Flex gap="20px" align="center"></Flex>
       </VStack>
       <VStack gap="5px" align="end">
         <Flex
@@ -49,7 +41,7 @@ export function AverageGrade({ id }: AverageGradeProps) {
           align="center"
           color={averageGrade >= 9 ? green : averageGrade > 5 ? "yellow" : red}
         >
-          <Text>{averageGrade}</Text>
+          <Text>{averageGrade.toString().slice(0, 4)}</Text>
           <Text>
             {averageGrade >= 9 ? (
               <AiOutlineSmile />

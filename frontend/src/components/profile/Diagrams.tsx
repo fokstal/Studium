@@ -59,12 +59,11 @@ export function Diagrams({ id }: DiagramsProps) {
         },
       ],
     };
-    console.log(data);
 
     setChartDataGrades(data);
 
     const creditsData = {
-      labels: ["Сдано работ", "Не сдано работ"],
+      labels: [Translator[lang.name]["pass_works"], Translator[lang.name]["not_pass_works"]],
       datasets: [
         {
           data: [

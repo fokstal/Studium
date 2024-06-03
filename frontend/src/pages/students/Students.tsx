@@ -20,6 +20,8 @@ import {
 } from "../../components/students";
 import { LanguageContext, Translator } from "../../store";
 import { filterStudents } from "../../lib";
+import { useRoles } from "../../hooks";
+import { useNavigate } from "react-router-dom";
 
 const studentService = new StudentService();
 const groupService = new GroupService();
@@ -47,6 +49,8 @@ export function Students() {
     (StudentsTableData & Student) | null
   >(null);
   const { lang } = useContext(LanguageContext);
+  const navigator = useNavigate();
+  const roles = useRoles();
 
   const handleOpenToggleColumns = () => {
     if (selectedStudent) setSelectedStudent(null);
@@ -81,6 +85,10 @@ export function Students() {
   useEffect(() => {
     updateStudents();
   }, [filters, search]);
+
+  useEffect(() => {
+    if (roles.includes("Student")) navigator("/journal");
+  }, []);
 
   return (
     <BaseLayout bg={colors.darkGrey}>
@@ -132,7 +140,9 @@ export function Students() {
             </InputGroup>
           </Flex>
           <Flex gap="20px" align="start">
-            {isOpenToggleFilters ? <Filters filters={filters} setFilters={setFilters}/> : null}
+            {isOpenToggleFilters ? (
+              <Filters filters={filters} setFilters={setFilters} />
+            ) : null}
             <Box w="100%">
               <StudentsTable
                 data={students!}

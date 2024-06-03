@@ -31,4 +31,17 @@ export class GradeService extends Service {
 
     return await res.json();
   }
+
+  public async getAverageForSemestr(data: any) {
+    const res = await fetch(`${this.url}/average-to-subject-list-by-student`, {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return await res.json();
+  }
 }

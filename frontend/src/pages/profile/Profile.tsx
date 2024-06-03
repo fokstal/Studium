@@ -8,14 +8,14 @@ import {
 } from "react-icons/ai";
 import { useContext, useEffect, useState } from "react";
 import { StudentComponent } from "../../components/students";
-import { AverageGrade, Diagrams } from "../../components/profile";
+import { AverageGrade, Diagrams, SemestrGrades } from "../../components/profile";
 import { LanguageContext, Translator } from "../../store";
 import { AuthServise } from "../../services";
 
 const authService = new AuthServise();
 
 export function Profile() {
-  const [id, setId] = useState<string>();
+  const [id, setId] = useState<string>("");
   const { lang } = useContext(LanguageContext);
   const [currentPart, setCurrentPart] = useState(
     Translator[lang.name]["information"]
@@ -61,13 +61,14 @@ export function Profile() {
             </Flex>
           </VStack>
           <VStack align="stretch" gap="20px" w="100%">
-            {currentPart === Translator[lang.name]["information"] ? (
-              <StudentComponent id={id ?? ""} />
+            {currentPart === Translator[lang.name]["information"] && id ? (
+              <StudentComponent id={id} />
             ) : null}
             {currentPart === Translator[lang.name]["performance"] ? (
               <>
                 <Diagrams id={id || ""} />
                 <AverageGrade id={id || ""} />
+                <SemestrGrades id={id || ""}/>
               </>
             ) : null}
           </VStack>
