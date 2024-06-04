@@ -45,21 +45,27 @@ namespace api.Controllers
 
             if (passportEntity is null) return NotFound();
 
-            PersonEntity? personEntity = await _personRepository.GetAsync(personEntityId: passportEntity.PersonEntityId);
+            PersonEntity personEntity = await
+                _personRepository.GetAsync(personEntityId: passportEntity.PersonEntityId)
+                ?? throw new Exception("Person on Passport is null!");
 
-            // if (person!.Student is not null)
-            // {
-            //     bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerAccess
-            //     (
-            //         new()
-            //         {
-            //             IdList = [person.Student.Id],
-            //             Role = Student
-            //         }
-            //     );
+            Authorizing authorizing = new(_userRepository, HttpContext);
 
-            //     if (userAccess is false) return Forbid();
-            // }
+            if (!authorizing.IsAdminAndSecretarRole())
+            {
+                if (personEntity.StudentEntity is null) return Forbid();
+
+                bool userAccess = await authorizing.RequireOwnerAccess
+                (
+                    new()
+                    {
+                        IdList = [personEntity.StudentEntity.Id],
+                        Role = Student
+                    }
+                );
+
+                if (userAccess is false) return Forbid();
+            }
 
             return Ok(passportEntity);
         }
