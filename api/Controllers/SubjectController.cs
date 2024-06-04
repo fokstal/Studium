@@ -8,6 +8,7 @@ using api.Extensions;
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
 using api.Services;
+using api.Helpers.Enums;
 
 namespace api.Controllers
 {
@@ -61,6 +62,48 @@ namespace api.Controllers
             }
 
             return Ok(await _subjectRepository.GetListAsync(groupEntityId: groupId));
+        }
+
+        [HttpGet("list-by-session")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([ViewSubject])]
+        public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListBySessionAsync()
+        {
+            IEnumerable<SubjectEntity> subjectEntityList = [];
+
+            try
+            {
+                Guid userIdSession = new HttpContextService(HttpContext).GetUserIdFromCookie();
+                HashSet<RoleEnum> roleListUserSession = await _userRepository.GetRoleListAsync(userIdSession);
+
+                if (new Authorizing(_userRepository, HttpContext).IsAdminAndSecretarRole())
+                {
+                    return Ok(await _subjectRepository.GetListAsync());
+                }
+
+                if (roleListUserSession.Contains(Curator))
+                {
+                    _ = subjectEntityList.Concat(await _subjectRepository.GetListByCuratorAsync(userIdSession));
+                }
+
+                if (roleListUserSession.Contains(Teacher))
+                {
+                    _ = subjectEntityList.Concat(await _subjectRepository.GetListByTeacherAsync(userIdSession));
+                }
+
+                if (roleListUserSession.Contains(Student))
+                {
+                    _ = subjectEntityList.Concat(await _subjectRepository.GetListByStudentAsync(userIdSession));
+                }
+            }
+            catch
+            {
+                return Unauthorized();
+            }
+
+            return Ok(subjectEntityList);
         }
 
         [HttpGet("{subjectId:int}")]

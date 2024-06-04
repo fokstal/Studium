@@ -35,6 +35,53 @@ namespace api.Repositories.Data
             return subjectEntityList;
         }
 
+        public async Task<IEnumerable<SubjectEntity>> GetListByCuratorAsync(Guid curatorId)
+        {
+            IEnumerable<SubjectEntity> subjectEntityList = [];
+            GroupEntity? groupEntity = await
+                _db
+                .Group
+                .Include(g => g.SubjectEntityList)
+                .FirstOrDefaultAsync(g => g.CuratorId == curatorId);
+
+            if (groupEntity is not null)
+            {
+                subjectEntityList = groupEntity.SubjectEntityList;
+            }
+
+            return subjectEntityList;
+        }
+
+        public async Task<IEnumerable<SubjectEntity>> GetListByTeacherAsync(Guid teacherId)
+        {
+            IEnumerable<SubjectEntity> subjectEntityList = await
+                _db.Subject.Where(s => s.TeacherId == teacherId).ToListAsync();
+
+            return subjectEntityList;
+        }
+
+        public async Task<IEnumerable<SubjectEntity>> GetListByStudentAsync(Guid studentId)
+        {
+            IEnumerable<SubjectEntity> subjectEntityList = [];
+            StudentEntity? studentEntity = await _db.Student.FirstOrDefaultAsync(s => s.Id == studentId);
+
+            if (studentEntity is not null)
+            {
+                GroupEntity? groupEntity = await
+                    _db
+                    .Group
+                    .Include(g => g.SubjectEntityList)
+                    .FirstOrDefaultAsync(g => g.Id == studentEntity.GroupEntityId);
+
+                if (groupEntity is not null)
+                {
+                    subjectEntityList = groupEntity.SubjectEntityList;
+                }
+            }
+
+            return subjectEntityList;
+        }
+
         public async override Task<SubjectEntity?> GetAsync(int subjectEntityId)
         {
             SubjectEntity? subjectEntity = await
