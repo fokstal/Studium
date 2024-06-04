@@ -11,6 +11,7 @@ using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using api.Helpers.Enums;
 
 namespace api.Controllers
 {
@@ -31,6 +32,47 @@ namespace api.Controllers
         [RequirePermissions([ViewUser])]
         public async Task<ActionResult<IEnumerable<UserEntity>>> GetListAsync()
             => Ok(await _userRepository.GetListAsync());
+
+        [HttpGet("list-by-session")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<UserEntity>>> GetListBySessionAsync()
+        {
+            IEnumerable<UserEntity> userEntityList = [];
+
+            try
+            {
+                Guid userIdSession = new HttpContextService(HttpContext).GetUserIdFromCookie();
+                HashSet<RoleEnum> roleListUserSession = await _userRepository.GetRoleListAsync(userIdSession);
+
+                if (new Authorizing(_userRepository, HttpContext).IsAdminAndSecretarRole())
+                {
+                    return Ok(await _userRepository.GetListAsync());
+                }
+
+                if (roleListUserSession.Contains(Curator))
+                {
+                    _ = userEntityList.Concat(await _userRepository.GetListByCuratorAsync(userIdSession));
+                }
+
+                if (roleListUserSession.Contains(Teacher))
+                {
+                    _ = userEntityList.Concat(await _userRepository.GetListByTeacherAsync(userIdSession));
+                }
+
+                if (roleListUserSession.Contains(Student))
+                {
+                    _ = userEntityList.Concat([await _userRepository.GetListByStudentAsync(userIdSession)]);
+                }
+            }
+            catch
+            {
+                return Unauthorized();
+            }
+
+            return Ok(userEntityList);
+        }
 
         [HttpGet("list-by-subject/{subjectId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

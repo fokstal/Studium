@@ -32,6 +32,110 @@ namespace api.Repositories.Data
             return userEntityList;
         }
 
+        public async Task<IEnumerable<UserEntity>> GetListByCuratorAsync(Guid curatorId)
+        {
+            List<UserEntity> userEntityList = [];
+
+            GroupEntity? groupEntity = await
+                _db.Group
+                .Include(g => g.StudentEntityList)
+                .FirstOrDefaultAsync(g => g.CuratorId == curatorId);
+
+            if (groupEntity is not null)
+            {
+                foreach (StudentEntity studentEntity in groupEntity.StudentEntityList)
+                {
+                    UserEntity? userEntity = await
+                    _db.User
+                    .Select(userDb => new UserEntity()
+                    {
+                        Id = userDb.Id,
+                        Login = userDb.Login,
+                        FirstName = userDb.FirstName,
+                        MiddleName = userDb.MiddleName,
+                        LastName = userDb.LastName,
+                        PasswordHash = userDb.PasswordHash,
+                        DateCreated = userDb.DateCreated,
+                        RoleEntityList =
+                            userDb.RoleEntityList
+                            .Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name })
+                            .ToList(),
+                    })
+                    .FirstOrDefaultAsync(u => u.Id == studentEntity.Id);
+
+                    if (userEntity is not null) userEntityList.Add(userEntity);
+                }
+            }
+
+            return userEntityList;
+        }
+
+        public async Task<IEnumerable<UserEntity>> GetListByTeacherAsync(Guid teacherId)
+        {
+            List<UserEntity> userEntityList = [];
+
+            SubjectEntity? subjectEntity = await _db.Subject.FirstOrDefaultAsync(s => s.TeacherId == teacherId);
+
+            if (subjectEntity is not null)
+            {
+                GroupEntity? groupEntity = await
+                _db.Group
+                .Include(g => g.StudentEntityList)
+                .FirstOrDefaultAsync(g => g.Id == subjectEntity.GroupEntityId);
+
+                if (groupEntity is not null)
+                {
+                    foreach (StudentEntity studentEntity in groupEntity.StudentEntityList)
+                    {
+                        UserEntity? userEntity = await
+                        _db.User
+                        .Select(userDb => new UserEntity()
+                        {
+                            Id = userDb.Id,
+                            Login = userDb.Login,
+                            FirstName = userDb.FirstName,
+                            MiddleName = userDb.MiddleName,
+                            LastName = userDb.LastName,
+                            PasswordHash = userDb.PasswordHash,
+                            DateCreated = userDb.DateCreated,
+                            RoleEntityList =
+                                userDb.RoleEntityList
+                                .Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name })
+                                .ToList(),
+                        })
+                        .FirstOrDefaultAsync(u => u.Id == studentEntity.Id);
+
+                        if (userEntity is not null) userEntityList.Add(userEntity);
+                    }
+                }
+            }
+
+            return userEntityList;
+        }
+
+        public async Task<UserEntity?> GetListByStudentAsync(Guid studentId)
+        {
+            UserEntity? userEntity = await
+            _db.User
+            .Select(userDb => new UserEntity()
+            {
+                Id = userDb.Id,
+                Login = userDb.Login,
+                FirstName = userDb.FirstName,
+                MiddleName = userDb.MiddleName,
+                LastName = userDb.LastName,
+                PasswordHash = userDb.PasswordHash,
+                DateCreated = userDb.DateCreated,
+                RoleEntityList =
+                    userDb.RoleEntityList
+                    .Select(roleDb => new RoleEntity { Id = roleDb.Id, Name = roleDb.Name })
+                    .ToList(),
+            })
+            .FirstOrDefaultAsync(u => u.Id == studentId);
+
+            return userEntity;
+        }
+
         public async Task<IEnumerable<UserEntity>> GetListAsync(List<StudentEntity> studentEntityList)
         {
             List<UserEntity> userEntityList = [];
