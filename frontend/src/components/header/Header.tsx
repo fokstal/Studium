@@ -21,6 +21,10 @@ import { getAvatarPath } from "../../lib";
 import { Person } from "../../types";
 import { useRoles } from "../../hooks";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { FaUserGroup } from "react-icons/fa6";
+import { PiBookFill } from "react-icons/pi";
+import { LuUserSquare } from "react-icons/lu";
+import { IoMdExit } from "react-icons/io";
 
 const authService = new AuthServise();
 const studentService = new StudentService();
@@ -129,20 +133,36 @@ export function Header() {
               />
               <MenuList>
                 <MenuItem _hover={{ background: colors.darkGrey }}>
-                  <Link to="/group">{Translator[lang.name]["group_list"]}</Link>
+                  <Link to="/group">
+                    <Flex gap="10px" align="center">
+                      <FaUserGroup />
+                      <Text>{Translator[lang.name]["group_list"]}</Text>
+                    </Flex>
+                  </Link>
                 </MenuItem>
                 <MenuItem _hover={{ background: colors.darkGrey }}>
                   <Link to="/subject">
-                    {Translator[lang.name]["subject_list"]}
+                    <Flex gap="10px" align="center">
+                      <PiBookFill />
+                      {Translator[lang.name]["subject_list"]}
+                    </Flex>
                   </Link>
                 </MenuItem>
                 <MenuItem _hover={{ background: colors.darkGrey }}>
-                  <Link to="/users">{Translator[lang.name]["user_list"]}</Link>
+                  <Flex gap="10px" align="center">
+                    <LuUserSquare />
+                    <Link to="/users">
+                      {Translator[lang.name]["user_list"]}
+                    </Link>
+                  </Flex>
                 </MenuItem>
-                <MenuItem _hover={{ background: colors.darkGrey }}>
-                  <Link to="/" onClick={() => authService.logout()}>
-                    {Translator[lang.name]["exit"]}
-                  </Link>
+                <MenuItem _hover={{ background: colors.darkGrey }} color={colors.red}>
+                  <Flex gap="10px" align="center">
+                    <IoMdExit />
+                    <Link to="/" onClick={() => authService.logout()}>
+                      {Translator[lang.name]["exit"]}
+                    </Link>
+                  </Flex>
                 </MenuItem>
               </MenuList>
             </Menu>
