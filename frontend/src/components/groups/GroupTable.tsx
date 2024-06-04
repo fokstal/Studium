@@ -96,16 +96,6 @@ export function GroupTable({ data }: GroupTableProps) {
                     <FaEdit color={colors.white} />
                   </Link>
                 </Box>
-                <Box
-                  p="5px"
-                  bg={colors.green}
-                  borderRadius="5px"
-                  cursor="pointer"
-                >
-                  <Link to="/group/new">
-                    <FaPlus color={colors.white} />
-                  </Link>
-                </Box>
               </Flex>
             )}
           ></Column>

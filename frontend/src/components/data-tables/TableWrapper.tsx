@@ -3,7 +3,7 @@ import { colors } from "../ui-kit/variables";
 
 export const TableWrapper = styled.div`
   background-color: ${colors.white};
-  max-width: 1200px;
+  width: 100%;
   font-size: 16px;
   color: ${colors.black};
   font-weight: 700;

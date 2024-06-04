@@ -5,12 +5,13 @@ import {
   InputLeftElement,
   Text,
   Input as ChakraInput,
+  Link,
 } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
 import { colors } from "../../components/ui-kit";
 import { useContext, useEffect, useState } from "react";
 import { AiOutlineFilter } from "react-icons/ai";
-import { FaSearch } from "react-icons/fa";
+import { FaPlus, FaSearch } from "react-icons/fa";
 import { Group, Student, StudentsTableData } from "../../types";
 import { GroupService, PersonService, StudentService } from "../../services";
 import {
@@ -99,9 +100,16 @@ export function Students() {
         direction="column"
         gap="10px"
       >
-        <Text color={colors.black} fontSize="32px" as="h1" fontWeight="bold">
-          {Translator[lang.name]["student_list"]}
-        </Text>
+        <Flex w="100%" justify="space-between" align="center">
+          <Text color={colors.black} fontSize="32px" as="h1" fontWeight="bold">
+            {Translator[lang.name]["student_list"]}
+          </Text>
+          <Box p="5px" bg={colors.green} borderRadius="5px" cursor="pointer">
+            <Link href="/students/new">
+              <FaPlus color={colors.white} />
+            </Link>
+          </Box>
+        </Flex>
         <Text color={colors.grey} fontSize="20px" as="b">
           {Translator[lang.name]["click_student"]}
         </Text>

@@ -41,21 +41,26 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
   const setSubject = (subject: Subject) => setFilters({ ...filters, subject });
 
   const updateOptions = async () => {
-    const groups = await groupService.get();
-    const persons = await personService.get();
-    const subjects = await subjectService.get();
-    const students = await studentService.get();
+    if (roles.includes("Student")) {
+      const subjects = await subjectService.getSubjectsBySession();
+      return setSelectOptions({ subjects: subjects });
+    } else {
+      const groups = await groupService.get();
+      const persons = await personService.get();
+      const subjects = await subjectService.getSubjectsBySession();
+      const students = await studentService.get();
 
-    const truePersons: Person[] = students.map((s: Student) =>
-      persons?.find((p: Person) => p.id === s.personEntityId)
-    );
+      const truePersons: Person[] = students.map((s: Student) =>
+        persons?.find((p: Person) => p.id === s.personEntityId)
+      );
 
-    setSelectOptions({
-      groups,
-      persons: truePersons,
-      subjects,
-      students,
-    });
+      setSelectOptions({
+        groups,
+        persons: truePersons,
+        students,
+        subjects
+      });
+    }
   };
 
   useEffect(() => {
@@ -80,24 +85,28 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
 
   return (
     <Flex gap="20px" align="center">
-      <Select
-        placeholder={Translator[lang.name]["select_group"]}
-        options={selectOptions?.groups || []}
-        value={group}
-        setValue={setGroup}
-      />
-      <Select
-        placeholder={Translator[lang.name]["select_student"]}
-        options={personOptions() || []}
-        value={person}
-        disabled={!filters.group}
-        setValue={setPerson}
-        name="lastName"
-      />
+      {roles.includes("Student") ? null : (
+        <>
+          <Select
+            placeholder={Translator[lang.name]["select_group"]}
+            options={selectOptions?.groups || []}
+            value={group}
+            setValue={setGroup}
+          />
+          <Select
+            placeholder={Translator[lang.name]["select_student"]}
+            options={personOptions() || []}
+            value={person}
+            disabled={!filters.group}
+            setValue={setPerson}
+            name="lastName"
+          />
+        </>
+      )}
       <Select
         placeholder={Translator[lang.name]["select_subject"]}
         options={subjectOptions() || []}
-        disabled={!filters.group}
+        disabled={roles.includes("Student") ? false : !filters.group}
         value={subject}
         setValue={setSubject}
       />
@@ -113,7 +122,9 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
         <Text userSelect="none">{Translator[lang.name]["clear_filters"]}</Text>
         <AiOutlineClose />
       </Flex>
-      <GradeModal onClose={onClose} isOpen={isOpen} />
+      {roles.includes("Student") || roles.includes("Curator") ? null : (
+        <GradeModal onClose={onClose} isOpen={isOpen} />
+      )}
     </Flex>
   );
 }

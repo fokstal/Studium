@@ -62,7 +62,7 @@ export function Profile() {
             ))}
             <Flex gap="10px" color={colors.red} align="center">
               <AiOutlineExport size="24px" />
-              <Link _hover={{ textDecoration: "none" }} href="/">
+              <Link _hover={{ textDecoration: "none" }} href="/" onClick={() => authService.logout()}>
                 <Text whiteSpace="pre">{Translator[lang.name]["exit"]}</Text>
               </Link>
             </Flex>

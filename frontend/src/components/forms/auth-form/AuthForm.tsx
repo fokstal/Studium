@@ -29,7 +29,15 @@ export function AuthForm() {
     startTransaction(() => {
       if (!login || !password) return;
       authService.login(login, password).then((res) => {
-        if (res.status === 200) return navigator("/journal");
+        if (res.status === 200) {
+          return authService.session().then((res) => {
+            const role = res?.roleEntityList;
+            if (res) {
+              localStorage.setItem("role", JSON.stringify(role));
+            }
+            return navigator("/journal");
+          })
+        }
         setErrorMessage(Translator[lang.name]["not_correct_password"]);
       });
     });

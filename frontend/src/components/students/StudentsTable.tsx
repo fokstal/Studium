@@ -16,8 +16,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Button, colors } from "../ui-kit";
-import { FaTrash, FaPlus, FaEdit } from "react-icons/fa";
-import { GradeService, PersonService, StudentService } from "../../services";
+import { FaTrash, FaEdit } from "react-icons/fa";
+import { GradeService, StudentService } from "../../services";
 import { useContext, useEffect, useState } from "react";
 import { AiOutlineCloseSquare } from "react-icons/ai";
 import { LanguageContext, Translator } from "../../store";
@@ -62,7 +62,7 @@ export function StudentsTable({
   };
 
   return (
-    <>
+    <Box w="100%">
       <TableWrapper>
         <DataTable
           value={data}
@@ -130,16 +130,6 @@ export function StudentsTable({
                     <FaEdit color={colors.white} />
                   </Link>
                 </Box>
-                <Box
-                  p="5px"
-                  bg={colors.green}
-                  borderRadius="5px"
-                  cursor="pointer"
-                >
-                  <Link href="/students/new">
-                    <FaPlus color={colors.white} />
-                  </Link>
-                </Box>
               </Flex>
             )}
           ></Column>
@@ -177,6 +167,6 @@ export function StudentsTable({
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </>
+    </Box>
   );
 }

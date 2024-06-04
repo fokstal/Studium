@@ -45,6 +45,6 @@ export class AuthServise {
       credentials: "include",
       method: "POST",
     });
-    localStorage.removeItem("role");
+    localStorage.setItem("role", "");
   }
 }

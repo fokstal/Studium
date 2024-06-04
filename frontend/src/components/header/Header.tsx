@@ -42,14 +42,9 @@ export function Header() {
   }, []);
 
   const updateAvatar = async () => {
+    if (!roles[0]) setIsAuth(false);
+    if (!roles.includes("Student")) return;
     const res = await authService.session();
-    setIsAuth(!!res);
-    const role = res?.roleEntityList;
-    if (res) {
-      localStorage.setItem("role", JSON.stringify(role));
-    }
-
-    if (!!role.find((r: any) => r.name !== "Student")) return;
     const student = await studentService.getById(res.id);
     const person = await personService.getById(student.personEntityId);
     setPerson(person);
@@ -156,7 +151,10 @@ export function Header() {
                     </Link>
                   </Flex>
                 </MenuItem>
-                <MenuItem _hover={{ background: colors.darkGrey }} color={colors.red}>
+                <MenuItem
+                  _hover={{ background: colors.darkGrey }}
+                  color={colors.red}
+                >
                   <Flex gap="10px" align="center">
                     <IoMdExit />
                     <Link to="/" onClick={() => authService.logout()}>

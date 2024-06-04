@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Text, Link } from "@chakra-ui/react";
 import { BaseLayout } from "../../layouts";
 import { colors } from "../../components/ui-kit";
 import { GroupService, SubjectService } from "../../services";
@@ -6,6 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { Subject } from "../../types";
 import { SubjectTable } from "../../components/subjects";
 import { LanguageContext, Translator } from "../../store";
+import { FaPlus } from "react-icons/fa";
 
 const subjectService = new SubjectService();
 const groupService = new GroupService();
@@ -38,9 +39,16 @@ export function Subjects() {
         direction="column"
         gap="10px"
       >
-        <Text color={colors.black} fontSize="32px" as="h1" fontWeight="bold">
-          {Translator[lang.name]["subject_list"]}
-        </Text>
+        <Flex align="center" justify="space-between">
+          <Text color={colors.black} fontSize="32px" as="h1" fontWeight="bold">
+            {Translator[lang.name]["subject_list"]}
+          </Text>
+          <Box p="5px" bg={colors.green} borderRadius="5px" cursor="pointer">
+            <Link href="/subject/new">
+              <FaPlus color={colors.white} />
+            </Link>
+          </Box>
+        </Flex>
         <Flex
           borderRadius="5px"
           bg={colors.white}
