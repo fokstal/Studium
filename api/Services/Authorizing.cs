@@ -8,6 +8,17 @@ namespace api.Services
 {
     public class Authorizing(UserRepository userRepository, HttpContext httpContext)
     {
+        public bool IsAdminAndSecretarRole()
+        {
+            Guid userIdFromCookie = new HttpContextService(httpContext).GetUserIdFromCookie();
+
+            RoleService roleService = httpContext.RequestServices.GetRequiredService<RoleService>();
+
+            HashSet<RoleEnum> roleList = roleService.GetRoleListAsync(userIdFromCookie).Result;
+
+            return roleList.Intersect([Admin, Secretar]).Any();
+        }
+
         public async Task<bool> RequireOwnerListAccess(OwnerParameters[] ownerList)
         {
             bool access = true;
@@ -28,11 +39,11 @@ namespace api.Services
 
             HashSet<RoleEnum> roleList = roleService.GetRoleListAsync(userIdFromCookie).Result;
 
-            if (roleList.Intersect([Admin, Secretar]).Any()) return true;
+            if (IsAdminAndSecretarRole()) return true;
             if (!roleList.Contains(owner.Role)) return false;
 
-            UserEntity user = await userRepository.GetAsync(Convert.ToInt32(userIdFromCookie)) ?? throw new ArgumentNullException("User is null!");
-            
+            UserEntity user = await userRepository.GetAsync(userEntityId: userIdFromCookie) ?? throw new ArgumentNullException("User is null!");
+
             if (!owner.IdList.ToList().Contains(user.Id)) return false;
 
             return true;
