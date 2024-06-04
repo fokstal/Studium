@@ -77,12 +77,12 @@ namespace api.Controllers
         {
             try
             {
-                IFormFile picture = await
+                IFormFile passportScanFile = await
                     PictureRepository
                     .GetAndDecryptPictureAsync
                         (PictureFolders.Passport, scanFileName, StringHasher.Generate32ByteKey(key));
 
-                return File(picture.OpenReadStream(), picture.ContentType);
+                return File(passportScanFile.OpenReadStream(), passportScanFile.ContentType, passportScanFile.FileName);
             }
             catch
             {
