@@ -217,18 +217,18 @@ namespace api.Controllers
 
             gradeModelDTO.SetDate = gradeModelDTO.SetDate.Date;
 
-            GradeModelEntity? gradeModelEntityControlWork = await
-                _gradeModelRepository.
-                GetAsync
-                (
-                    subjectEntityId: gradeModelDTO.SubjectEntityId,
-                    typeName: GradeTypeEnum.ControlWork.ToString()
-                );
+            // GradeModelEntity? gradeModelEntityControlWork = await
+            //     _gradeModelRepository.
+            //     GetAsync
+            //     (
+            //         subjectEntityId: gradeModelDTO.SubjectEntityId,
+            //         typeName: GradeTypeEnum.ControlWork.ToString()
+            //     );
 
-            if (gradeModelEntityControlWork is not null && gradeModelEntityControlWork.SetDate != gradeModelDTO.SetDate)
-            {
-                return BadRequest("ControlWork for this Subject already Exists!");
-            }
+            // if (gradeModelEntityControlWork is not null && gradeModelEntityControlWork.SetDate != gradeModelDTO.SetDate)
+            // {
+            //     return BadRequest("ControlWork for this Subject already Exists!");
+            // }
 
             GradeModelEntity? gradeModelEntity = await
                 _gradeModelRepository.
