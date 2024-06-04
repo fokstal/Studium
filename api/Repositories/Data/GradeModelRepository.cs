@@ -135,6 +135,22 @@ namespace api.Repositories.Data
             return gradeModelEntity;
         }
 
+        public async Task<GradeModelEntity?> GetAsync(int subjectEntityId, string typeName)
+        {
+            GradeModelEntity? gradeModelEntity = await
+                _db.GradeModel
+                .Include(gm => gm.TypeEntity)
+                .Include(gm => gm.GradeEntityList)
+                .FirstOrDefaultAsync
+                (
+                    gm =>
+                        gm.SubjectEntityId == subjectEntityId &&
+                        gm.TypeEntity.Name == typeName
+                );
+
+            return gradeModelEntity;
+        }
+
         public override GradeModelEntity Create(GradeModelDTO gradeModelDTO)
         {
             List<GradeEntity> gradeEntityList = [];
@@ -198,7 +214,7 @@ namespace api.Repositories.Data
             {
                 foreach (GradeDTO gradeDTO in gradeDTOList)
                 {
-                    StudentEntity? studentEntity = await 
+                    StudentEntity? studentEntity = await
                         _db.Student.FirstOrDefaultAsync(s => s.Id == gradeDTO.StudentEntityId);
 
                     if (studentEntity is null) return false;

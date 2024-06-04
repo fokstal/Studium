@@ -9,6 +9,7 @@ using api.Models.DTO;
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
 using api.Models.Entities;
+using api.Helpers.Enums;
 
 namespace api.Controllers
 {
@@ -215,6 +216,19 @@ namespace api.Controllers
                 return BadRequest("Students dont have Access to this Subject!");
 
             gradeModelDTO.SetDate = gradeModelDTO.SetDate.Date;
+
+            GradeModelEntity? gradeModelEntityControlWork = await
+                _gradeModelRepository.
+                GetAsync
+                (
+                    subjectEntityId: gradeModelDTO.SubjectEntityId,
+                    typeName: GradeTypeEnum.ControlWork.ToString()
+                );
+
+            if (gradeModelEntityControlWork is not null && gradeModelEntityControlWork.SetDate != gradeModelDTO.SetDate)
+            {
+                return BadRequest("ControlWork for this Subject already Exists!");
+            }
 
             GradeModelEntity? gradeModelEntity = await
                 _gradeModelRepository.
