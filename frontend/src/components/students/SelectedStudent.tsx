@@ -37,9 +37,6 @@ export function SelectedStudent({
       <VStack align="stretch" gap="20px">
         <VStack align="stretch">
           <Flex justify="end" gap="5px">
-            <Box borderRadius="5px" bg={colors.darkGreen} cursor="pointer">
-              <AiOutlinePushpin color={colors.white} size="24px" />
-            </Box>
             <Box cursor="pointer">
               <AiOutlineCloseSquare
                 color={colors.white}
