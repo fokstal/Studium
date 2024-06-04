@@ -18,6 +18,9 @@ namespace api.Repositories.Data
             IEnumerable<SubjectEntity> subjectEntityList = await
                 _db.Subject
                 .Include(s => s.GradeModelEntityList)
+                .ThenInclude(s => s.TypeEntity)
+                .Include(s => s.GradeModelEntityList)
+                .ThenInclude(gm => gm.GradeEntityList)
                 .ToArrayAsync();
 
             return subjectEntityList;
@@ -27,6 +30,8 @@ namespace api.Repositories.Data
         {
             IEnumerable<SubjectEntity> subjectEntityList = await
                 _db.Subject
+                .Include(s => s.GradeModelEntityList)
+                .ThenInclude(s => s.TypeEntity)
                 .Include(s => s.GradeModelEntityList)
                 .ThenInclude(gm => gm.GradeEntityList)
                 .Where(s => s.GroupEntityId == groupEntityId)
