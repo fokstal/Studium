@@ -1,7 +1,7 @@
 using api.Data;
 using api.Model.DTO;
 using api.Models;
-
+using api.Services;
 using static api.Repositories.PictureRepository;
 
 namespace api.Repositories.Data
@@ -18,8 +18,12 @@ namespace api.Repositories.Data
             return new()
             {
                 ScanFileName =
-                    UploadPassportScanAsync(passportDTO.ScanFile, personEntity.FirstName + personEntity.AvatarFileName).Result,
-                    
+                    UploadPassportScanAsync
+                    (
+                        passportDTO.ScanFile,
+                        StringHasher.Generate32ByteKey(personEntity.BirthDate + personEntity.AvatarFileName)
+                    ).Result,
+
                 PersonEntityId = passportDTO.PersonEntityId,
             };
         }
@@ -31,7 +35,11 @@ namespace api.Repositories.Data
                 ?? throw new Exception("Person on Passport is null!");
 
             passportEntityToUpdate.ScanFileName = await
-                UploadPassportScanAsync(passportDTO.ScanFile, personEntity.FirstName + personEntity.AvatarFileName);
+                UploadPassportScanAsync
+                (
+                    passportDTO.ScanFile,
+                    StringHasher.Generate32ByteKey(personEntity.BirthDate + personEntity.AvatarFileName)
+                );
 
             passportEntityToUpdate.PersonEntityId = passportDTO.Id;
 

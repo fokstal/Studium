@@ -71,7 +71,8 @@ namespace api.Controllers
             {
                 IFormFile picture = await
                     PictureRepository
-                    .GetAndDecryptPictureAsync(PictureFolders.Passport, scanFileName, key);
+                    .GetAndDecryptPictureAsync
+                        (PictureFolders.Passport, scanFileName, StringHasher.Generate32ByteKey(key));
 
                 return File(picture.OpenReadStream(), picture.ContentType);
             }
