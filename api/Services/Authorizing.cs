@@ -26,6 +26,8 @@ namespace api.Services
             foreach (OwnerParameters owner in ownerList)
             {
                 access = await RequireOwnerAccess(owner);
+
+                if (access is true) return true;
             }
 
             return access;
