@@ -26,7 +26,7 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewPassportList])]
-        public async Task<ActionResult<IEnumerable<PassportEntity>>> GetListAsync() 
+        public async Task<ActionResult<IEnumerable<PassportEntity>>> GetListAsync()
             => Ok(await _passportRepository.GetListAsync());
 
         [HttpGet("{passportId:int}")]
@@ -62,6 +62,23 @@ namespace api.Controllers
             // }
 
             return Ok(passportEntity);
+        }
+
+        [HttpGet("get-scan-file/{scanFileName}/{key}")]
+        public async Task<IActionResult> GetScanFileAsync(string scanFileName, string key)
+        {
+            try
+            {
+                IFormFile picture = await
+                    PictureRepository
+                    .GetAndDecryptPictureAsync(PictureFolders.Passport, scanFileName, key);
+
+                return File(picture.OpenReadStream(), picture.ContentType);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPost]
