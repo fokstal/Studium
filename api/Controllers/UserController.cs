@@ -92,6 +92,32 @@ namespace api.Controllers
                 .GetAsync(groupEntityId: subjectEntity.GroupEntityId)
                 ?? throw new Exception("Group on Subject in Db is null!");
 
+            Authorizing authorizing = new(_userRepository, HttpContext);
+
+            if (!authorizing.IsAdminAndSecretarRole())
+            {
+                bool userAccess = await authorizing.RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [groupEntity.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = [subjectEntity.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList = groupEntity.StudentEntityList.Select(s => s.Id).ToArray(),
+                        Role = Student
+                    },
+                ]);
+
+                if (userAccess is false) return Forbid();
+            }
+
             List<StudentEntity> studentEntityList = groupEntity.StudentEntityList;
 
             return Ok(await _userRepository.GetListAsync(studentEntityList: studentEntityList));
