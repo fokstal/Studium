@@ -41,7 +41,9 @@ export function Header() {
     const res = await authService.session();
     setIsAuth(!!res);
     const role = res?.roleEntityList;
-    localStorage.setItem("role", JSON.stringify(role));
+    if (res) {
+      localStorage.setItem("role", JSON.stringify(role));
+    }
 
     if (!!role.find((r: any) => r.name !== "Student")) return;
     const student = await studentService.getById(res.id);
@@ -138,7 +140,9 @@ export function Header() {
                   <Link to="/users">{Translator[lang.name]["user_list"]}</Link>
                 </MenuItem>
                 <MenuItem _hover={{ background: colors.darkGrey }}>
-                  <Link to="/">{Translator[lang.name]["exit"]}</Link>
+                  <Link to="/" onClick={() => authService.logout()}>
+                    {Translator[lang.name]["exit"]}
+                  </Link>
                 </MenuItem>
               </MenuList>
             </Menu>

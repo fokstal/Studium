@@ -10,9 +10,9 @@ type JournalTableProps = {
 export function JournalTable({ data, columns }: JournalTableProps) {
   return (
     <TableWrapper>
-      <DataTable value={data} scrollable paginator={data.length > 7} rows={7}>
+      <DataTable value={data} scrollable paginator={data.length > 15} rows={15} resizableColumns>
         {columns.map(({ header, field }) => (
-          <Column key={field} field={field} header={header}></Column>
+          <Column key={field} field={field} header={header} style={{padding: "10px 20px"}}></Column>
         ))}
       </DataTable>
     </TableWrapper>

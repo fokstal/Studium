@@ -102,7 +102,7 @@ export function StudentsTable({
               }, [rowData.id]);
 
               return (
-                <>{averageGrade !== null ? averageGrade : "Calculating"}</>
+                <>{averageGrade !== null ? averageGrade.toString().slice(0, 4) : "Calculating"}</>
               );
             }}
           ></Column>

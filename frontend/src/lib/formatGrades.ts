@@ -43,7 +43,6 @@ export async function formatGrades(filters: Filter) {
       Object.defineProperty(data, g.setDate.toString() + i, { value: g.value });
     });
     tableData = [data];
-
   } else if (filters?.person) {
     const students = await studentService.get();
     const subjects = await subjectService.get();
@@ -58,7 +57,7 @@ export async function formatGrades(filters: Filter) {
 
     columns = [
       { field: "subject", header: "Предмет" },
-      ...grades.map((g: Grade, i:number) => ({
+      ...grades.map((g: Grade, i: number) => ({
         field: g.setDate.toString() + i,
         header: new Date(g.setDate).toLocaleDateString(),
       })),
@@ -82,7 +81,7 @@ export async function formatGrades(filters: Filter) {
     columns = [
       { field: "student", header: "Студент" },
       ...grades.map((g: Grade, i: number) => ({
-        field: g.setDate.toString() + i,
+        field: g.setDate.toString(),
         header: new Date(g.setDate).toLocaleDateString(),
       })),
     ];
@@ -99,12 +98,14 @@ export async function formatGrades(filters: Filter) {
           student: student.firstName + " " + student.lastName,
         };
 
-        const studentGrades = grades.filter(
-          (g: any) => g.gradeEntityList[0].studentId === s.id
+        const studentGrades = grades.filter((g: any) =>
+          g.gradeEntityList.find((gr: any) => gr.studentEntityId === s.id)
         );
-        studentGrades.forEach((g: any, i: number) => {
-          Object.defineProperty(result, g.setDate.toString() + i, {
-            value: g.gradeEntityList[0].value,
+        studentGrades.forEach((g: any) => {
+          Object.defineProperty(result, g.setDate.toString(), {
+            value: g.gradeEntityList.find(
+              (gr: any) => gr.studentEntityId === s.id
+            ).value,
           });
         });
 

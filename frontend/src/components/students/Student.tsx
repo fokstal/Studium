@@ -55,11 +55,11 @@ export function StudentComponent({ id }: StudentComponentProps) {
     setStudent(student);
 
     if (roles.includes("Student")) return;
-    const passports = await passportService.get();
-    const passport = passports.find(
-      (p: any) => p.personEntityId === personData.id
+    await passportService.getScanFile(
+      personData.passportEntity?.scanFileName + "1",
+      personData.id || 0
     );
-    setPassport(passport?.scanFileName ?? null);
+    setPassport(personData.passportEntity?.scanFileName || "");
   };
 
   useEffect(() => {

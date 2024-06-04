@@ -33,10 +33,18 @@ export class AuthServise {
 
   public async session() {
     const res = await fetch(`${this.url}session`, {
-      credentials: "include"
+      credentials: "include",
     });
 
     if (!res.ok) return false;
     return await res.json();
+  }
+
+  public async logout() {
+    const res = await fetch(`${this.url}logout`, {
+      credentials: "include",
+      method: "POST",
+    });
+    localStorage.removeItem("role");
   }
 }
