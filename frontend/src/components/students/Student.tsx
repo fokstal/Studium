@@ -7,8 +7,8 @@ import {
   StudentService,
 } from "../../services";
 import { Avatar, colors, Input } from "../../components/ui-kit";
-import { Flex, HStack, Link, Text, VStack } from "@chakra-ui/react";
-import { getAvatarPath, getPassportPath } from "../../lib/";
+import { Box, Flex, HStack, Link, Text, VStack } from "@chakra-ui/react";
+import { getAvatarPath } from "../../lib/";
 import {
   AiFillCheckCircle,
   AiFillCloseCircle,
@@ -28,7 +28,7 @@ type StudentComponentProps = {
 
 export function StudentComponent({ id }: StudentComponentProps) {
   const [student, setStudent] = useState<Person & Group & Student>();
-  const [passport, setPassport] = useState<string>();
+  const [passport, setPassport] = useState<Blob>();
   const roles = useRoles();
   const { lang } = useContext(LanguageContext);
 
@@ -55,13 +55,25 @@ export function StudentComponent({ id }: StudentComponentProps) {
     setStudent(student);
 
     if (roles.includes("Student")) return;
-    await passportService.getScanFile(
-      personData.passportEntity?.scanFileName + "1",
+    const scan = await passportService.getScanFile(
+      personData.passportEntity?.scanFileName || "",
       personData.id || 0
     );
-    setPassport(personData.passportEntity?.scanFileName || "");
+    setPassport(scan || "");
   };
 
+  const handleDownloadFile = () => {
+    if (passport) {
+      const fileUrl = URL.createObjectURL(passport);
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.setAttribute('download', "image");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(fileUrl);
+    }
+  };
   useEffect(() => {
     updateStudent();
   }, []);
@@ -149,9 +161,9 @@ export function StudentComponent({ id }: StudentComponentProps) {
                 </Text>
               </Flex>
               {passport ? (
-                <Link href={getPassportPath(passport)} target="blank">
+                <Box onClick={handleDownloadFile}>
                   <AiOutlineEye size="24px" />
-                </Link>
+                </Box>
               ) : null}
             </HStack>
           </Flex>

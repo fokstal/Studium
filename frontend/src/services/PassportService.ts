@@ -7,6 +7,7 @@ export class PassportService extends Service {
     const res = await fetch(`${this.url}/get-scan-file/${scan}/${id}`, {
       credentials: "include",
     });
+    return await res.blob();
   }
 
   public async post(data: any) {
