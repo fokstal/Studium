@@ -71,6 +71,8 @@ namespace api.Controllers
         }
 
         [HttpGet("get-scan-file/{scanFileName}/{key}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetScanFileAsync(string scanFileName, string key)
         {
             try
