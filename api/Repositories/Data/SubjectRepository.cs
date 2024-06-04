@@ -4,6 +4,7 @@ using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
 using api.Models.Entities;
 using api.Models.DTO;
+using api.Helpers.Enums;
 
 namespace api.Repositories.Data
 {
@@ -183,6 +184,7 @@ namespace api.Repositories.Data
                 Guid studentEntityId
             )
         {
+            int controlWorkGrade = 0;
             double summGrade = 0;
             int countGrade = 0;
 
@@ -194,14 +196,31 @@ namespace api.Repositories.Data
 
                 if (gradeEntity is not null)
                 {
-                    summGrade += gradeEntity.Value;
+                    if (gradeModelEntity.TypeEntity.Name == GradeTypeEnum.ControlWork.ToString())
+                    {
+                        controlWorkGrade = gradeEntity.Value;
+                    }
+
+                    if (gradeModelEntity.TypeEntity.Name == GradeTypeEnum.Lecture.ToString())
+                    {
+                        summGrade += gradeEntity.Value;
+                    }
+
+                    if (gradeModelEntity.TypeEntity.Name == GradeTypeEnum.Practice.ToString())
+                    {
+                        continue;
+                    }
+
                     countGrade++;
                 }
             }
 
             if (countGrade != 0)
             {
-                summaryGradeSubject += Math.Round(summGrade / countGrade);
+                if (controlWorkGrade != 0) summaryGradeSubject += (Math.Round(summGrade / countGrade) + controlWorkGrade) / 2;
+
+                if (controlWorkGrade == 0) summaryGradeSubject += Math.Round(summGrade / countGrade);
+
                 countGradeModel++;
             }
         }
