@@ -45,10 +45,10 @@ namespace api.Controllers
 
             if (subjectEntity is null) return NotFound();
 
-            GroupEntity groupEntity = await 
+            GroupEntity groupEntity = await
                 _groupRepository
-                .GetAsync(groupEntityId: subjectEntity.GroupEntityId) 
-                ?? throw new Exception("Group on Subject in Db is null!"); 
+                .GetAsync(groupEntityId: subjectEntity.GroupEntityId)
+                ?? throw new Exception("Group on Subject in Db is null!");
 
             List<StudentEntity> studentEntityList = groupEntity.StudentEntityList;
 
@@ -105,12 +105,20 @@ namespace api.Controllers
 
             if (userEntity is null) return NotFound();
 
-            if (StringHasher.Verify(userDTO.Password, userEntity.PasswordHash) is false) 
+            if (StringHasher.Verify(userDTO.Password, userEntity.PasswordHash) is false)
                 return BadRequest("Password is not valid!");
 
             HttpContext.Response.Cookies
             .Append(CookieNames.USER_TOKEN, new JwtProvider(_configuration)
             .GenerateToken(userEntity));
+
+            return Ok();
+        }
+
+        [HttpPost("logout")]
+        public IActionResult LogoutAsync()
+        {
+            HttpContext.Response.Cookies.Delete(CookieNames.USER_TOKEN);
 
             return Ok();
         }
@@ -128,9 +136,9 @@ namespace api.Controllers
 
             if (UserService.CheckRoleContains(_userRepository, userEntityToRemove, Student))
             {
-                StudentEntity studentToRemove = await 
+                StudentEntity studentToRemove = await
                     _studentRepository
-                    .GetAsync(userEntityToRemove.Id) 
+                    .GetAsync(userEntityToRemove.Id)
                     ?? throw new Exception("Student on User is null!");
 
                 await _studentRepository.RemoveAsync(studentToRemove);
