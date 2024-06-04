@@ -29,7 +29,7 @@ export function AuthForm() {
     startTransaction(() => {
       if (!login || !password) return;
       authService.login(login, password).then((res) => {
-        if (res.status === 200) return navigator("/students");
+        if (res.status === 200) return navigator("/journal");
         setErrorMessage(Translator[lang.name]["not_correct_password"]);
       });
     });
