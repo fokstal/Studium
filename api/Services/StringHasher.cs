@@ -34,6 +34,12 @@ namespace api.Services
             return new Guid(guidBytes);
         }
 
+        public static byte[] Generate32ByteKey(string inputLine)
+        {
+            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(inputLine));
+            return hash.Take(32).ToArray();
+        }
+
         public static bool Verify(string verifyLine, string hashedLine) => Equals(Generate(verifyLine), hashedLine);
         public static bool Verify(string verifyLine, string hashedLine, string salt) => Equals(Generate(verifyLine, salt), hashedLine);
     }

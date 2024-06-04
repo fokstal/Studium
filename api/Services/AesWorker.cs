@@ -1,15 +1,14 @@
 using System.Security.Cryptography;
-using System.Text;
 
 namespace api.Services
 {
     public class AesWorker
     {
-        public static byte[] EncryptPicture(byte[] pictureBytes, string encryptionKey)
+        public static byte[] EncryptPicture(byte[] pictureBytes, byte[] encryptionKey)
         {
             using (Aes aes = Aes.Create())
             {
-                aes.Key = Encoding.UTF8.GetBytes(encryptionKey);
+                aes.Key = encryptionKey;
                 aes.GenerateIV();
 
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
@@ -26,11 +25,11 @@ namespace api.Services
             }
         }
 
-        public static byte[] DecryptPicture(byte[] encryptedPictureBytes, string encryptionKey)
+        public static byte[] DecryptPicture(byte[] encryptedPictureBytes, byte[] encryptionKey)
         {
             using (Aes aes = Aes.Create())
             {
-                aes.Key = Encoding.UTF8.GetBytes(encryptionKey);
+                aes.Key = encryptionKey;
                 aes.GenerateIV();
 
                 ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
