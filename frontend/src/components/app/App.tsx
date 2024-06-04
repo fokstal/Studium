@@ -37,6 +37,7 @@ export function App() {
             <Route path="students/edit/:id" element={<CreateEditStudent />} />
             <Route path="students/:id" element={<Student />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="profile/:userId" element={<Profile />} />
             <Route path="group" element={<Groups />} />
             <Route path="group/new" element={<CreateEditGroup />} />
             <Route path="group/edit/:id" element={<CreateEditGroup />} />

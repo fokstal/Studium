@@ -8,13 +8,19 @@ import {
 } from "react-icons/ai";
 import { useContext, useEffect, useState } from "react";
 import { StudentComponent } from "../../components/students";
-import { AverageGrade, Diagrams, SemestrGrades } from "../../components/profile";
+import {
+  AverageGrade,
+  Diagrams,
+  SemestrGrades,
+} from "../../components/profile";
 import { LanguageContext, Translator } from "../../store";
 import { AuthServise } from "../../services";
+import { useParams } from "react-router-dom";
 
 const authService = new AuthServise();
 
 export function Profile() {
+  const { userId } = useParams();
   const [id, setId] = useState<string>("");
   const { lang } = useContext(LanguageContext);
   const [currentPart, setCurrentPart] = useState(
@@ -30,6 +36,7 @@ export function Profile() {
   ];
 
   useEffect(() => {
+    if (userId) return setId(userId);
     authService.session().then((user) => setId(user.id));
   }, []);
 
@@ -55,7 +62,7 @@ export function Profile() {
             ))}
             <Flex gap="10px" color={colors.red} align="center">
               <AiOutlineExport size="24px" />
-              <Link _hover={{textDecoration: "none"}} href="/">
+              <Link _hover={{ textDecoration: "none" }} href="/">
                 <Text whiteSpace="pre">{Translator[lang.name]["exit"]}</Text>
               </Link>
             </Flex>
@@ -68,7 +75,7 @@ export function Profile() {
               <>
                 <Diagrams id={id || ""} />
                 <AverageGrade id={id || ""} />
-                <SemestrGrades id={id || ""}/>
+                <SemestrGrades id={id || ""} />
               </>
             ) : null}
           </VStack>

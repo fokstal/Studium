@@ -56,7 +56,7 @@ export function SelectedStudent({
             />
             <VStack align="stretch" gap="12px">
               <Link
-                href={`/students/${studentId}`}
+                href={`/profile/${studentId}`}
                 color={colors.white}
                 fontWeight="bold"
                 fontSize="24px"
