@@ -33,11 +33,12 @@ namespace api.Repositories
             byte[] decryptedPictureBytes = AesWorker.DecryptPicture(encryptedPictureBytes, encryptionKey);
 
             MemoryStream decryptedPictureStream = new(decryptedPictureBytes);
-            IFormFile decryptedPicture = new FormFile(decryptedPictureStream, 0, decryptedPictureStream.Length, null!, pathToFileName)
-            {
-                Headers = new HeaderDictionary(),
-                ContentType = "image/jpeg"
-            };
+            IFormFile decryptedPicture =
+                new FormFile(decryptedPictureStream, 0, decryptedPictureStream.Length, null!, pathToFileName)
+                {
+                    Headers = new HeaderDictionary(),
+                    ContentType = "image/jpeg"
+                };
 
             return decryptedPicture;
         }
@@ -48,14 +49,16 @@ namespace api.Repositories
             string pictureGuidName = Guid.NewGuid().ToString();
             string pictureExtension = Path.GetExtension(picture.FileName);
 
-            using (FileStream fileStream = new(Path.Combine($"{picturesFolderPath}/{pictureFolder.Path}/{pictureGuidName + pictureExtension}"), FileMode.Create))
+            using (FileStream fileStream =
+                new(Path.Combine($"{picturesFolderPath}/{pictureFolder.Path}/{pictureGuidName + pictureExtension}"),
+                FileMode.Create))
             {
                 await picture.CopyToAsync(fileStream);
             }
 
-            string passportScanFileName = pictureGuidName + pictureExtension;
+            string pictureFileName = pictureGuidName + pictureExtension;
 
-            return passportScanFileName;
+            return pictureFileName;
         }
 
         private static async Task<string> UploadAndEncryptPicture
@@ -64,22 +67,25 @@ namespace api.Repositories
             string pictureGuidName = Guid.NewGuid().ToString();
             string pictureExtension = Path.GetExtension(picture.FileName);
 
-            using (FileStream fileStream = new(Path.Combine($"{picturesFolderPath}/{pictureFolder.Path}/{pictureGuidName + pictureExtension}"), FileMode.Create))
+            using (FileStream fileStream =
+                new(Path.Combine($"{picturesFolderPath}/{pictureFolder.Path}/{pictureGuidName + pictureExtension}"),
+                FileMode.Create))
             {
                 byte[] encryptedPictureBytes = AesWorker.EncryptPicture(await picture.ToByteArrayAsync(), encryptionKey);
                 await fileStream.WriteAsync(encryptedPictureBytes);
             }
 
-            string passportScanFileName = pictureGuidName + pictureExtension;
+            string pictureFileName = pictureGuidName + pictureExtension;
 
-            return passportScanFileName;
+            return pictureFileName;
         }
 
         public static async Task<string> UploadPassportScanAsync(IFormFile passportScan, string encryptionKey)
         {
             if (passportScan is null) throw new Exception("Passport.Scan is null!");
 
-            string passportScanFileName = await UploadAndEncryptPicture(PictureFolders.Passport, passportScan, encryptionKey);
+            string passportScanFileName = await 
+                UploadAndEncryptPicture(PictureFolders.Passport, passportScan, encryptionKey);
 
             return passportScanFileName;
         }
@@ -93,7 +99,8 @@ namespace api.Repositories
 
                 if (personSex == 1) randomMaxValue = 8;
 
-                string defaultAvatarName = PersonHelper.SexStringByInt(personSex) + "-" + random.Next(1, randomMaxValue) + ".png";
+                string defaultAvatarName = 
+                    PersonHelper.SexStringByInt(personSex) + "-" + random.Next(1, randomMaxValue) + ".png";
 
                 personAvatar = GetPicture(defaultPersonPicturesFolderPath, defaultAvatarName);
             }
