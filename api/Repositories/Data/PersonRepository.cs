@@ -20,6 +20,34 @@ namespace api.Repositories.Data
             return personList;
         }
 
+        public async Task<IEnumerable<PersonEntity>> GetListByCuratorAsync(Guid curatorId)
+        {
+            List<PersonEntity> personList = [];
+
+            GroupEntity? groupEntity = await
+                _db.Group
+                .Include(g => g.StudentEntityList)
+                .FirstOrDefaultAsync(g => g.CuratorId == curatorId);
+
+            if (groupEntity is not null)
+            {
+                foreach (StudentEntity studentEntity in groupEntity.StudentEntityList)
+                {
+                    PersonEntity? personEntity = await _db.Person.FirstOrDefaultAsync(p => p.Id == studentEntity.PersonEntityId);
+
+                    if (personEntity is not null)
+                    {
+                        personEntity.StudentEntity = studentEntity;
+
+                        personList.Add(personEntity);
+                    }
+
+                }
+            }
+
+            return personList;
+        }
+
         public async override Task<PersonEntity?> GetAsync(int personEntityId)
         {
             PersonEntity? personEntity = await

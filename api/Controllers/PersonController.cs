@@ -10,6 +10,7 @@ using api.Extensions;
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
 using api.Services;
+using api.Helpers.Enums;
 
 namespace api.Controllers
 {
@@ -28,6 +29,40 @@ namespace api.Controllers
         [RequirePermissions([ViewPersonList])]
         public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListAsync()
             => Ok(await _personRepository.GetListAsync());
+
+        [HttpGet("list-by-session")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [RequirePermissions([ViewPerson])]
+        public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListBySessionAsync()
+        {
+            IEnumerable<PersonEntity> personEntityList = [];
+
+            try
+            {
+                Guid userIdSession = new HttpContextService(HttpContext).GetUserIdFromCookie();
+                HashSet<RoleEnum> roleListUserSession = await _userRepository.GetRoleListAsync(userIdSession);
+
+                if (new Authorizing(_userRepository, HttpContext).IsAdminAndSecretarRole())
+                {
+                    return Ok(await _personRepository.GetListAsync());
+                }
+
+                if (roleListUserSession.Contains(Curator))
+                {
+                    _ = personEntityList.Concat(await _personRepository.GetListByCuratorAsync(userIdSession));
+                }
+                else return Forbid();
+            }
+            catch
+            {
+                return Unauthorized();
+            }
+
+            return Ok(personEntityList);
+        }
 
         [HttpGet("{personId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -113,7 +148,7 @@ namespace api.Controllers
             PersonEntity? personEntityToUpdate = await _personRepository.GetAsync(personEntityId: personId);
 
             if (personEntityToUpdate is null) return NotFound();
-                
+
             PersonEntity? personEntityAnother = await _personRepository.GetAsync
                 (
                     firstName: personDTO.FirstName,
