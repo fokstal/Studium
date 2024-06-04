@@ -29,7 +29,7 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
     persons?: Person[];
     subjects?: Subject[];
     students?: Student[];
-  }>();
+  }>({});
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { lang } = useContext(LanguageContext);
   const roles = useRoles();
@@ -90,12 +90,14 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
         placeholder={Translator[lang.name]["select_student"]}
         options={personOptions() || []}
         value={person}
+        disabled={!filters.group}
         setValue={setPerson}
         name="lastName"
       />
       <Select
         placeholder={Translator[lang.name]["select_subject"]}
         options={subjectOptions() || []}
+        disabled={!filters.group}
         value={subject}
         setValue={setSubject}
       />

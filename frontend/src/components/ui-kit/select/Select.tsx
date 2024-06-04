@@ -11,6 +11,7 @@ type SelectProps = {
   value: any;
   setValue: Function;
   name?: string;
+  disabled?: boolean;
 };
 
 const SelectWrapper = styled.div`
@@ -23,6 +24,12 @@ const SelectWrapper = styled.div`
     font-size: 16px;
     font-weight: 400;
     padding: 6px 10px;
+  }
+
+  & > .p-dropdown.p-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: wait;
   }
 `;
 
@@ -43,6 +50,7 @@ export function Select({
   value,
   setValue,
   name = "name",
+  disabled = false,
 }: SelectProps) {
   const OptionlTemplate = (option: any) => {
     return (
@@ -53,7 +61,11 @@ export function Select({
   };
 
   return (
-    <SelectWrapper style={{ color: value ? colors.black : colors.lightGrey }}>
+    <SelectWrapper
+      style={{
+        color: value ? colors.black : colors.lightGrey,
+      }}
+    >
       <Dropdown
         style={{ background: colors.white }}
         value={value}
@@ -62,6 +74,7 @@ export function Select({
         optionLabel={name}
         placeholder={placeholder}
         itemTemplate={OptionlTemplate}
+        className={disabled ? "p-disabled" : ""}
       />
     </SelectWrapper>
   );
