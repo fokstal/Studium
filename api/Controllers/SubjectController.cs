@@ -33,13 +33,32 @@ namespace api.Controllers
         [RequirePermissions([ViewSubject])]
         public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListAsync(int groupId)
         {
-            // custom auth
-
             if (groupId < 1) return BadRequest();
 
             GroupEntity? groupEntity = await _groupRepository.GetAsync(groupEntityId: groupId);
 
             if (groupEntity is null) return NotFound();
+
+            Authorizing authorizing = new(_userRepository, HttpContext);
+
+            if (!authorizing.IsAdminAndSecretarRole())
+            {
+                bool userAccess = await authorizing.RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [groupEntity.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = groupEntity.StudentEntityList.Select(s => s.Id).ToArray(),
+                        Role = Student
+                    },
+                ]);
+
+                if (userAccess is false) return Forbid();
+            }
 
             return Ok(await _subjectRepository.GetListAsync(groupEntityId: groupId));
         }
