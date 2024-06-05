@@ -1,3 +1,5 @@
+import { Student } from "./Student";
+
 export type Person = {
   id?: number;
   firstName?: string;
@@ -6,5 +8,6 @@ export type Person = {
   birthDate?: string | Date;
   sex?: boolean;
   avatarFileName?: string;
+  studentEntity?: Student;
   passportEntity?: { scanFileName: string };
 };

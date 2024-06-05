@@ -30,13 +30,13 @@ export async function formatGrades(filters: Filter) {
         filters?.studentId || ""
       );
     } else {
-      const students = await studentService.get();
+      const students = await personService.getPersonsBySession();
       const student = students.find(
-        (s: Student) => s.personEntityId === filters.person?.id
+        (p: Person) => p.id === filters.person?.id
       );
       grades = await gradeService.getBySubjectByStudent(
         filters?.subject?.id || 0,
-        student.id || 0
+        student.studentEntity.id || 0
       );
     }
 
@@ -53,16 +53,16 @@ export async function formatGrades(filters: Filter) {
     });
     tableData = [data];
   } else if (filters?.person) {
-    const students = await studentService.get();
-    const subjects = await subjectService.get();
-    const student = students.find(
-      (s: Student) => s.personEntityId === filters.person?.id
+    const persons = await personService.getPersonsBySession();
+    const subjects = await subjectService.getSubjectsBySession();
+    const person = persons.find(
+      (p: Person) => p.id === filters.person?.id
     );
     const studentSubjects = subjects.filter(
-      (s: Subject) => s.groupEntityId === student.groupEntityId
+      (s: Subject) => s.groupEntityId === person.studentEntity.groupEntityId
     );
 
-    grades = await gradeService.getByStudent(student.id);
+    grades = await gradeService.getByStudent(person.studentEntity.id);
 
     columns = [
       { field: "subject", header: "Предмет" },
@@ -95,7 +95,8 @@ export async function formatGrades(filters: Filter) {
       })),
     ];
 
-    const students = await studentService.get();
+    const persons = await personService.getPersonsBySession();
+    const students = persons.map((p: Person) => p.studentEntity);
     const neededStudents = students.filter(
       (s: Student) => s.groupEntityId === filters.subject?.groupEntityId
     );

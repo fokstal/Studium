@@ -53,6 +53,15 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
       const student = await authService.session();
       setFilters({ studentId: student.id });
       return setSelectOptions({ subjects: subjects });
+    } else if (roles.includes("Curator") || roles.includes("Teacher")) {
+      const groups = await groupService.get();
+      const subjects = await subjectService.getSubjectsBySession();
+      const persons = await personService.getPersonsBySession();
+      setSelectOptions({
+        groups,
+        persons,
+        subjects,
+      });
     } else {
       const groups = await groupService.get();
       const persons = await personService.get();
@@ -79,11 +88,9 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
   const personOptions = () => {
     if (!group) return selectOptions?.persons;
 
-    return selectOptions?.students
-      ?.filter((s) => s.groupEntityId === group.id)
-      .map((s) =>
-        selectOptions.persons?.find((p) => p.id === s.personEntityId)
-      );
+    return selectOptions?.persons?.filter(
+      (s) => s.studentEntity?.groupEntityId === group.id
+    );
   };
 
   const subjectOptions = () => {
@@ -119,9 +126,11 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
         value={subject}
         setValue={setSubject}
       />
-      {roles.includes("Student") || roles.includes("Curator") ? null : (
+      {roles.includes("Teacher") ||
+      roles.includes("Admin") ||
+      roles.includes("Secretar") ? (
         <Button onClick={onOpen}>{Translator[lang.name]["add_mark"]}</Button>
-      )}
+      ) : null}
       <Flex
         gap="10px"
         align="center"
@@ -131,9 +140,11 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
         <Text userSelect="none">{Translator[lang.name]["clear_filters"]}</Text>
         <AiOutlineClose />
       </Flex>
-      {roles.includes("Student") || roles.includes("Curator") ? null : (
+      {roles.includes("Teacher") ||
+      roles.includes("Admin") ||
+      roles.includes("Secretar") ? (
         <GradeModal onClose={onClose} isOpen={isOpen} />
-      )}
+      ) : null}
     </Flex>
   );
 }

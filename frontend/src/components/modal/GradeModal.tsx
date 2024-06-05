@@ -43,19 +43,19 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
   }>({});
   const { lang } = useContext(LanguageContext);
 
-  useEffect(() => {
-    subjectService.get().then((subjects) => setSubjects(subjects));
-    studentService.get().then((data) => setStudentsUsers(data));
-  }, []);
-  const updateStudents = async () => {
-    if (data.subjectId) {
-      const res = await userService.getUsersBySubject(data.subjectId);
-      setStudentsUsers(res);
-    }
-  };
+  // useEffect(() => {
+  //   subjectService.get().then((subjects) => setSubjects(subjects));
+  //   studentService.get().then((data) => setStudentsUsers(data));
+  // }, []);
+  // const updateStudents = async () => {
+  //   if (data.subjectId) {
+  //     const res = await userService.getUsersBySubject(data.subjectId);
+  //     setStudentsUsers(res);
+  //   }
+  // };
 
   useEffect(() => {
-    updateStudents();
+    //updateStudents();
   }, [data]);
 
   const handleSubmit = async () => {
