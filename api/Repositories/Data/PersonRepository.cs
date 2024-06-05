@@ -48,6 +48,43 @@ namespace api.Repositories.Data
             return personList;
         }
 
+        public async Task<IEnumerable<PersonEntity>> GetListByTeacherAsync(Guid teacherId)
+        {
+            List<PersonEntity> personEntityList = [];
+
+            List<SubjectEntity> subjectEntityList = 
+                _db
+                .Subject
+                .Where(s => s.TeacherId == teacherId)
+                .ToList();
+
+            foreach (SubjectEntity subjectEntity in subjectEntityList)
+            {
+                GroupEntity? groupEntity = await
+                _db.Group
+                .Include(g => g.StudentEntityList)
+                .FirstOrDefaultAsync(g => g.Id == subjectEntity.GroupEntityId);
+
+                if (groupEntity is not null)
+                {
+                    foreach (StudentEntity studentEntity in groupEntity.StudentEntityList)
+                    {
+                        PersonEntity personEntity = await
+                        _db
+                        .Person
+                        .FirstOrDefaultAsync(p => p.Id == studentEntity.PersonEntityId)
+                        ?? throw new Exception("Person on Student is null!");
+
+                        personEntity.StudentEntity = studentEntity;
+
+                        if (personEntity is not null) personEntityList.Add(personEntity);
+                    }
+                }
+            }
+
+            return personEntityList;
+        }
+
         public async override Task<PersonEntity?> GetAsync(int personEntityId)
         {
             PersonEntity? personEntity = await
