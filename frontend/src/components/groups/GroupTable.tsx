@@ -22,6 +22,7 @@ import { useContext, useState } from "react";
 import { AiOutlineCloseSquare } from "react-icons/ai";
 import { LanguageContext, Translator } from "../../store";
 import { GroupService } from "../../services";
+import { useRoles } from "../../hooks";
 
 type GroupTableProps = {
   data: Group[];
@@ -33,6 +34,7 @@ export function GroupTable({ data }: GroupTableProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState<number>(0);
   const { lang } = useContext(LanguageContext);
+  const roles = useRoles();
 
   const deleteGroupHandler = (id: number) => {
     setGroupToDelete(id);
@@ -74,31 +76,33 @@ export function GroupTable({ data }: GroupTableProps) {
             header={Translator[lang.name]["group_auditory"]}
             sortable
           ></Column>
-          <Column
-            body={(rowData) => (
-              <Flex gap="10px" align="center">
-                <Box
-                  onClick={() => deleteGroupHandler(rowData.id)}
-                  p="5px"
-                  bg={colors.red}
-                  borderRadius="5px"
-                  cursor="pointer"
-                >
-                  <FaTrash color={colors.white} />
-                </Box>
-                <Box
-                  p="5px"
-                  bg={colors.green}
-                  borderRadius="5px"
-                  cursor="pointer"
-                >
-                  <Link to={`/group/edit/${rowData.id}`}>
-                    <FaEdit color={colors.white} />
-                  </Link>
-                </Box>
-              </Flex>
-            )}
-          ></Column>
+          {roles.includes("Admin") || roles.includes("Secretar") ? (
+            <Column
+              body={(rowData) => (
+                <Flex gap="10px" align="center">
+                  <Box
+                    onClick={() => deleteGroupHandler(rowData.id)}
+                    p="5px"
+                    bg={colors.red}
+                    borderRadius="5px"
+                    cursor="pointer"
+                  >
+                    <FaTrash color={colors.white} />
+                  </Box>
+                  <Box
+                    p="5px"
+                    bg={colors.green}
+                    borderRadius="5px"
+                    cursor="pointer"
+                  >
+                    <Link to={`/group/edit/${rowData.id}`}>
+                      <FaEdit color={colors.white} />
+                    </Link>
+                  </Box>
+                </Flex>
+              )}
+            ></Column>
+          ) : null}
         </DataTable>
       </TableWrapper>
       <Modal isOpen={isDeleteModalOpen} onClose={cancelDeleteGroup} isCentered>

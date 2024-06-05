@@ -57,7 +57,7 @@ export function Header() {
   return (
     <BaseLayout>
       <Flex align="center" justify="space-between" h="100px">
-        <Link to="/students">
+        <Link to="/journal">
           <img
             src={process.env.PUBLIC_URL + "/images/logo.svg"}
             alt="Studium"
@@ -66,7 +66,9 @@ export function Header() {
           />
         </Link>
         <Flex gap="20px">
-          {roles.includes("Student") ? null : (
+          {roles.includes("Student") ||
+          roles.includes("Teacher") ||
+          roles.includes("Curator") ? null : (
             <>
               <Text>
                 <Link
@@ -135,22 +137,26 @@ export function Header() {
                     </Flex>
                   </Link>
                 </MenuItem>
-                <MenuItem _hover={{ background: colors.darkGrey }}>
-                  <Link to="/subject">
-                    <Flex gap="10px" align="center">
-                      <PiBookFill />
-                      {Translator[lang.name]["subject_list"]}
-                    </Flex>
-                  </Link>
-                </MenuItem>
-                <MenuItem _hover={{ background: colors.darkGrey }}>
-                  <Flex gap="10px" align="center">
-                    <LuUserSquare />
-                    <Link to="/users">
-                      {Translator[lang.name]["user_list"]}
-                    </Link>
-                  </Flex>
-                </MenuItem>
+                {roles.includes("Admin") || roles.includes("Secretar") ? (
+                  <>
+                    <MenuItem _hover={{ background: colors.darkGrey }}>
+                      <Link to="/subject">
+                        <Flex gap="10px" align="center">
+                          <PiBookFill />
+                          {Translator[lang.name]["subject_list"]}
+                        </Flex>
+                      </Link>
+                    </MenuItem>
+                    <MenuItem _hover={{ background: colors.darkGrey }}>
+                      <Flex gap="10px" align="center">
+                        <LuUserSquare />
+                        <Link to="/users">
+                          {Translator[lang.name]["user_list"]}
+                        </Link>
+                      </Flex>
+                    </MenuItem>
+                  </>
+                ) : null}
                 <MenuItem
                   _hover={{ background: colors.darkGrey }}
                   color={colors.red}
