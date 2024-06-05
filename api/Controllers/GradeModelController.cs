@@ -8,8 +8,6 @@ using api.Models.DTO;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
-using api.Models.Entities;
-using api.Helpers.Enums;
 
 namespace api.Controllers
 {
@@ -39,31 +37,50 @@ namespace api.Controllers
         [RequirePermissions([ViewGrade])]
         public async Task<ActionResult<IEnumerable<GradeStudentDTO>>> GetListAsync(Guid studentId)
         {
-            if (await _studentRepository.CheckExistsAsync(studentId) is false) return NotFound();
+            StudentEntity? studentEntity = await _studentRepository.GetAsync(studentEntityId: studentId);
+
+            if (studentEntity is null) return NotFound();
 
             IEnumerable<GradeStudentDTO> gradeStudentDTOList = await
                 _gradeModelRepository.GetListAsync(studentEntityId: studentId);
 
-            // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-            //     ([
-            //         new()
-            //         {
-            //             IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-            //             Role = Teacher
-            //         },
-            //         new()
-            //         {
-            //             IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-            //             Role = Curator
-            //         },
-            //         new()
-            //         {
-            //             IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
-            //             Role = Student
-            //         },
-            //     ]);
+            Authorizing authorizing = new(_userRepository, HttpContext);
 
-            // if (userAccess is false) return Forbid();
+            if (!authorizing.IsAdminAndSecretarRole())
+            {
+                bool userAccess = await authorizing.RequireOwnerListAccess
+                    ([
+                        new()
+                    {
+                        IdList =
+                            _groupRepository
+                            .GetAsync(groupEntityId: studentEntity.GroupEntityId)
+                            .Result!
+                            .SubjectEntityList
+                            .Select(s => s.TeacherId)
+                            .ToArray(),
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList =
+                        [
+                            _groupRepository
+                            .GetAsync(groupEntityId: studentEntity.GroupEntityId)
+                            .Result!
+                            .CuratorId
+                        ],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = [studentId],
+                        Role = Student
+                    },
+                    ]);
+
+                if (userAccess is false) return Forbid();
+            }
 
             return Ok(gradeStudentDTOList);
         }
@@ -78,30 +95,44 @@ namespace api.Controllers
         {
             if (subjectId < 1) return BadRequest();
 
-            if (await _subjectRepository.CheckExistsAsync(subjectId) is false) return NotFound();
+            SubjectEntity? subjectEntity = await _subjectRepository.GetAsync(subjectEntityId: subjectId);
+
+            if (subjectEntity is null) return NotFound();
 
             IEnumerable<GradeModelEntity> gradeModelEntityList = await _gradeModelRepository.GetListAsync(subjectEntityId: subjectId);
 
-            // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-            //     ([
-            //         new()
-            //         {
-            //             IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-            //             Role = Teacher
-            //         },
-            //         new()
-            //         {
-            //             IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-            //             Role = Curator
-            //         },
-            //         new()
-            //         {
-            //             IdList = gradeList.SelectMany(grade => grade.StudentToValueList.Select(sv => sv.StudentId)).ToArray(),
-            //             Role = Student
-            //         },
-            //     ]);
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [subjectEntity.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList =
+                        [
+                            _groupRepository
+                            .GetAsync(groupEntityId: subjectEntity.GroupEntityId)
+                            .Result!
+                            .CuratorId
+                        ],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList =
+                            _groupRepository
+                            .GetAsync(groupEntityId: subjectEntity.GroupEntityId)
+                            .Result!
+                            .StudentEntityList
+                            .Select(s => s.Id)
+                            .ToArray(),
+                        Role = Student
+                    },
+                ]);
 
-            // if (userAccess is false) return Forbid();
+            if (userAccess is false) return Forbid();
 
             return Ok(gradeModelEntityList);
         }
@@ -116,33 +147,37 @@ namespace api.Controllers
         {
             if (subjectId < 1) return BadRequest();
 
-            if (await _studentRepository.CheckExistsAsync(studentId) is false) return NotFound("Student is null!");
-            if (await _subjectRepository.CheckExistsAsync(subjectId) is false) return NotFound("Subject is null!");
+            StudentEntity? studentEntity = await _studentRepository.GetAsync(studentEntityId: studentId);
+            SubjectEntity? subjectEntity = await _subjectRepository.GetAsync(subjectEntityId: subjectId);
+
+
+            if (studentEntity is null) return NotFound("Student is null!");
+            if (subjectEntity is null) return NotFound("Subject is null!");
 
             IEnumerable<GradeStudentDTO> gradeStudentDTOList = await
                 _gradeModelRepository
                 .GetListAsync(studentEntityId: studentId, subjectEntityId: subjectId);
 
-            // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-            //     ([
-            //         new()
-            //         {
-            //             IdList = [_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.TeacherId],
-            //             Role = Teacher
-            //         },
-            //         new()
-            //         {
-            //             IdList = [_groupRepository.GetAsync(_subjectRepository.GetAsync(gradeList.ToList()[0].SubjectId).Result!.GroupId).Result!.CuratorId],
-            //             Role = Curator
-            //         },
-            //         new()
-            //         {
-            //             IdList = gradeList.Select(grade => grade.StudentId).ToArray(),
-            //             Role = Student
-            //         },
-            //     ]);
+            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                ([
+                    new()
+                    {
+                        IdList = [subjectEntity.TeacherId],
+                        Role = Teacher
+                    },
+                    new()
+                    {
+                        IdList = [_groupRepository.GetAsync(subjectEntity).Result!.CuratorId],
+                        Role = Curator
+                    },
+                    new()
+                    {
+                        IdList = [studentEntity.Id],
+                        Role = Student
+                    },
+                ]);
 
-            // if (userAccess is false) return Forbid();
+            if (userAccess is false) return Forbid();
 
             return Ok(gradeStudentDTOList);
         }
