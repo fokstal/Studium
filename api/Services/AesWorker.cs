@@ -1,50 +1,56 @@
 using System.Security.Cryptography;
+using System.Text;
 
 namespace api.Services
 {
     public class AesWorker
     {
-        public static byte[] EncryptPicture(byte[] pictureBytes, byte[] encryptionKey)
+        public static byte[] Encrypt(byte[] data, string key)
         {
             using (Aes aes = Aes.Create())
             {
-                aes.Key = encryptionKey;
-                aes.GenerateIV();
+                aes.Key = DeriveKey(key, aes.KeySize / 8);
+                aes.Mode = CipherMode.ECB;
+                aes.Padding = PaddingMode.PKCS7;
 
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
-                using (MemoryStream ms = new())
+                using (MemoryStream ms = new MemoryStream())
+                using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                 {
-                    using (CryptoStream cs = new(ms, encryptor, CryptoStreamMode.Write))
-                    {
-                        cs.Write(pictureBytes, 0, pictureBytes.Length);
-                        cs.FlushFinalBlock();
-                    }
+                    cs.Write(data, 0, data.Length);
+                    cs.FlushFinalBlock();
                     return ms.ToArray();
                 }
             }
         }
 
-        public static byte[] DecryptPicture(byte[] encryptedPictureBytes, byte[] encryptionKey)
+        public static byte[] Decrypt(byte[] data, string key)
         {
             using (Aes aes = Aes.Create())
             {
-                aes.Key = encryptionKey;
-                aes.GenerateIV();
+                aes.Key = DeriveKey(key, aes.KeySize / 8);;
+                aes.Mode = CipherMode.ECB;
+                aes.Padding = PaddingMode.PKCS7;
 
                 ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-                using (MemoryStream ms = new(encryptedPictureBytes))
+                using (MemoryStream ms = new MemoryStream(data))
+                using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
                 {
-                    using (CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Read))
-                    {
-                        byte[] decryptedBytes = new byte[encryptedPictureBytes.Length];
-                        int bytesRead = cs.Read(decryptedBytes, 0, decryptedBytes.Length);
-                        byte[] result = new byte[bytesRead];
-                        Array.Copy(decryptedBytes, 0, result, 0, bytesRead);
-                        return result;
-                    }
+                    byte[] decryptedData = new byte[data.Length];
+                    int bytesRead = cs.Read(decryptedData, 0, decryptedData.Length);
+                    return decryptedData;
                 }
+            }
+        }
+
+        private static byte[] DeriveKey(string key, int keySize)
+        {
+            using (Rfc2898DeriveBytes pbkdf2 = 
+                new(key, salt: Encoding.UTF8.GetBytes("salt"), iterations: 100000, hashAlgorithm: HashAlgorithmName.SHA256))
+            {
+                return pbkdf2.GetBytes(keySize);
             }
         }
     }

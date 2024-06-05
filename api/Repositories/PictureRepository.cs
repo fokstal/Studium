@@ -1,4 +1,3 @@
-using System.Text;
 using api.Helpers;
 using api.Helpers.Constants;
 using api.Services;
@@ -26,13 +25,13 @@ namespace api.Repositories
         }
 
         public static async Task<IFormFile> GetAndDecryptPictureAsync
-            (PictureFolders.PictureFolderEntity pictureFolder, string fileName, byte[] encryptionKey)
+            (PictureFolders.PictureFolderEntity pictureFolder, string fileName, string encryptionKey)
         {
             string pathToFileName = Path.Combine($"{picturesFolderPath}/{pictureFolder.Path}/{fileName}");
 
             byte[] encryptedPictureBytes = await File.ReadAllBytesAsync(pathToFileName);
             byte[] decryptedPictureBytes =  
-            AesWorker.DecryptPicture(encryptedPictureBytes, encryptionKey);
+            AesWorker.Decrypt(encryptedPictureBytes, encryptionKey);
 
             MemoryStream decryptedPictureStream = new(decryptedPictureBytes);
             IFormFile decryptedPicture =
@@ -64,13 +63,13 @@ namespace api.Repositories
         }
 
         private static async Task<string> UploadAndEncryptPicture
-            (PictureFolders.PictureFolderEntity pictureFolder, IFormFile picture, byte[] encryptionKey)
+            (PictureFolders.PictureFolderEntity pictureFolder, IFormFile picture, string encryptionKey)
         {
             string pictureGuidName = Guid.NewGuid().ToString();
             string pictureExtension = Path.GetExtension(picture.FileName);
 
             byte[] encryptedPictureBytes = 
-                AesWorker.EncryptPicture
+                AesWorker.Encrypt
                     (await picture.ToByteArrayAsync(), encryptionKey);
 
             using (FileStream fileStream =
@@ -85,7 +84,7 @@ namespace api.Repositories
             return pictureFileName;
         }
 
-        public static async Task<string> UploadPassportScanAsync(IFormFile passportScan, byte[] encryptionKey)
+        public static async Task<string> UploadPassportScanAsync(IFormFile passportScan, string encryptionKey)
         {
             if (passportScan is null) throw new Exception("Passport.Scan is null!");
 

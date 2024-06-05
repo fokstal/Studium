@@ -80,13 +80,13 @@ namespace api.Controllers
                 IFormFile passportScanFile = await
                     PictureRepository
                     .GetAndDecryptPictureAsync
-                        (PictureFolders.Passport, scanFileName, StringHasher.Generate32ByteKey(key));
+                        (PictureFolders.Passport, scanFileName, key);
 
-                return File(passportScanFile.OpenReadStream(), passportScanFile.ContentType, passportScanFile.FileName);
+                return File(passportScanFile.OpenReadStream(), passportScanFile.ContentType, "passport-scan");
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 

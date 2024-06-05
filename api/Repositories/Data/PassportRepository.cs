@@ -21,7 +21,7 @@ namespace api.Repositories.Data
                     UploadPassportScanAsync
                     (
                         passportDTO.ScanFile,
-                        StringHasher.Generate32ByteKey(personEntity.Id.ToString())
+                        personEntity.Id.ToString()
                     ).Result,
 
                 PersonEntityId = passportDTO.PersonEntityId,
@@ -38,7 +38,7 @@ namespace api.Repositories.Data
                 UploadPassportScanAsync
                 (
                     passportDTO.ScanFile,
-                    StringHasher.Generate32ByteKey(personEntity.Id.ToString())
+                    personEntity.Id.ToString()
                 );
 
             passportEntityToUpdate.PersonEntityId = passportDTO.Id;
