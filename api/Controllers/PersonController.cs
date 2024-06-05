@@ -16,7 +16,7 @@ namespace api.Controllers
 {
     [Route("person")]
     [ApiController]
-    [RequireRoles([Admin, Secretar, Curator, Student])]
+    [RequireRoles([Admin, Secretar, Curator, Teacher, Student])]
     public class PersonController(AppDbContext db) : ControllerBase
     {
         private readonly PersonRepository _personRepository = new(db);
@@ -35,7 +35,6 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([ViewPerson])]
         public async Task<ActionResult<IEnumerable<PersonEntity>>> GetListBySessionAsync()
         {
             IEnumerable<PersonEntity> personEntityList = [];

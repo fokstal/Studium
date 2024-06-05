@@ -68,7 +68,6 @@ namespace api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [RequirePermissions([ViewSubject])]
         public async Task<ActionResult<IEnumerable<SubjectEntity>>> GetListBySessionAsync()
         {
             IEnumerable<SubjectEntity> subjectEntityList = [];
