@@ -74,9 +74,12 @@ namespace api.Repositories.Data
         {
             List<UserEntity> userEntityList = [];
 
-            SubjectEntity? subjectEntity = await _db.Subject.FirstOrDefaultAsync(s => s.TeacherId == teacherId);
+            List<SubjectEntity> subjectEntityList = await
+                _db.Subject
+                .Where(s => s.TeacherId == teacherId)
+                .ToListAsync();
 
-            if (subjectEntity is not null)
+            foreach (SubjectEntity subjectEntity in subjectEntityList)
             {
                 GroupEntity? groupEntity = await
                 _db.Group
