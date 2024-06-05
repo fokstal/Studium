@@ -52,7 +52,7 @@ namespace api.Controllers
 
                 if (roleListUserSession.Contains(Curator))
                 {
-                    _ = personEntityList.Concat(await _personRepository.GetListByCuratorAsync(userIdSession));
+                    personEntityList = personEntityList.Concat(await _personRepository.GetListByCuratorAsync(userIdSession));
                 }
                 else return Forbid();
             }

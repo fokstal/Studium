@@ -85,17 +85,17 @@ namespace api.Controllers
 
                 if (roleListUserSession.Contains(Curator))
                 {
-                    _ = subjectEntityList.Concat(await _subjectRepository.GetListByCuratorAsync(userIdSession));
+                    subjectEntityList = subjectEntityList.Concat(await _subjectRepository.GetListByCuratorAsync(userIdSession));
                 }
 
                 if (roleListUserSession.Contains(Teacher))
                 {
-                    _ = subjectEntityList.Concat(await _subjectRepository.GetListByTeacherAsync(userIdSession));
+                    subjectEntityList = subjectEntityList.Concat(await _subjectRepository.GetListByTeacherAsync(userIdSession));
                 }
 
                 if (roleListUserSession.Contains(Student))
                 {
-                    _ = subjectEntityList.Concat(await _subjectRepository.GetListByStudentAsync(userIdSession));
+                    subjectEntityList = subjectEntityList.Concat(await _subjectRepository.GetListByStudentAsync(userIdSession));
                 }
             }
             catch
