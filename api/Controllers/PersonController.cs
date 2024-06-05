@@ -6,11 +6,11 @@ using api.Repositories;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
 using api.Extensions;
+using api.Services;
+using api.Helpers.Enums;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
-using api.Services;
-using api.Helpers.Enums;
 
 namespace api.Controllers
 {

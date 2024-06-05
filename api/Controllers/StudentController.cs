@@ -4,11 +4,11 @@ using api.Model.DTO;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
 using api.Extensions;
+using api.Services;
+using api.Models.DTO;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
-using api.Services;
-using api.Models.DTO;
 
 namespace api.Controllers
 {
