@@ -101,38 +101,43 @@ namespace api.Controllers
 
             IEnumerable<GradeModelEntity> gradeModelEntityList = await _gradeModelRepository.GetListAsync(subjectEntityId: subjectId);
 
-            bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-                ([
-                    new()
-                    {
-                        IdList = [subjectEntity.TeacherId],
-                        Role = Teacher
-                    },
-                    new()
-                    {
-                        IdList =
-                        [
-                            _groupRepository
-                            .GetAsync(groupEntityId: subjectEntity.GroupEntityId)
-                            .Result!
-                            .CuratorId
-                        ],
-                        Role = Curator
-                    },
-                    new()
-                    {
-                        IdList =
-                            _groupRepository
-                            .GetAsync(groupEntityId: subjectEntity.GroupEntityId)
-                            .Result!
-                            .StudentEntityList
-                            .Select(s => s.Id)
-                            .ToArray(),
-                        Role = Student
-                    },
-                ]);
+            Authorizing authorizing = new(_userRepository, HttpContext);
 
-            if (userAccess is false) return Forbid();
+            if (!authorizing.IsAdminAndSecretarRole())
+            {
+                bool userAccess = await authorizing.RequireOwnerListAccess
+                    ([
+                        new()
+                        {
+                            IdList = [subjectEntity.TeacherId],
+                            Role = Teacher
+                        },
+                        new()
+                        {
+                            IdList =
+                            [
+                                _groupRepository
+                                .GetAsync(groupEntityId: subjectEntity.GroupEntityId)
+                                .Result!
+                                .CuratorId
+                            ],
+                            Role = Curator
+                        },
+                        new()
+                        {
+                            IdList =
+                                _groupRepository
+                                .GetAsync(groupEntityId: subjectEntity.GroupEntityId)
+                                .Result!
+                                .StudentEntityList
+                                .Select(s => s.Id)
+                                .ToArray(),
+                            Role = Student
+                        },
+                    ]);
+
+                if (userAccess is false) return Forbid();
+            }
 
             return Ok(gradeModelEntityList);
         }

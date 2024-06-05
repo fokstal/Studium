@@ -41,26 +41,38 @@ namespace api.Controllers
 
             if (studentEntity is null) return NotFound();
 
-            // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-            //     ([
-            //         new()
-            //         {
-            //             IdList = [_groupRepository.GetAsync(student.GroupId).Result!.CuratorId],
-            //             Role = Curator
-            //         },
-            //         new()
-            //         {
-            //             IdList = [student.Id],
-            //             Role = Student
-            //         },
-            //         new()
-            //         {
-            //             IdList = _groupRepository.GetAsync(student.GroupId).Result!.SubjectList.Select(subject => subject.TeacherId).ToArray(),
-            //             Role = Teacher
-            //         },
-            //     ]);
+            Authorizing authorizing = new(_userRepository, HttpContext);
 
-            // if (userAccess is false) return Forbid();
+            if (!authorizing.IsAdminAndSecretarRole())
+            {
+                bool userAccess = await authorizing.RequireOwnerListAccess
+                    ([
+                        new()
+                        {
+                            IdList = [_groupRepository.GetAsync(studentEntity.GroupEntityId).Result!.CuratorId],
+                            Role = Curator
+                        },
+                        new()
+                        {
+                            IdList = [studentEntity.Id],
+                            Role = Student
+                        },
+                        new()
+                        {
+                            IdList =
+                                _groupRepository
+                                .GetAsync(studentEntity.GroupEntityId)
+                                .Result!
+                                .SubjectEntityList.Select(s => s.TeacherId)
+                                .ToArray(),
+
+                            Role = Teacher
+                        },
+                    ]);
+
+                if (userAccess is false) return Forbid();
+
+            }
 
             return Ok(studentEntity);
         }

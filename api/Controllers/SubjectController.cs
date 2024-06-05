@@ -120,26 +120,36 @@ namespace api.Controllers
 
             if (subjectEntity is null) return NotFound();
 
-            // bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
-            //     ([
-            //         new()
-            //         {
-            //             IdList = [subject.TeacherId],
-            //             Role = Teacher
-            //         },
-            //         new()
-            //         {
-            //             IdList = [_groupRepository.GetAsync(subject).Result.CuratorId],
-            //             Role = Curator
-            //         },
-            //         new()
-            //         {
-            //             IdList = _groupRepository.GetAsync(subject).Result.StudentList.Select(student => student.Id).ToArray(),
-            //             Role = Student
-            //         },
-            //     ]);
+            Authorizing authorizing = new(_userRepository, HttpContext);
 
-            // if (userAccess is false) return Forbid();
+            if (!authorizing.IsAdminAndSecretarRole())
+            {
+                bool userAccess = await new Authorizing(_userRepository, HttpContext).RequireOwnerListAccess
+                    ([
+                        new()
+                        {
+                            IdList = [subjectEntity.TeacherId],
+                            Role = Teacher
+                        },
+                        new()
+                        {
+                            IdList = [_groupRepository.GetAsync(subjectEntity).Result.CuratorId],
+                            Role = Curator
+                        },
+                        new()
+                        {
+                            IdList = 
+                                _groupRepository
+                                .GetAsync(subjectEntity).Result.StudentEntityList
+                                .Select(s => s.Id)
+                                .ToArray(),
+
+                            Role = Student
+                        },
+                    ]);
+
+                if (userAccess is false) return Forbid();
+            }
 
             return Ok(subjectEntity);
         }
