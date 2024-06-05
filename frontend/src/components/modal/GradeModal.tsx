@@ -43,19 +43,19 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
   }>({});
   const { lang } = useContext(LanguageContext);
 
-  // useEffect(() => {
-  //   subjectService.get().then((subjects) => setSubjects(subjects));
-  //   studentService.get().then((data) => setStudentsUsers(data));
-  // }, []);
-  // const updateStudents = async () => {
-  //   if (data.subjectId) {
-  //     const res = await userService.getUsersBySubject(data.subjectId);
-  //     setStudentsUsers(res);
-  //   }
-  // };
+  useEffect(() => {
+    subjectService.getSubjectsBySession().then((subjects) => setSubjects(subjects));
+  }, []);
+  
+  const updateStudents = async () => {
+    if (data.subjectId) {
+      const res = await userService.getUsersBySubject(data.subjectId);
+      setStudentsUsers(res);
+    }
+  };
 
   useEffect(() => {
-    //updateStudents();
+    updateStudents();
   }, [data]);
 
   const handleSubmit = async () => {
@@ -112,6 +112,7 @@ export function GradeModal({ isOpen, onClose }: GradeModalProps) {
             <VStack align="stretch">
               <Text>{Translator[lang.name]["student"]}:</Text>
               <Select
+                disabled={!data.subjectId}
                 borderColor={colors.darkGrey}
                 _focusVisible={{ borderColor: colors.darkGrey }}
                 onChange={(e) =>
