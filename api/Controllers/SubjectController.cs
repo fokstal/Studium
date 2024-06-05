@@ -82,7 +82,7 @@ namespace api.Controllers
                     return Ok(await _subjectRepository.GetListAsync());
                 }
 
-                if (roleListUserSession.Contains(Curator))
+                if (roleListUserSession.Contains(Curator) && !roleListUserSession.Contains(Teacher))
                 {
                     subjectEntityList = subjectEntityList.Concat(await _subjectRepository.GetListByCuratorAsync(userIdSession));
                 }
