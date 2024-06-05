@@ -1,14 +1,21 @@
 import { Flex, Text, VStack } from "@chakra-ui/react";
 import { Chart } from "primereact/chart";
 import { useContext, useEffect, useState } from "react";
-import { GradeService, StudentService, SubjectService } from "../../services";
+import {
+  AuthServise,
+  GradeService,
+  StudentService,
+  SubjectService,
+} from "../../services";
 import { Select, colors } from "../ui-kit";
 import { LanguageContext, Translator } from "../../store";
 import { Grade, Subject } from "../../types";
+import { useRoles } from "../../hooks";
 
 const gradeService = new GradeService();
 const studentService = new StudentService();
 const subjectService = new SubjectService();
+const authService = new AuthServise();
 
 type DiagramsProps = {
   id: string;
@@ -22,14 +29,20 @@ export function Diagrams({ id }: DiagramsProps) {
   const [subject, setSubject] = useState<Subject>();
   const { red, green, darkGreen, darkRed, white, darkGrey } = colors;
   const { lang } = useContext(LanguageContext);
+  const roles = useRoles();
 
   const updateData = async () => {
-    const student = await studentService.getById(id);
-    const subjects = await subjectService.get();
-    const studentSubjects = subjects.filter(
-      (subject: Subject) => student.groupId === subject.groupEntityId
-    );
-    setSubjects(studentSubjects);
+    if (roles.includes("Student")) {
+      const usersSubject = await subjectService.getSubjectsBySession();
+      setSubjects(usersSubject);
+    } else {
+      const student = await studentService.getById(id);
+      const subjects = await subjectService.get();
+      const studentSubjects = subjects.filter(
+        (subject: Subject) => student.groupId === subject.groupEntityId
+      );
+      setSubjects(studentSubjects);
+    }
   };
 
   const updateGrades = async () => {
@@ -41,8 +54,6 @@ export function Diagrams({ id }: DiagramsProps) {
       grades = await gradeService.getByStudent(id);
       setGrades(grades);
     }
-
-    console.log(grades)
     const data = {
       labels: [
         Translator[lang.name]["marks_lower_3"],
@@ -63,14 +74,15 @@ export function Diagrams({ id }: DiagramsProps) {
     setChartDataGrades(data);
 
     const creditsData = {
-      labels: [Translator[lang.name]["pass_works"], Translator[lang.name]["not_pass_works"]],
+      labels: [
+        Translator[lang.name]["pass_works"],
+        Translator[lang.name]["not_pass_works"],
+      ],
       datasets: [
         {
           data: [
-            grades?.filter((g: any) => g.type === 1 && g.value !== -1)
-              .length,
-            grades?.filter((g: any) => g.type === 1 && g.value === -1)
-              .length,
+            grades?.filter((g: any) => g.type === 1 && g.value !== -1).length,
+            grades?.filter((g: any) => g.type === 1 && g.value === -1).length,
           ],
           backgroundColor: ["#2555FF", "#AC43FF"],
           hoverBackgroundColor: ["#5376f4", "#ba66f9"],

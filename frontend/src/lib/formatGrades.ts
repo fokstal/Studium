@@ -1,3 +1,4 @@
+import { generateKeyPair } from "crypto";
 import {
   GradeService,
   PersonService,
@@ -15,21 +16,29 @@ type Filter = {
   group?: Group;
   person?: Person;
   subject?: Subject;
+  studentId?: string;
 };
 
 export async function formatGrades(filters: Filter) {
   let grades: any = [];
   let columns: any = [];
   let tableData = [];
-  if (filters?.person && filters?.subject) {
-    const students = await studentService.get();
-    const student = students.find(
-      (s: Student) => s.personEntityId === filters.person?.id
-    );
-    grades = await gradeService.getBySubjectByStudent(
-      filters?.subject?.id || 0,
-      student.id || 0
-    );
+  if ((filters?.person || filters?.studentId) && filters?.subject) {
+    if (filters.studentId) {
+      grades = await gradeService.getBySubjectByStudent(
+        filters?.subject?.id || 0,
+        filters?.studentId || ""
+      );
+    } else {
+      const students = await studentService.get();
+      const student = students.find(
+        (s: Student) => s.personEntityId === filters.person?.id
+      );
+      grades = await gradeService.getBySubjectByStudent(
+        filters?.subject?.id || 0,
+        student.id || 0
+      );
+    }
 
     columns = [
       ...grades.map((g: Grade, i: number) => ({

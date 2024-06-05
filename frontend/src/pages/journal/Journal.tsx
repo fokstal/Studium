@@ -12,6 +12,7 @@ export function Journal() {
     group?: Group;
     person?: Person;
     subject?: Subject;
+    studentId?: string;
   }>();
   const [data, setData] = useState<any[]>();
   const [columns, setColumns] = useState<{ field: string; header: string }[]>(
@@ -21,9 +22,9 @@ export function Journal() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const {columns, tableData} = await formatGrades(filters || {});
+      const { columns, tableData } = await formatGrades(filters || {});
       setColumns(columns);
-      setData(tableData)
+      setData(tableData);
     };
     fetchData();
   }, [filters]);

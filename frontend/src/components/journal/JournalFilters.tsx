@@ -3,6 +3,7 @@ import { Button, Select } from "../ui-kit";
 import { useContext, useEffect, useState } from "react";
 import { Group, Person, Student, Subject } from "../../types";
 import {
+  AuthServise,
   GroupService,
   PersonService,
   StudentService,
@@ -17,9 +18,15 @@ const groupService = new GroupService();
 const personService = new PersonService();
 const subjectService = new SubjectService();
 const studentService = new StudentService();
+const authService = new AuthServise();
 
 type JournalFiltersProps = {
-  filters: { group?: Group; person?: Person; subject?: Subject };
+  filters: {
+    group?: Group;
+    person?: Person;
+    subject?: Subject;
+    studentId?: string;
+  };
   setFilters: Function;
 };
 
@@ -43,6 +50,8 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
   const updateOptions = async () => {
     if (roles.includes("Student")) {
       const subjects = await subjectService.getSubjectsBySession();
+      const student = await authService.session();
+      setFilters({ studentId: student.id });
       return setSelectOptions({ subjects: subjects });
     } else {
       const groups = await groupService.get();
@@ -58,7 +67,7 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
         groups,
         persons: truePersons,
         students,
-        subjects
+        subjects,
       });
     }
   };
