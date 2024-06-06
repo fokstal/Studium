@@ -7,7 +7,17 @@ import {
   StudentService,
 } from "../../services";
 import { Avatar, colors, Input } from "../../components/ui-kit";
-import { Box, Flex, HStack, Link, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  HStack,
+  Popover,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { getAvatarPath } from "../../lib/";
 import {
   AiFillCheckCircle,
@@ -16,6 +26,7 @@ import {
 } from "react-icons/ai";
 import { LanguageContext, Translator } from "../../store";
 import { useRoles } from "../../hooks";
+import { Image } from "primereact/image";
 
 const studentService = new StudentService();
 const personService = new PersonService();
@@ -60,20 +71,9 @@ export function StudentComponent({ id }: StudentComponentProps) {
       personData.id || 0
     );
     setPassport(scan || "");
+    console.log(scan);
   };
 
-  const handleDownloadFile = () => {
-    if (passport) {
-      const fileUrl = URL.createObjectURL(passport);
-      const link = document.createElement('a');
-      link.href = fileUrl;
-      link.setAttribute('download', "image");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(fileUrl);
-    }
-  };
   useEffect(() => {
     updateStudent();
   }, []);
@@ -161,9 +161,21 @@ export function StudentComponent({ id }: StudentComponentProps) {
                 </Text>
               </Flex>
               {passport ? (
-                <Box onClick={handleDownloadFile}>
-                  <AiOutlineEye size="24px" />
-                </Box>
+                <Popover>
+                  <PopoverTrigger>
+                    <Box onClick={() => {}}>
+                      <AiOutlineEye size="24px" />
+                    </Box>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <PopoverBody>
+                      <Image 
+                        preview
+                        src={URL.createObjectURL(passport)}
+                      />
+                    </PopoverBody>
+                  </PopoverContent>
+                </Popover>
               ) : null}
             </HStack>
           </Flex>
