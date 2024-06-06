@@ -26,7 +26,7 @@ export async function editGroup(
     ...data,
     curatorId: data.curator.id,
   });
-  if (res.status !== 201) {
+  if (res.status !== 204) {
     return "error_in_data";
   } else {
     return "Created";
