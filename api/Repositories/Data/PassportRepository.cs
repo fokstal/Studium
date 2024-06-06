@@ -1,7 +1,6 @@
 using api.Data;
 using api.Model.DTO;
 using api.Models;
-using api.Services;
 using static api.Repositories.PictureRepository;
 
 namespace api.Repositories.Data
@@ -24,7 +23,7 @@ namespace api.Repositories.Data
                         personEntity.Id.ToString()
                     ).Result,
 
-                PersonEntityId = passportDTO.PersonEntityId,
+                PersonEntityId = personEntity.Id,
             };
         }
 
@@ -41,7 +40,7 @@ namespace api.Repositories.Data
                     personEntity.Id.ToString()
                 );
 
-            passportEntityToUpdate.PersonEntityId = passportDTO.Id;
+            passportEntityToUpdate.PersonEntityId = personEntity.Id;
 
             await _db.SaveChangesAsync();
         }
