@@ -82,7 +82,7 @@ namespace api.Controllers
                     .GetAndDecryptPictureAsync
                         (PictureFolders.Passport, scanFileName, key);
 
-                return File(passportScanFile.OpenReadStream(), passportScanFile.ContentType, "passport-scan");
+                return File(passportScanFile.OpenReadStream(), passportScanFile.ContentType);
             }
             catch (Exception ex)
             {
