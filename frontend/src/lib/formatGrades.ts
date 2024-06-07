@@ -98,7 +98,7 @@ export async function formatGrades(filters: Filter) {
     const persons = await personService.getPersonsBySession();
     const students = persons.map((p: Person) => p.studentEntity);
     const neededStudents = students.filter(
-      (s: Student) => s.groupEntityId === filters.subject?.groupEntityId
+      (s: Student) => s?.groupEntityId === filters.subject?.groupEntityId
     );
 
     const data = await Promise.all(
