@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { Group, Person, Student, Subject } from "../../types";
 import {
   AuthServise,
+  GradeService,
   GroupService,
   PersonService,
   StudentService,
@@ -19,6 +20,7 @@ const personService = new PersonService();
 const subjectService = new SubjectService();
 const studentService = new StudentService();
 const authService = new AuthServise();
+const gradeService = new GradeService();
 
 type JournalFiltersProps = {
   filters: {
@@ -98,6 +100,7 @@ export function JournalFilters({ filters, setFilters }: JournalFiltersProps) {
 
     return selectOptions?.subjects?.filter((s) => s.groupEntityId === group.id);
   };
+
 
   return (
     <Flex gap="20px" align="center">

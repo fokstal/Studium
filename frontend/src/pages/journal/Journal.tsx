@@ -21,6 +21,11 @@ export function Journal() {
   const { lang } = useContext(LanguageContext);
 
   useEffect(() => {
+    if (!filters) {
+      setColumns([]);
+      setData([]);
+      return;
+    }
     const fetchData = async () => {
       const { columns, tableData } = await formatGrades(filters || {});
       setColumns(columns);
