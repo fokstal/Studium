@@ -27,7 +27,7 @@ services:
         target: /app/wwwroot/pictures
       - type: volume
         source: db_volume
-        target: /app/Appdata
+        target: /app/AppData
     networks:
       - app-network
 
