@@ -7,43 +7,52 @@ namespace api.Repositories.Data
 {
     public class GroupRepository(AppDbContext db) : DataRepositoryBase<GroupEntity, GroupDTO>(db)
     {
-        public async Task<bool> CheckExistsAsync(Guid userId) => await _db.Group.FirstOrDefaultAsync(valueDb => valueDb.CuratorId == userId) is not null;
+        public async Task<bool> CheckExistsAsync(Guid userEntityId) 
+            => await _db.Group.FirstOrDefaultAsync(g => g.CuratorId == userEntityId) is not null;
 
         public override async Task<IEnumerable<GroupEntity>> GetListAsync()
         {
-            IEnumerable<GroupEntity> groupList = await _db.Group.Include(groupDb => groupDb.StudentList).Include(groupdDb => groupdDb.SubjectList).ToArrayAsync();
+            IEnumerable<GroupEntity> groupEntityList = await 
+                _db.Group
+                .Include(g => g.StudentEntityList)
+                .Include(g => g.SubjectEntityList)
+                .ToArrayAsync();
 
-            return groupList;
+            return groupEntityList;
         }
 
-        public async Task<GroupEntity?> GetAsync(int? id)
+        public async Task<GroupEntity?> GetAsync(int? groupEntityId)
         {
-            GroupEntity? group = await _db.Group
-                .Include(groupDb => groupDb.StudentList)
-                .Include(groupdDb => groupdDb.SubjectList)
-                .FirstOrDefaultAsync(groupdId => groupdId.Id == id);
+            GroupEntity? groupEntity = await 
+                _db.Group
+                .Include(g => g.StudentEntityList)
+                .Include(g => g.SubjectEntityList)
+                .FirstOrDefaultAsync(g => g.Id == groupEntityId);
 
-            return group;
+            return groupEntity;
         }
 
-        public async Task<GroupEntity?> GetAsync(string name)
+        public async Task<GroupEntity?> GetAsync(string groupEntityName)
         {
-            GroupEntity? group = await _db.Group
-                .Include(groupDb => groupDb.StudentList)
-                .Include(groupdDb => groupdDb.SubjectList)
-                .FirstOrDefaultAsync(groupdId => groupdId.Name.ToLower() == name.ToLower());
+            GroupEntity? groupEntity = await 
+                _db.Group
+                .Include(g => g.StudentEntityList)
+                .Include(g => g.SubjectEntityList)
+                .FirstOrDefaultAsync(g => StringComparer.CurrentCultureIgnoreCase.Compare(g.Name, groupEntityName) == 0);
 
-            return group;
+            return groupEntity;
         }
 
-        public async Task<GroupEntity?> GetAsync(SubjectEntity subject)
+        public async Task<GroupEntity> GetAsync(SubjectEntity subject)
         {
-            GroupEntity? group = await _db.Group
-                .Include(groupDb => groupDb.StudentList)
-                .Include(groupdDb => groupdDb.SubjectList)
-                .FirstOrDefaultAsync(groupdId => groupdId.SubjectList.Contains(subject));
-
-            return group;
+            GroupEntity? groupEntity = await 
+                _db.Group
+                .Include(g => g.StudentEntityList)
+                .Include(g => g.SubjectEntityList)
+                .FirstOrDefaultAsync(g => g.SubjectEntityList.Contains(subject)) 
+                ?? throw new Exception("Subject exists without Group ib Db!");
+                
+            return groupEntity;
         }
 
         public override GroupEntity Create(GroupDTO groupDTO)
@@ -57,12 +66,12 @@ namespace api.Repositories.Data
             };
         }
 
-        public override async Task UpdateAsync(GroupEntity groupToUpdate, GroupDTO groupDTO)
+        public override async Task UpdateAsync(GroupEntity groupEntityToUpdate, GroupDTO groupDTO)
         {
-            groupToUpdate.Name = groupDTO.Name;
-            groupToUpdate.Description = groupDTO.Name;
-            groupToUpdate.CuratorId = groupDTO.CuratorId;
-            groupToUpdate.AuditoryName = groupDTO.AuditoryName;
+            groupEntityToUpdate.Name = groupDTO.Name;
+            groupEntityToUpdate.Description = groupDTO.Name;
+            groupEntityToUpdate.CuratorId = groupDTO.CuratorId;
+            groupEntityToUpdate.AuditoryName = groupDTO.AuditoryName;
 
             await _db.SaveChangesAsync();
         }

@@ -13,6 +13,6 @@ namespace api.Model.DTO
         public string Description { get; set; } = null!;
 
         public Guid TeacherId { get; set; }
-        public int? GroupId { get; set; }
+        public int GroupEntityId { get; set; }
     }
 }

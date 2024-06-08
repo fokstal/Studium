@@ -13,7 +13,7 @@ namespace api.Model.DTO
         public DateTime RemovedDate { get; set; }
 
         [Required]
-        public int PersonId { get; set; }
-        public int? GroupId { get; set; }
+        public int PersonEntityId { get; set; }
+        public int? GroupEntityId { get; set; }
     }
 }

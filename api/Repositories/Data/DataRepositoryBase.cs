@@ -10,7 +10,8 @@ namespace api.Repositories.Data
     {
         protected readonly AppDbContext _db = db;
 
-        public virtual async Task<bool> CheckExistsAsync(int id) => await _db.Set<TValue>().FirstOrDefaultAsync(valueDb => valueDb.Id == id) is not null;
+        public virtual async Task<bool> CheckExistsAsync(int id) 
+            => await _db.Set<TValue>().FirstOrDefaultAsync(valueDb => valueDb.Id == id) is not null;
 
         public virtual async Task<IEnumerable<TValue>> GetListAsync()
         {
@@ -19,7 +20,8 @@ namespace api.Repositories.Data
             return valueList;
         }
 
-        public virtual async Task<TValue?> GetAsync(int id) => await _db.Set<TValue>().FirstOrDefaultAsync(valueDb => valueDb.Id == id);
+        public virtual async Task<TValue?> GetAsync(int passportEntityId) 
+            => await _db.Set<TValue>().FirstOrDefaultAsync(valueDb => valueDb.Id == passportEntityId);
 
         public abstract TValue Create(TValueDTO valueDTO);
 

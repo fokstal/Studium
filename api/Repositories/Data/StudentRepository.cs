@@ -2,6 +2,7 @@ using api.Data;
 using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
+using api.Models.DTO;
 
 namespace api.Repositories.Data
 {
@@ -9,22 +10,25 @@ namespace api.Repositories.Data
     {
         public override Task<bool> CheckExistsAsync(int id) => throw new NotImplementedException();
 
-        public async Task<bool> CheckExistsAsync(Guid id) => await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id) is not null;
+        public async Task<bool> CheckExistsAsync(Guid id) 
+            => await _db.Student.FirstOrDefaultAsync(s => s.Id == id) is not null;
 
         public override Task<StudentEntity?> GetAsync(int id) => throw new NotImplementedException();
 
-        public async Task<StudentEntity?> GetAsync(Guid id)
+        public async Task<StudentEntity?> GetAsync(Guid studentEntityId)
         {
-            StudentEntity? student = await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.Id == id);
+            StudentEntity? studentEntity = await _db.Student.FirstOrDefaultAsync(s => s.Id == studentEntityId);
 
-            return student;
+            return studentEntity;
         }
 
-        public async Task<StudentEntity?> GetAsync(int personId, int? groupId)
+        public async Task<StudentEntity?> GetAsync(int personEntityId, int? groupEntityId)
         {
-            StudentEntity? student = await _db.Student.FirstOrDefaultAsync(studentDb => studentDb.PersonId == personId && studentDb.GroupId == groupId);
+            StudentEntity? studentEntity = await 
+                _db.Student
+                .FirstOrDefaultAsync(s => s.PersonEntityId == personEntityId && s.GroupEntityId == groupEntityId);
 
-            return student;
+            return studentEntity;
         }
         
         public override StudentEntity Create(StudentDTO studentDTO)
@@ -32,20 +36,27 @@ namespace api.Repositories.Data
             return new()
             {
                 Id = studentDTO.Id,
-                AddedDate = studentDTO.AddedDate,
-                RemovedDate = studentDTO.RemovedDate,
-                PersonId = studentDTO.PersonId,
-                GroupId = studentDTO.GroupId,
+                AddedDate = studentDTO.AddedDate.Date,
+                RemovedDate = studentDTO.RemovedDate.Date,
+                PersonEntityId = studentDTO.PersonEntityId,
+                GroupEntityId = studentDTO.GroupEntityId,
             };
         }
 
-        public async override Task UpdateAsync(StudentEntity studentToUpdate, StudentDTO studentDTO)
+        public async override Task UpdateAsync(StudentEntity studentEntityToUpdate, StudentDTO studentDTO)
         {
-            studentToUpdate.Id = studentDTO.Id;
-            studentToUpdate.AddedDate = studentDTO.AddedDate;
-            studentToUpdate.RemovedDate = studentDTO.RemovedDate;
-            studentToUpdate.PersonId = studentDTO.PersonId;
-            studentToUpdate.GroupId = studentDTO.GroupId;
+            studentEntityToUpdate.AddedDate = studentDTO.AddedDate.Date;
+            studentEntityToUpdate.RemovedDate = studentDTO.RemovedDate.Date;
+            studentEntityToUpdate.PersonEntityId = studentDTO.PersonEntityId;
+            studentEntityToUpdate.GroupEntityId = studentDTO.GroupEntityId;
+
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(StudentEntity studentEntityToUpdate, DateStudentDTO dateStudentDTO)
+        {
+            studentEntityToUpdate.AddedDate = dateStudentDTO.AddedDate;
+            studentEntityToUpdate.RemovedDate = dateStudentDTO.RemovedDate;
 
             await _db.SaveChangesAsync();
         }

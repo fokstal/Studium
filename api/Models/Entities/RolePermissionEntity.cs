@@ -2,7 +2,7 @@ namespace api.Models
 {
     public class RolePermissionEntity
     {
-        public int RoleId { get; set;}
-        public int PermissionId { get; set;}
+        public int RoleEntityId { get; set;}
+        public int PermissionEntityId { get; set;}
     }
 }

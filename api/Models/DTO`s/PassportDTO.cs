@@ -7,9 +7,9 @@ namespace api.Model.DTO
         public int Id { get; set; }
         
         [Required]
-        public IFormFile Scan { get; set; } = null!;
+        public IFormFile ScanFile { get; set; } = null!;
         
         [Required]
-        public int PersonId { get; set; }
+        public int PersonEntityId { get; set; }
     }
 }

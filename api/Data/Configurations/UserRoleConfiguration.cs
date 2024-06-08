@@ -10,12 +10,12 @@ namespace api.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<UserRoleEntity> builder)
         {
-            builder.HasKey(userRole => new { userRole.UserId, userRole.RoleId });
+            builder.HasKey(userRole => new { userRole.UserEntityId, userRole.RoleEntityId });
 
             IEnumerable<UserRoleEntity> userRoleList = Enum.GetValues<RoleEnum>().Select(roleEnum => new UserRoleEntity
             {
-                UserId = StringHasher.GenerateGuid(Convert.ToInt32(roleEnum).ToString()),
-                RoleId = Convert.ToInt32(roleEnum),
+                UserEntityId = StringHasher.GenerateGuid(Convert.ToInt32(roleEnum).ToString()),
+                RoleEntityId = Convert.ToInt32(roleEnum),
             });
 
             builder.HasData(userRoleList);

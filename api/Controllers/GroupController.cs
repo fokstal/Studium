@@ -4,43 +4,44 @@ using api.Model.DTO;
 using api.Repositories.Data;
 using Microsoft.AspNetCore.Mvc;
 using api.Extensions;
+using api.Services;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
-using api.Services;
 
 namespace api.Controllers
 {
     [Route("group")]
     [ApiController]
     [RequireRoles([Admin, Secretar, Curator, Teacher, Student])]
-    public class GroupEntityController(AppDbContext db) : ControllerBase
+    public class GroupController(AppDbContext db) : ControllerBase
     {
         private readonly GroupRepository _groupRepository = new(db);
         private readonly UserRepository _userRepository = new(db);
 
 
-        [HttpGet]
+        [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGroup])]
-        public async Task<ActionResult<IEnumerable<GroupEntity>>> GetListAsync() => Ok(await _groupRepository.GetListAsync());
+        public async Task<ActionResult<IEnumerable<GroupEntity>>> GetListAsync() 
+            => Ok(await _groupRepository.GetListAsync());
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{groupId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([ViewGroup])]
-        public async Task<ActionResult<GroupEntity>> GetAsync(int id)
+        public async Task<ActionResult<GroupEntity>> GetAsync(int groupId)
         {
-            if (id < 1) return BadRequest();
+            if (groupId < 1) return BadRequest();
 
-            GroupEntity? group = await _groupRepository.GetAsync(id);
+            GroupEntity? groupEntity = await _groupRepository.GetAsync(groupId);
 
-            if (group is null) return NotFound();
+            if (groupEntity is null) return NotFound();
 
-            return Ok(group);
+            return Ok(groupEntity);
         }
 
         [HttpPost]
@@ -50,72 +51,72 @@ namespace api.Controllers
         [RequirePermissions([EditGroup])]
         public async Task<ActionResult<GroupDTO>> CreateAsync([FromBody] GroupDTO groupDTO)
         {
-            if (await _groupRepository.GetAsync(groupDTO.Name) is not null)
+            if (await _groupRepository.GetAsync(groupEntityName: groupDTO.Name) is not null)
             {
                 ModelState.AddModelError("Custom Error", "GroupEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            UserEntity? user = await _userRepository.GetNoTrackingAsync(groupDTO.CuratorId);
+            UserEntity? userEntity = await _userRepository.GetNoTrackingAsync(userEntityId: groupDTO.CuratorId);
 
-            if (user is null) return NotFound("Curator is null");
-            if (!UserService.CheckRoleContains(_userRepository, user, Curator)) return BadRequest("User is not a Curator!");
-            if (await _groupRepository.CheckExistsAsync(user.Id)) return BadRequest("Curator already have the Group!");
+            if (userEntity is null) return NotFound("Curator is null");
+            if (!UserService.CheckRoleContains(_userRepository, userEntity, Curator)) return BadRequest("User is not a Curator!");
+            if (await _groupRepository.CheckExistsAsync(userEntityId: userEntity.Id)) return BadRequest("Curator already have the Group!");
 
             await _groupRepository.AddAsync(_groupRepository.Create(groupDTO));
 
             return Created("GroupEntity", groupDTO);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{groupId:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditGroup])]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] GroupDTO groupDTO)
+        public async Task<IActionResult> UpdateAsync(int groupId, [FromBody] GroupDTO groupDTO)
         {
-            if (id < 1) return BadRequest();
+            if (groupId < 1) return BadRequest();
 
-            GroupEntity? groupToUpdate = await _groupRepository.GetAsync(id);
-            GroupEntity? groupAnother = await _groupRepository.GetAsync(groupDTO.Name);
+            GroupEntity? groupEntiyToUpdate = await _groupRepository.GetAsync(groupEntityId: groupId);
+            GroupEntity? groupEntityAnother = await _groupRepository.GetAsync(groupEntityName: groupDTO.Name);
 
-            if (groupToUpdate is null) return NotFound();
+            if (groupEntiyToUpdate is null) return NotFound();
 
-            if (groupAnother is not null && groupAnother.Id != groupToUpdate.Id)
+            if (groupEntityAnother is not null && groupEntityAnother.Id != groupEntiyToUpdate.Id)
             {
                 ModelState.AddModelError("Custom Error", "GroupEntity already Exists!");
 
                 return BadRequest(ModelState);
             }
 
-            UserEntity? user = await _userRepository.GetNoTrackingAsync(groupDTO.CuratorId);
+            UserEntity? userEntity = await _userRepository.GetNoTrackingAsync(userEntityId: groupDTO.CuratorId);
 
-            if (user is null) return NotFound("Curator is null");
-            if (!UserService.CheckRoleContains(_userRepository, user, Curator)) return BadRequest("User is not a Curator!");
-            if (await _groupRepository.CheckExistsAsync(user.Id) && user.Id != groupToUpdate.CuratorId) return BadRequest("Curator already have the Group!");
+            if (userEntity is null) return NotFound("Curator is null");
+            if (!UserService.CheckRoleContains(_userRepository, userEntity, Curator)) return BadRequest("User is not a Curator!");
+            if (await _groupRepository.CheckExistsAsync(userEntityId: userEntity.Id) && userEntity.Id != groupEntiyToUpdate.CuratorId) return BadRequest("Curator already have the Group!");
 
-            await _groupRepository.UpdateAsync(groupToUpdate, groupDTO);
+            await _groupRepository.UpdateAsync(groupEntiyToUpdate, groupDTO);
 
             return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{groupId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [RequirePermissions([EditGroup])]
-        public async Task<IActionResult> DeleteAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int groupId)
         {
-            if (id < 1) return BadRequest();
+            if (groupId < 1) return BadRequest();
 
-            GroupEntity? groupToRemove = await _groupRepository.GetAsync(id);
+            GroupEntity? groupEntityToRemove = await _groupRepository.GetAsync(groupEntityId: groupId);
 
-            if (groupToRemove is null) return NotFound();
+            if (groupEntityToRemove is null) return NotFound();
 
-            await _groupRepository.RemoveAsync(groupToRemove);
+            await _groupRepository.RemoveAsync(groupEntityToRemove);
 
             return NoContent();
         }

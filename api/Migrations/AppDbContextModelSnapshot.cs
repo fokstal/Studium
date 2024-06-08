@@ -17,6 +17,28 @@ namespace api.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.5");
 
+            modelBuilder.Entity("api.Models.Entities.GradeEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("GradeModelEntityId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("StudentEntityId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GradeModelEntityId");
+
+                    b.ToTable("Grade");
+                });
+
             modelBuilder.Entity("api.Models.Entities.GradeTypeEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -29,7 +51,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GradeTypeEntity");
+                    b.ToTable("GradeType");
 
                     b.HasData(
                         new
@@ -49,53 +71,28 @@ namespace api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("api.Models.Entities.StudentToValueEntity", b =>
+            modelBuilder.Entity("api.Models.GradeModelEntity", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("GradesEntityId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("StudentId")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("Value")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GradesEntityId");
-
-                    b.ToTable("StudentToValueEntity");
-                });
-
-            modelBuilder.Entity("api.Models.GradesEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("SetDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("SubjectEntityId")
+                    b.Property<int>("SubjectEntityId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SubjectId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TypeId")
+                    b.Property<int>("TypeEntityId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SubjectEntityId");
 
-                    b.HasIndex("TypeId");
+                    b.HasIndex("TypeEntityId");
 
-                    b.ToTable("Grades");
+                    b.ToTable("GradeModel");
                 });
 
             modelBuilder.Entity("api.Models.GroupEntity", b =>
@@ -130,7 +127,7 @@ namespace api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("PersonId")
+                    b.Property<int>("PersonEntityId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ScanFileName")
@@ -138,6 +135,9 @@ namespace api.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PersonEntityId")
+                        .IsUnique();
 
                     b.ToTable("Passport");
                 });
@@ -284,20 +284,10 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("PassportId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("Sex")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid?>("StudentId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("PassportId");
-
-                    b.HasIndex("StudentId");
 
                     b.ToTable("Person");
                 });
@@ -346,303 +336,303 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.RolePermissionEntity", b =>
                 {
-                    b.Property<int>("RoleId")
+                    b.Property<int>("RoleEntityId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("PermissionId")
+                    b.Property<int>("PermissionEntityId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("RoleId", "PermissionId");
+                    b.HasKey("RoleEntityId", "PermissionEntityId");
 
-                    b.HasIndex("PermissionId");
+                    b.HasIndex("PermissionEntityId");
 
                     b.ToTable("RolePermissionEntity");
 
                     b.HasData(
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 1
+                            RoleEntityId = 1,
+                            PermissionEntityId = 1
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 2
+                            RoleEntityId = 1,
+                            PermissionEntityId = 2
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 3
+                            RoleEntityId = 1,
+                            PermissionEntityId = 3
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 4
+                            RoleEntityId = 1,
+                            PermissionEntityId = 4
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 5
+                            RoleEntityId = 1,
+                            PermissionEntityId = 5
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 6
+                            RoleEntityId = 1,
+                            PermissionEntityId = 6
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 7
+                            RoleEntityId = 1,
+                            PermissionEntityId = 7
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 8
+                            RoleEntityId = 1,
+                            PermissionEntityId = 8
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 9
+                            RoleEntityId = 1,
+                            PermissionEntityId = 9
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 10
+                            RoleEntityId = 1,
+                            PermissionEntityId = 10
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 11
+                            RoleEntityId = 1,
+                            PermissionEntityId = 11
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 12
+                            RoleEntityId = 1,
+                            PermissionEntityId = 12
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 13
+                            RoleEntityId = 1,
+                            PermissionEntityId = 13
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 14
+                            RoleEntityId = 1,
+                            PermissionEntityId = 14
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 15
+                            RoleEntityId = 1,
+                            PermissionEntityId = 15
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 16
+                            RoleEntityId = 1,
+                            PermissionEntityId = 16
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 17
+                            RoleEntityId = 1,
+                            PermissionEntityId = 17
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 18
+                            RoleEntityId = 1,
+                            PermissionEntityId = 18
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 19
+                            RoleEntityId = 1,
+                            PermissionEntityId = 19
                         },
                         new
                         {
-                            RoleId = 1,
-                            PermissionId = 20
+                            RoleEntityId = 1,
+                            PermissionEntityId = 20
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 1
+                            RoleEntityId = 2,
+                            PermissionEntityId = 1
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 2
+                            RoleEntityId = 2,
+                            PermissionEntityId = 2
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 3
+                            RoleEntityId = 2,
+                            PermissionEntityId = 3
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 4
+                            RoleEntityId = 2,
+                            PermissionEntityId = 4
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 5
+                            RoleEntityId = 2,
+                            PermissionEntityId = 5
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 6
+                            RoleEntityId = 2,
+                            PermissionEntityId = 6
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 7
+                            RoleEntityId = 2,
+                            PermissionEntityId = 7
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 8
+                            RoleEntityId = 2,
+                            PermissionEntityId = 8
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 9
+                            RoleEntityId = 2,
+                            PermissionEntityId = 9
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 10
+                            RoleEntityId = 2,
+                            PermissionEntityId = 10
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 11
+                            RoleEntityId = 2,
+                            PermissionEntityId = 11
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 12
+                            RoleEntityId = 2,
+                            PermissionEntityId = 12
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 13
+                            RoleEntityId = 2,
+                            PermissionEntityId = 13
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 14
+                            RoleEntityId = 2,
+                            PermissionEntityId = 14
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 15
+                            RoleEntityId = 2,
+                            PermissionEntityId = 15
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 16
+                            RoleEntityId = 2,
+                            PermissionEntityId = 16
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 17
+                            RoleEntityId = 2,
+                            PermissionEntityId = 17
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 18
+                            RoleEntityId = 2,
+                            PermissionEntityId = 18
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 19
+                            RoleEntityId = 2,
+                            PermissionEntityId = 19
                         },
                         new
                         {
-                            RoleId = 2,
-                            PermissionId = 20
+                            RoleEntityId = 2,
+                            PermissionEntityId = 20
                         },
                         new
                         {
-                            RoleId = 3,
-                            PermissionId = 2
+                            RoleEntityId = 3,
+                            PermissionEntityId = 2
                         },
                         new
                         {
-                            RoleId = 3,
-                            PermissionId = 4
+                            RoleEntityId = 3,
+                            PermissionEntityId = 4
                         },
                         new
                         {
-                            RoleId = 3,
-                            PermissionId = 10
+                            RoleEntityId = 3,
+                            PermissionEntityId = 10
                         },
                         new
                         {
-                            RoleId = 3,
-                            PermissionId = 13
+                            RoleEntityId = 3,
+                            PermissionEntityId = 13
                         },
                         new
                         {
-                            RoleId = 3,
-                            PermissionId = 16
+                            RoleEntityId = 3,
+                            PermissionEntityId = 16
                         },
                         new
                         {
-                            RoleId = 4,
-                            PermissionId = 2
+                            RoleEntityId = 4,
+                            PermissionEntityId = 2
                         },
                         new
                         {
-                            RoleId = 4,
-                            PermissionId = 3
+                            RoleEntityId = 4,
+                            PermissionEntityId = 3
                         },
                         new
                         {
-                            RoleId = 4,
-                            PermissionId = 4
+                            RoleEntityId = 4,
+                            PermissionEntityId = 4
                         },
                         new
                         {
-                            RoleId = 4,
-                            PermissionId = 10
+                            RoleEntityId = 4,
+                            PermissionEntityId = 10
                         },
                         new
                         {
-                            RoleId = 4,
-                            PermissionId = 13
+                            RoleEntityId = 4,
+                            PermissionEntityId = 13
                         },
                         new
                         {
-                            RoleId = 4,
-                            PermissionId = 16
+                            RoleEntityId = 4,
+                            PermissionEntityId = 16
                         },
                         new
                         {
-                            RoleId = 5,
-                            PermissionId = 2
+                            RoleEntityId = 5,
+                            PermissionEntityId = 2
                         },
                         new
                         {
-                            RoleId = 5,
-                            PermissionId = 4
+                            RoleEntityId = 5,
+                            PermissionEntityId = 4
                         },
                         new
                         {
-                            RoleId = 5,
-                            PermissionId = 7
+                            RoleEntityId = 5,
+                            PermissionEntityId = 7
                         },
                         new
                         {
-                            RoleId = 5,
-                            PermissionId = 10
+                            RoleEntityId = 5,
+                            PermissionEntityId = 10
                         },
                         new
                         {
-                            RoleId = 5,
-                            PermissionId = 13
+                            RoleEntityId = 5,
+                            PermissionEntityId = 13
                         },
                         new
                         {
-                            RoleId = 5,
-                            PermissionId = 16
+                            RoleEntityId = 5,
+                            PermissionEntityId = 16
                         });
                 });
 
@@ -658,10 +648,7 @@ namespace api.Migrations
                     b.Property<int?>("GroupEntityId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("PersonId")
+                    b.Property<int>("PersonEntityId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("RemovedDate")
@@ -670,6 +657,9 @@ namespace api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GroupEntityId");
+
+                    b.HasIndex("PersonEntityId")
+                        .IsUnique();
 
                     b.ToTable("Student");
                 });
@@ -684,10 +674,7 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("GroupEntityId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("GroupId")
+                    b.Property<int>("GroupEntityId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -792,94 +779,92 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.UserRoleEntity", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("UserEntityId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("RoleId")
+                    b.Property<int>("RoleEntityId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("UserId", "RoleId");
+                    b.HasKey("UserEntityId", "RoleEntityId");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("RoleEntityId");
 
                     b.ToTable("UserRoleEntity");
 
                     b.HasData(
                         new
                         {
-                            UserId = new Guid("a34eff4d-f040-23a8-f15d-3f4f01ab62ea"),
-                            RoleId = 1
+                            UserEntityId = new Guid("a34eff4d-f040-23a8-f15d-3f4f01ab62ea"),
+                            RoleEntityId = 1
                         },
                         new
                         {
-                            UserId = new Guid("1144b240-4126-78dd-dd4f-93b6c9190dd4"),
-                            RoleId = 2
+                            UserEntityId = new Guid("1144b240-4126-78dd-dd4f-93b6c9190dd4"),
+                            RoleEntityId = 2
                         },
                         new
                         {
-                            UserId = new Guid("08bfaf3b-2a88-102d-1330-93a1b8433f50"),
-                            RoleId = 3
+                            UserEntityId = new Guid("08bfaf3b-2a88-102d-1330-93a1b8433f50"),
+                            RoleEntityId = 3
                         },
                         new
                         {
-                            UserId = new Guid("b4d821a3-e305-26ef-0495-9847b36d171e"),
-                            RoleId = 4
+                            UserEntityId = new Guid("b4d821a3-e305-26ef-0495-9847b36d171e"),
+                            RoleEntityId = 4
                         },
                         new
                         {
-                            UserId = new Guid("3705df06-8119-37a2-d0ed-11472fae7c94"),
-                            RoleId = 5
+                            UserEntityId = new Guid("3705df06-8119-37a2-d0ed-11472fae7c94"),
+                            RoleEntityId = 5
                         });
                 });
 
-            modelBuilder.Entity("api.Models.Entities.StudentToValueEntity", b =>
+            modelBuilder.Entity("api.Models.Entities.GradeEntity", b =>
                 {
-                    b.HasOne("api.Models.GradesEntity", null)
-                        .WithMany("StudentToValueList")
-                        .HasForeignKey("GradesEntityId");
+                    b.HasOne("api.Models.GradeModelEntity", null)
+                        .WithMany("GradeEntityList")
+                        .HasForeignKey("GradeModelEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("api.Models.GradesEntity", b =>
+            modelBuilder.Entity("api.Models.GradeModelEntity", b =>
                 {
                     b.HasOne("api.Models.SubjectEntity", null)
-                        .WithMany("GradesList")
-                        .HasForeignKey("SubjectEntityId");
-
-                    b.HasOne("api.Models.Entities.GradeTypeEntity", "Type")
-                        .WithMany()
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany("GradeModelEntityList")
+                        .HasForeignKey("SubjectEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Type");
+                    b.HasOne("api.Models.Entities.GradeTypeEntity", "TypeEntity")
+                        .WithMany()
+                        .HasForeignKey("TypeEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TypeEntity");
                 });
 
-            modelBuilder.Entity("api.Models.PersonEntity", b =>
+            modelBuilder.Entity("api.Models.PassportEntity", b =>
                 {
-                    b.HasOne("api.Models.PassportEntity", "Passport")
-                        .WithMany()
-                        .HasForeignKey("PassportId");
-
-                    b.HasOne("api.Models.StudentEntity", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId");
-
-                    b.Navigation("Passport");
-
-                    b.Navigation("Student");
+                    b.HasOne("api.Models.PersonEntity", null)
+                        .WithOne("PassportEntity")
+                        .HasForeignKey("api.Models.PassportEntity", "PersonEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("api.Models.RolePermissionEntity", b =>
                 {
                     b.HasOne("api.Models.PermissionEntity", null)
                         .WithMany()
-                        .HasForeignKey("PermissionId")
+                        .HasForeignKey("PermissionEntityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("api.Models.RoleEntity", null)
                         .WithMany()
-                        .HasForeignKey("RoleId")
+                        .HasForeignKey("RoleEntityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -887,47 +872,62 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.StudentEntity", b =>
                 {
                     b.HasOne("api.Models.GroupEntity", null)
-                        .WithMany("StudentList")
+                        .WithMany("StudentEntityList")
                         .HasForeignKey("GroupEntityId");
+
+                    b.HasOne("api.Models.PersonEntity", null)
+                        .WithOne("StudentEntity")
+                        .HasForeignKey("api.Models.StudentEntity", "PersonEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("api.Models.SubjectEntity", b =>
                 {
                     b.HasOne("api.Models.GroupEntity", null)
-                        .WithMany("SubjectList")
-                        .HasForeignKey("GroupEntityId");
+                        .WithMany("SubjectEntityList")
+                        .HasForeignKey("GroupEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("api.Models.UserRoleEntity", b =>
                 {
                     b.HasOne("api.Models.RoleEntity", null)
                         .WithMany()
-                        .HasForeignKey("RoleId")
+                        .HasForeignKey("RoleEntityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("api.Models.UserEntity", null)
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserEntityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("api.Models.GradesEntity", b =>
+            modelBuilder.Entity("api.Models.GradeModelEntity", b =>
                 {
-                    b.Navigation("StudentToValueList");
+                    b.Navigation("GradeEntityList");
                 });
 
             modelBuilder.Entity("api.Models.GroupEntity", b =>
                 {
-                    b.Navigation("StudentList");
+                    b.Navigation("StudentEntityList");
 
-                    b.Navigation("SubjectList");
+                    b.Navigation("SubjectEntityList");
+                });
+
+            modelBuilder.Entity("api.Models.PersonEntity", b =>
+                {
+                    b.Navigation("PassportEntity");
+
+                    b.Navigation("StudentEntity");
                 });
 
             modelBuilder.Entity("api.Models.SubjectEntity", b =>
                 {
-                    b.Navigation("GradesList");
+                    b.Navigation("GradeModelEntityList");
                 });
 #pragma warning restore 612, 618
         }

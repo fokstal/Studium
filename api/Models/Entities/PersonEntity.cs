@@ -9,7 +9,7 @@ namespace api.Models
         public int Sex { get; set; }
         public string AvatarFileName { get; set; } = null!;
 
-        public PassportEntity? Passport { get; set; }
-        public StudentEntity? Student { get; set; }
+        public PassportEntity? PassportEntity { get; set; }
+        public StudentEntity? StudentEntity { get; set; }
     }
 }

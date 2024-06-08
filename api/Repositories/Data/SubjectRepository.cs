@@ -2,47 +2,279 @@ using api.Data;
 using api.Models;
 using api.Model.DTO;
 using Microsoft.EntityFrameworkCore;
+using api.Models.Entities;
+using api.Models.DTO;
+using api.Helpers.Enums;
 
 namespace api.Repositories.Data
 {
     public class SubjectRepository(AppDbContext db) : DataRepositoryBase<SubjectEntity, SubjectDTO>(db)
     {
-        public async Task<bool> CheckExistsAsync(Guid userId) => await _db.Subject.FirstOrDefaultAsync(valueDb => valueDb.TeacherId == userId) is not null;
+        public async Task<bool> CheckExistsAsync(Guid userId)
+            => await _db.Subject.FirstOrDefaultAsync(s => s.TeacherId == userId) is not null;
 
         public async override Task<IEnumerable<SubjectEntity>> GetListAsync()
         {
-            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Include(subjectDb => subjectDb.GradesList).ToArrayAsync();
+            IEnumerable<SubjectEntity> subjectEntityList = await
+                _db.Subject
+                .Include(s => s.GradeModelEntityList)
+                .ThenInclude(s => s.TypeEntity)
+                .Include(s => s.GradeModelEntityList)
+                .ThenInclude(gm => gm.GradeEntityList)
+                .ToArrayAsync();
 
-            return subjectList;
+            return subjectEntityList;
         }
 
-        public async Task<IEnumerable<SubjectEntity>> GetListByGroupAsync(int id)
+        public async Task<IEnumerable<SubjectEntity>> GetListAsync(int groupEntityId)
         {
-            IEnumerable<SubjectEntity> subjectList = await _db.Subject.Where(subjectDb => subjectDb.GroupId == id).Include(subjectDb => subjectDb.GradesList).ToArrayAsync();
+            IEnumerable<SubjectEntity> subjectEntityList = await
+                _db.Subject
+                .Include(s => s.GradeModelEntityList)
+                .ThenInclude(s => s.TypeEntity)
+                .Include(s => s.GradeModelEntityList)
+                .ThenInclude(gm => gm.GradeEntityList)
+                .Where(s => s.GroupEntityId == groupEntityId)
+                .ToArrayAsync();
 
-            return subjectList;
+            return subjectEntityList;
         }
 
-        public async override Task<SubjectEntity?> GetAsync(int id)
+        public async Task<IEnumerable<SubjectEntity>> GetListByCuratorAsync(Guid curatorId)
         {
-            SubjectEntity? subject = await _db.Subject.Include(subjectDb => subjectDb.GradesList).FirstOrDefaultAsync(subjectDb => subjectDb.Id == id);
+            IEnumerable<SubjectEntity> subjectEntityList = [];
+            GroupEntity? groupEntity = await
+                _db
+                .Group
+                .Include(g => g.SubjectEntityList)
+                .FirstOrDefaultAsync(g => g.CuratorId == curatorId);
 
-            return subject;
+            if (groupEntity is not null)
+            {
+                subjectEntityList = groupEntity.SubjectEntityList;
+            }
+
+            return subjectEntityList;
         }
 
-        public async Task<SubjectEntity?> GetAsync(string name, Guid? teacherId)
+        public async Task<IEnumerable<SubjectEntity>> GetListByTeacherAsync(Guid teacherId)
         {
-            SubjectEntity? subject =
-            await _db.Subject
-                .Include(subjectDb => subjectDb.GradesList)
+            IEnumerable<SubjectEntity> subjectEntityList = await
+                _db.Subject.Where(s => s.TeacherId == teacherId).ToListAsync();
+
+            return subjectEntityList;
+        }
+
+        public async Task<IEnumerable<SubjectEntity>> GetListByStudentAsync(Guid studentId)
+        {
+            IEnumerable<SubjectEntity> subjectEntityList = [];
+            StudentEntity? studentEntity = await _db.Student.FirstOrDefaultAsync(s => s.Id == studentId);
+
+            if (studentEntity is not null)
+            {
+                GroupEntity? groupEntity = await
+                    _db
+                    .Group
+                    .Include(g => g.SubjectEntityList)
+                    .FirstOrDefaultAsync(g => g.Id == studentEntity.GroupEntityId);
+
+                if (groupEntity is not null)
+                {
+                    subjectEntityList = groupEntity.SubjectEntityList;
+                }
+            }
+
+            return subjectEntityList;
+        }
+
+        public async override Task<SubjectEntity?> GetAsync(int subjectEntityId)
+        {
+            SubjectEntity? subjectEntity = await
+                _db.Subject
+                .Include(s => s.GradeModelEntityList)
+                .FirstOrDefaultAsync(s => s.Id == subjectEntityId);
+
+            return subjectEntity;
+        }
+
+        public async Task<SubjectEntity?> GetAsync(string subjectEntityName, Guid? teacherId)
+        {
+            SubjectEntity? subjectEntity = await
+                _db.Subject
+                .Include(s => s.GradeModelEntityList)
                 .FirstOrDefaultAsync
                 (
-                    subjectDb =>
-                        subjectDb.Name.ToLower() == name.ToLower() &&
-                        subjectDb.TeacherId == teacherId
+                    s =>
+                        StringComparer.CurrentCultureIgnoreCase.Compare(s.Name, subjectEntityName) == 0 &&
+                        s.TeacherId == teacherId
                 );
 
-            return subject;
+            return subjectEntity;
+        }
+
+        public async Task<double> GetAverageGradeAsync(StudentEntity studentEntity)
+        {
+            IEnumerable<SubjectEntity> subjectEntityList = await
+                GetListAsync(groupEntityId: Convert.ToInt32(studentEntity.GroupEntityId));
+
+            return CalculateAverageGrade(subjectEntityList, studentEntity.Id);
+        }
+
+        public async Task<List<AverageGradeToSubjectDTO>> GetAverageGradeListAsync
+            (StudentEntity studentEntity, DateTime startCheck, DateTime endCheck)
+        {
+            IEnumerable<SubjectEntity> subjectEntityList = await
+                GetListAsync(groupEntityId: Convert.ToInt32(studentEntity.GroupEntityId));
+
+            return CalculateAverageGradeToSubjectList(subjectEntityList, studentEntity.Id, startCheck, endCheck);
+        }
+
+        public async Task<double> GetAverageGradeAsync
+            (StudentEntity studentEntity, DateTime startCheck, DateTime endCheck)
+        {
+            IEnumerable<SubjectEntity> subjectEntityList = await
+                GetListAsync(groupEntityId: Convert.ToInt32(studentEntity.GroupEntityId));
+
+            return CalculateAverageGrade(subjectEntityList, studentEntity.Id, startCheck, endCheck);
+        }
+
+        public double CalculateAverageGrade(IEnumerable<SubjectEntity> subjectEntityList, Guid studentEntityId)
+        {
+            double averageGrade = 0;
+            double summaryGrades = 0;
+            int countSubject = 0;
+
+            foreach (SubjectEntity subjectEntity in subjectEntityList)
+            {
+                CalculateAverageGradeSubject
+                (
+                    ref summaryGrades,
+                    ref countSubject,
+                    subjectEntity.GradeModelEntityList,
+                    studentEntityId
+                );
+            }
+
+            if (countSubject != 0) averageGrade = summaryGrades / countSubject;
+
+            return averageGrade;
+        }
+
+        public List<AverageGradeToSubjectDTO> CalculateAverageGradeToSubjectList
+            (IEnumerable<SubjectEntity> subjectEntityList, Guid studentEntityId,
+            DateTime startCheck, DateTime endCheck)
+        {
+            List<AverageGradeToSubjectDTO> averageGradeToSubjectList = new();
+
+            foreach (SubjectEntity subjectEntity in subjectEntityList)
+            {
+                List<GradeModelEntity> gradeModelListInInterval =
+                    subjectEntity
+                    .GradeModelEntityList
+                    .Where(gm => gm.SetDate > startCheck && gm.SetDate < endCheck)
+                    .ToList();
+
+                double summaryGrades = 0;
+                int countGradeModel = 0;
+
+                CalculateAverageGradeSubject
+                (
+                    ref summaryGrades,
+                    ref countGradeModel,
+                    gradeModelListInInterval,
+                    studentEntityId
+                );
+
+                if (countGradeModel != 0)
+                {
+                    averageGradeToSubjectList.Add(new()
+                    {
+                        SubjectName = subjectEntity.Name,
+                        AverageGrade = summaryGrades / countGradeModel,
+                    });
+                }
+            }
+
+            return averageGradeToSubjectList;
+        }
+
+        public double CalculateAverageGrade
+            (IEnumerable<SubjectEntity> subjectEntityList, Guid studentEntityId,
+            DateTime startCheck, DateTime endCheck)
+        {
+            double averageGrade = 0;
+            double summaryGrades = 0;
+            int countSubject = 0;
+
+            foreach (SubjectEntity subjectEntity in subjectEntityList)
+            {
+                List<GradeModelEntity> gradeModelListInInterval =
+                    subjectEntity
+                    .GradeModelEntityList
+                    .Where(gm => gm.SetDate > startCheck && gm.SetDate < endCheck)
+                    .ToList();
+
+                CalculateAverageGradeSubject
+                (
+                    ref summaryGrades,
+                    ref countSubject,
+                    gradeModelListInInterval,
+                    studentEntityId
+                );
+            }
+
+            if (countSubject != 0) averageGrade = summaryGrades / countSubject;
+
+            return averageGrade;
+        }
+
+        public void CalculateAverageGradeSubject
+            (
+                ref double summaryGradeSubject,
+                ref int countGradeModel,
+                List<GradeModelEntity> gradeModelListInInterval,
+                Guid studentEntityId
+            )
+        {
+            int controlWorkGrade = 0;
+            double summGrade = 0;
+            int countGrade = 0;
+
+            foreach (GradeModelEntity gradeModelEntity in gradeModelListInInterval)
+            {
+                GradeEntity? gradeEntity =
+                    gradeModelEntity.GradeEntityList
+                    .FirstOrDefault(g => g.StudentEntityId == studentEntityId);
+
+                if (gradeEntity is not null)
+                {
+                    if (gradeModelEntity.TypeEntity.Name == GradeTypeEnum.ControlWork.ToString())
+                    {
+                        controlWorkGrade = gradeEntity.Value;
+                    }
+
+                    if (gradeModelEntity.TypeEntity.Name == GradeTypeEnum.Lecture.ToString())
+                    {
+                        summGrade += gradeEntity.Value;
+                    }
+
+                    if (gradeModelEntity.TypeEntity.Name == GradeTypeEnum.Practice.ToString())
+                    {
+                        continue;
+                    }
+
+                    countGrade++;
+                }
+            }
+
+            if (countGrade != 0)
+            {
+                if (controlWorkGrade != 0) summaryGradeSubject += (Math.Round(summGrade / countGrade) + controlWorkGrade) / 2;
+
+                if (controlWorkGrade == 0) summaryGradeSubject += Math.Round(summGrade / countGrade);
+
+                countGradeModel++;
+            }
         }
 
         public override SubjectEntity Create(SubjectDTO subjectDTO)
@@ -52,16 +284,16 @@ namespace api.Repositories.Data
                 Name = subjectDTO.Name,
                 Description = subjectDTO.Description,
                 TeacherId = subjectDTO.TeacherId,
-                GroupId = subjectDTO.GroupId,
+                GroupEntityId = subjectDTO.GroupEntityId,
             };
         }
 
-        public async override Task UpdateAsync(SubjectEntity subjectToUpdate, SubjectDTO subjectDTO)
+        public async override Task UpdateAsync(SubjectEntity subjectEntityToUpdate, SubjectDTO subjectDTO)
         {
-            subjectToUpdate.Name = subjectDTO.Name;
-            subjectToUpdate.Description = subjectDTO.Description;
-            subjectToUpdate.TeacherId = subjectDTO.TeacherId;
-            subjectToUpdate.GroupId = subjectDTO.GroupId;
+            subjectEntityToUpdate.Name = subjectDTO.Name;
+            subjectEntityToUpdate.Description = subjectDTO.Description;
+            subjectEntityToUpdate.TeacherId = subjectDTO.TeacherId;
+            subjectEntityToUpdate.GroupEntityId = subjectDTO.GroupEntityId;
 
             await _db.SaveChangesAsync();
         }

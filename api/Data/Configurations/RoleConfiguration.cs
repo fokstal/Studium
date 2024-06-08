@@ -11,12 +11,12 @@ namespace api.Data.Configurations
         {
             builder.HasKey(role => role.Id);
 
-            builder.HasMany(role => role.PermissionList)
-                .WithMany(permission => permission.RoleList)
+            builder.HasMany(role => role.PermissionEntityList)
+                .WithMany(permission => permission.RoleEntityList)
                 .UsingEntity<RolePermissionEntity>
                 (
-                    r => r.HasOne<PermissionEntity>().WithMany().HasForeignKey(r => r.PermissionId),
-                    l => l.HasOne<RoleEntity>().WithMany().HasForeignKey(l => l.RoleId)
+                    r => r.HasOne<PermissionEntity>().WithMany().HasForeignKey(r => r.PermissionEntityId),
+                    l => l.HasOne<RoleEntity>().WithMany().HasForeignKey(l => l.RoleEntityId)
                 );
 
             IEnumerable<RoleEntity> roleList = Enum.GetValues<RoleEnum>().Select(roleEnum => new RoleEntity

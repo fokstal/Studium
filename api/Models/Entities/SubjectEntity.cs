@@ -6,7 +6,7 @@ namespace api.Models
         public string Description { get; set; } = null!;
         public Guid TeacherId { get; set; }
 
-        public int? GroupId { get; set; }
-        public List<GradesEntity> GradesList { get; set; } = [];
+        public int GroupEntityId { get; set; }
+        public List<GradeModelEntity> GradeModelEntityList { get; set; } = [];
     }
 }

@@ -21,6 +21,6 @@ namespace api.Model.DTO
         [Range(0, 1)]
         public int Sex { get; set; }
 
-        public IFormFile? Avatar { get; set; }
+        public IFormFile? AvatarFile { get; set; }
     }
 }
