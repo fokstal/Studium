@@ -15,7 +15,7 @@
 ## Вход:
 - Администратор:
     login: admin
-    password: admiadmin
+    password: adminadmin
 
 ---
 
@@ -36,6 +36,6 @@
  ## Login:
  - Administrator:
  Login: admin
- Password: admiadmin
+ Password: adminadmin
 
  ---
