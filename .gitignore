@@ -2,5 +2,10 @@
 
 /api/bin
 /api/obj
+/api/AppData/Database.db
 
 Studium.sln
+
+## to help
+tasks.md
+/api/Controllers/GodController.cs

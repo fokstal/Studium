@@ -1,0 +1,7 @@
+export type Group = {
+  id?: number;
+  name: string;
+  description: string;
+  curator: string;
+  auditoryName: string;
+}
