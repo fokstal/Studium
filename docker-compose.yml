@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  client:
+    container_name: client
+    build: 
+      context: ./frontend/
+      dockerfile: dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - api
+    networks:
+      - app-network
+    environment:
+      - REACT_APP_IP=http://localhost:5141
+
+  api:
+    container_name: api
+    build: 
+      context: ./api/
+      dockerfile: dockerfile
+    ports:
+      - 5141:8080
+    volumes:
+      - type: volume
+        source: pictures_volume
+        target: /app/wwwroot/pictures
+      - type: volume
+        source: db_volume
+        target: /app/Appdata
+    networks:
+      - app-network
+
+volumes:
+  pictures_volume:
+  db_volume:
+
+networks:
+  app-network:
+    driver: bridge
