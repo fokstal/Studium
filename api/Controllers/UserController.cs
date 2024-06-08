@@ -11,8 +11,6 @@ using api.Helpers.Enums;
 
 using static api.Helpers.Enums.RoleEnum;
 using static api.Helpers.Enums.PermissionEnum;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace api.Controllers
 {
