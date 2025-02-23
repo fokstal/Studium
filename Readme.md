@@ -14,8 +14,8 @@
 
 ## Вход:
 - Администратор:
-    login: admin
-    password: adminadmin
+    логин: *admin*
+    пароль: *adminadmin*
 
 ---
 
@@ -28,14 +28,14 @@
 
  ## Launch:
  1. Open the root folder of the project in the terminal.
- 2. Launch the project using the `docker-accose up --build` command.
+ 2. Launch the project using the `docker-compose up --build` command.
  3. Wait for installing all packages and dependencies.
  4. Go to the address "http:localhost:3000".
 
 
  ## Login:
  - Administrator:
- Login: admin
- Password: adminadmin
+ login: *admin*
+ password: *adminadmin*
 
  ---
